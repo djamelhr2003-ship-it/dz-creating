@@ -26,10 +26,10 @@
         .logo-area p { margin: 5px 0 0 0; color: #94a3b8; font-size: 12px; }
 
         .header-actions { display: flex; gap: 10px; align-items: center; }
-        .btn-lang, .btn-admin, .btn-cart {
+        .btn-lang, .btn-admin {
             background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; text-decoration: none;
         }
-        .btn-lang:hover, .btn-admin:hover, .btn-cart:hover { background: rgba(255,255,255,0.2); }
+        .btn-lang:hover, .btn-admin:hover { background: rgba(255,255,255,0.2); }
 
         .filter-section { background: white; padding: 15px 20px; border-bottom: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 15px; max-width: 1200px; margin: 0 auto; }
         .search-bar { width: 100%; padding: 12px 20px; border: 2px solid #e2e8f0; border-radius: 30px; font-size: 15px; outline: none; box-sizing: border-box; }
@@ -65,14 +65,29 @@
         .single-media { flex: 1; min-width: 280px; }
         .single-details { flex: 1.5; min-width: 280px; }
 
-        /* أزرار زيادة و نقص الكمية بأسلوب احترافي */
         .qty-selector { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
         .qty-btn { background: #e2e8f0; border: none; width: 35px; height: 35px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; }
         .qty-input { width: 60px; text-align: center; padding: 8px; font-size: 16px; border: 1px solid #cbd5e1; border-radius: 6px; }
 
-        /* نموذج اتمام الطلب COD الجزائري السريع */
         .checkout-box { background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; margin-top: 20px; }
         .no-content { text-align: center; grid-column: 1 / -1; padding: 40px; color: var(--text-muted); }
+
+        /* نافذة رسالة النجاح المنبثقة (Success Modal) */
+        .success-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .success-box {
+            background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 16px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: popUp 0.3s ease-in-out;
+        }
+        @keyframes popUp {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .success-box h2 { color: #16a34a; margin-top: 0; }
+        .success-box p { color: #475569; font-size: 14px; line-height: 1.5; margin-bottom: 25px; }
+        .success-actions { display: flex; gap: 10px; flex-direction: column; }
     </style>
 </head>
 <body>
@@ -100,10 +115,22 @@
         </div>
     </div>
 
-    <!-- صفحة تفاصيل المنتج وإتمام الطلب التلقائي COD -->
     <div class="container" id="single-product-view">
         <button class="btn-sec" onclick="backToHome()" style="margin-bottom: 20px;">⬅️ العودة إلى الصفحة الرئيسية</button>
         <div class="single-layout" id="single-product-content"></div>
+    </div>
+
+    <!-- نافذة نجاح الطلب المنبثقة -->
+    <div class="success-modal" id="successModal">
+        <div class="success-box">
+            <div style="font-size: 50px; margin-bottom: 10px;">🎉</div>
+            <h2>تم إرسال طلبك بنجاح!</h2>
+            <p>شكراً لثقتك بنا. لقد تم تسجيل طلبيتك وسنتصل بك هاتفياً قريباً لتأكيد تفاصيل الإرسال والدفع عند الاستلام 🇩🇿.</p>
+            <div class="success-actions">
+                <button class="btn-main" onclick="shopAgain()" style="padding: 12px; font-size: 15px;">🛍️ التسوق مرة أخرى</button>
+                <button class="btn-sec" onclick="closeStoreWindow()" style="padding: 12px; font-size: 15px; background: #e2e8f0; border: none;">❌ الخروج من المتجر</button>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -126,7 +153,6 @@
         let currentLang = 'ar';
         let selectedCategory = 'all';
 
-        // قاعدة بيانات الولايات والبلديات الجزائرية الدقيقة
         const algeriaData = {
             "الشلف": ["الشلف", "تنس", "بوقادير", "الصلاتنة", "أولاد فارس", "الزبوجة", "الشطية"],
             "الجزائر": ["الجزائر الوسطى", "باب الواد", "سيدي امحمد", "الدار البيضاء", "الرويبة", "بئر مراد رايس", "حيدرة"],
@@ -266,15 +292,10 @@
                 };
 
                 let imgUrl = (prod.imageUrls && prod.imageUrls.length > 0) ? prod.imageUrls[0] : 'https://via.placeholder.com/250';
-                const stockVal = prod.stock !== undefined ? prod.stock : 10;
-                
                 let promoBadgeHtml = prod.isSpecialOffer ? `<div class="promo-badge">عرض خاص 🔥</div>` : '';
-                let priceHtml = `${prod.price} دج`;
-                if(prod.isSpecialOffer && prod.promoPrice) {
-                    priceHtml = `<span class="price">${prod.promoPrice} دج</span> <span class="old-price">${prod.price} دج</span>`;
-                } else {
-                    priceHtml = `<span class="price">${prod.price} دج</span>`;
-                }
+                let priceHtml = prod.isSpecialOffer && prod.promoPrice ? 
+                    `<span class="price">${prod.promoPrice} دج</span> <span class="old-price">${prod.price} دج</span>` : 
+                    `<span class="price">${prod.price} دج</span>`;
 
                 card.innerHTML = `
                     ${promoBadgeHtml}
@@ -304,7 +325,6 @@
                 const stockVal = prod.stock !== undefined ? prod.stock : 10;
                 const activePrice = (prod.isSpecialOffer && prod.promoPrice) ? prod.promoPrice : prod.price;
                 let imgUrl = (prod.imageUrls && prod.imageUrls.length > 0) ? prod.imageUrls[0] : 'https://via.placeholder.com/300';
-
                 let shippingInfo = prod.freeShipping ? "🚚 التوصيل مجاني 🎁" : "🚚 التوصيل متوفر حسب الولاية والمكتب/المنزل";
 
                 let wilayaOptions = `<option value="">-- اختر الولاية --</option>`;
@@ -322,24 +342,22 @@
                         <h3 style="color:var(--danger); font-size:24px;" id="display-unit-price">${activePrice} دج</h3>
                         <p style="color:#16a34a; font-weight:bold;">${shippingInfo}</p>
                         
-                        <!-- عداد الكمية بالأسهم وسعر المجموع الديناميكي -->
                         <div class="qty-selector">
                             <label><b>الكمية المطلوبة:</b></label>
                             <button class="qty-btn" onclick="adjustQty(-1, ${stockVal}, ${activePrice}, ${prod.maxLimit || 99})">-</button>
                             <input type="text" id="order-qty" class="qty-input" value="1" readonly>
                             <button class="qty-btn" onclick="adjustQty(1, ${stockVal}, ${activePrice}, ${prod.maxLimit || 99})">+</button>
                         </div>
-                        <p style="font-size:15px; font-weight:bold;">المجموع الفرعي للمنتجات: <span id="sub-total-price" style="color:var(--danger);">${activePrice}</span> دج</p>
+                        <p style="font-size:15px; font-weight:bold;">المجموع الفرعي: <span id="sub-total-price" style="color:var(--danger);">${activePrice}</span> دج</p>
 
-                        <!-- نموذج الطلب السريع COD الجزائري -->
                         <div class="checkout-box">
-                            <h3>أدخل معلومات التوصيل (الدفع عند الاستلام 🇩🇿)</h3>
+                            <h3>أدخل معلومات التوصيل (الدفع عند الاستلاستلام 🇩🇿)</h3>
                             <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="cust-name" placeholder="الاسم واللقب"></div>
                             <div class="form-group"><label>رقم الهاتف:</label><input type="text" id="cust-phone" placeholder="05 / 06 / 07 ..."></div>
                             
                             <div class="form-group">
                                 <label>الولاية:</label>
-                                <select id="cust-wilaya" onchange="updateCommunes('${activePrice}', ${prod.freeShipping ? 0 : 1})">
+                                <select id="cust-wilaya" onchange="updateCommunes('${activePrice}', ${prod.freeShipping ? true : false})">
                                     ${wilayaOptions}
                                 </select>
                             </div>
@@ -353,21 +371,21 @@
 
                             <div class="form-group">
                                 <label>نوع التوصيل:</label>
-                                <select id="cust-delivery-type" onchange="updateTotalPrice('${activePrice}', ${prod.freeShipping ? 0 : 1})">
+                                <select id="cust-delivery-type" onchange="updateTotalPrice('${activePrice}', ${prod.freeShipping ? true : false})">
                                     <option value="home">توصيل إلى المنزل 🏠 (+600 دج)</option>
                                     <option value="desk">توصيل إلى المكتب 🏢 (+400 دج)</option>
                                 </select>
                             </div>
 
                             <div style="background: #fff; padding: 12px; border-radius: 6px; margin: 15px 0; border: 1px dashed #cbd5e1;">
-                                <h4>المجموع الإجمالي النهائي (مع الشحن): <span id="final-total-price" style="color:var(--danger); font-size:20px;">0</span> دج</h4>
+                                <h4>المجموع الإجمالي النهائي: <span id="final-total-price" style="color:var(--danger); font-size:20px;">0</span> دج</h4>
                             </div>
 
                             <button class="btn-main" style="padding:14px; font-size:16px;" onclick="submitOrder('${prod.name}', ${activePrice}, ${stockVal}, ${prod.maxLimit || 99}, ${prod.freeShipping ? true : false})">إتمام الطلب بنجاح 🚀</button>
                         </div>
                     </div>
                 `;
-                updateTotalPrice(activePrice, prod.freeShipping ? 0 : 1);
+                updateTotalPrice(activePrice, prod.freeShipping ? true : false);
             } catch(e) { container.innerHTML = '<h3>خطأ في التحميل.</h3>'; }
         }
 
@@ -387,8 +405,7 @@
 
             qtyInput.value = current;
             document.getElementById('sub-total-price').innerText = current * unitPrice;
-            
-            const freeShip = document.getElementById('cust-delivery-type') ? 0 : 0; // سيتم تحديثه بدالة التوصيل
+            const freeShip = document.getElementById('cust-delivery-type') ? false : false;
             updateTotalPrice(unitPrice, freeShip);
         }
 
@@ -410,13 +427,8 @@
             const qty = parseInt(document.getElementById('order-qty').value) || 1;
             const deliveryType = document.getElementById('cust-delivery-type').value;
             
-            let shippingCost = 0;
-            if(!isFreeShip) {
-                shippingCost = deliveryType === 'home' ? 600 : 400; // أسعار تقديرية للشحن بالجزائر
-            }
-
-            let subTotal = qty * unitPrice;
-            let finalTotal = subTotal + shippingCost;
+            let shippingCost = isFreeShip ? 0 : (deliveryType === 'home' ? 600 : 400);
+            let finalTotal = (qty * unitPrice) + shippingCost;
             document.getElementById('final-total-price').innerText = finalTotal;
         }
 
@@ -452,11 +464,21 @@
                     createdAt: new Date()
                 });
 
-                alert('🎉 مبروك! تم تسجيل طلبك بنجاح. سيتم الاتصال بك هاتفياً قريباً لتأكيد الإرسال.');
-                window.location.href = window.location.pathname;
+                // إظهار نافذة النجاح المنبثقة بدلاً من رسالة الـ alert العادية
+                document.getElementById('successModal').style.display = 'flex';
             } catch(e) {
                 alert('حدث خطأ أثناء إرسال الطلب.');
             }
+        }
+
+        // أزرار نافذة النجاح
+        window.shopAgain = function() {
+            window.location.href = window.location.pathname;
+        }
+
+        window.closeStoreWindow = function() {
+            document.getElementById('successModal').style.display = 'none';
+            document.body.innerHTML = '<div style="text-align:center; margin-top:100px; font-family:Tahoma;"><h2>شكراً لزيارتك متجرنا! يمكنك إغلاق هذه الصفحة بأمان. 👋</h2></div>';
         }
 
         window.backToHome = function() { window.location.href = window.location.pathname; }
