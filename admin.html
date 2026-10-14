@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المتجر - جودة 1080p</title>
+    <title>إدارة المتجر - جلسة مستمرة</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
@@ -49,7 +49,7 @@
 
         <!-- قسم إضافة المنتجات -->
         <div class="container">
-            <h2>إضافة منتج جديد (صور + فيديو بجودة 1080p) ➕</h2>
+            <h2>إضافة منتج جديد (صور + فيديو 1080p) ➕</h2>
             <div class="form-group">
                 <label>اسم المنتج:</label>
                 <input type="text" id="prod-name" placeholder="مثال: ساعة ذكية Ultra">
@@ -65,7 +65,6 @@
             <div class="form-group">
                 <label>فيديو تعريفي (جودة 1080p - أقل من 30 ثانية):</label>
                 <input type="file" id="prod-video-file" accept="video/mp4,video/quicktime">
-                <small style="color: #666;">يدعم ملفات MP4 بدقة 1080p لتوضيح تفاصيل المنتج.</small>
             </div>
             <div class="form-group">
                 <label>وصف المنتج:</label>
@@ -124,7 +123,14 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        let currentUser = null;
+        // التحقق عند فتح الصفحة إذا كان هناك جلسة مسجلة مسبقاً
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = sessionStorage.getItem('ecom_logged_user');
+            const savedRole = sessionStorage.getItem('ecom_logged_role');
+            if(savedUser && savedRole) {
+                initDashboardDirect(savedUser, savedRole);
+            }
+        });
 
         window.checkLogin = async function() {
             const username = document.getElementById('login-username').value.trim();
@@ -137,8 +143,9 @@
             }
 
             if(username === "admin" && pass === "dzstore2026") {
-                currentUser = { username: "admin", role: "Super Admin" };
-                initDashboard();
+                sessionStorage.setItem('ecom_logged_user', 'admin');
+                sessionStorage.setItem('ecom_logged_role', 'Super Admin');
+                initDashboardDirect('admin', 'Super Admin');
                 return;
             }
 
@@ -147,8 +154,9 @@
                 const userSnap = await getDoc(userDocRef);
 
                 if(userSnap.exists() && userSnap.data().password === pass) {
-                    currentUser = { username: username, role: "فريق العمل (Staff)" };
-                    initDashboard();
+                    sessionStorage.setItem('ecom_logged_user', username);
+                    sessionStorage.setItem('ecom_logged_role', 'فريق العمل (Staff)');
+                    initDashboardDirect(username, 'فريق العمل (Staff)');
                 } else {
                     errorBox.innerText = "اسم المستخدم أو كلمة المرور غير صحيحة!";
                 }
@@ -157,12 +165,12 @@
             }
         }
 
-        function initDashboard() {
+        function initDashboardDirect(username, role) {
             document.getElementById('login-box').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
-            document.getElementById('welcome-role').innerText = `${currentUser.username} (${currentUser.role})`;
+            document.getElementById('welcome-role').innerText = `${username} (${role})`;
 
-            if(currentUser.username === "admin") {
+            if(username === "admin") {
                 document.getElementById('admin-management-section').style.display = 'block';
                 loadStaffList();
             }
@@ -171,7 +179,11 @@
             loadOrders();
         }
 
-        window.logout = function() { location.reload(); }
+        window.logout = function() {
+            sessionStorage.removeItem('ecom_logged_user');
+            sessionStorage.removeItem('ecom_logged_role');
+            location.reload();
+        }
 
         window.addProduct = async function() {
             const name = document.getElementById('prod-name').value;
@@ -201,8 +213,8 @@
                 }
 
                 if(videoFile) {
-                    alert('جاري رفع فيديو 1080p إلى السحابة (قد يستغرق بضع ثوانٍ)...');
-                    const videoRef = ref(storage, 'products/' + Date.now() + '_vid_1080p_' + videoFile.name);
+                    alert('جاري رفع الفيديو التعريفي...');
+                    const videoRef = ref(storage, 'products/' + Date.now() + '_vid_' + videoFile.name);
                     const vidSnapshot = await uploadBytes(videoRef, videoFile);
                     videoUrl = await getDownloadURL(vidSnapshot.ref);
                 }
@@ -216,7 +228,7 @@
                     createdAt: new Date()
                 });
 
-                alert('تمت إضافة المنتج والفيديو بجودة عالية بنجاح! 🚀');
+                alert('تمت إضافة المنتج بنجاح! 🚀');
                 document.getElementById('prod-name').value = '';
                 document.getElementById('prod-price').value = '';
                 document.getElementById('prod-desc').value = '';
