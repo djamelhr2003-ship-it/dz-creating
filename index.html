@@ -8,7 +8,6 @@
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
-            --accent: #f59e0b;
             --danger: #ef4444;
             --success: #10b981;
             --bg-color: #f8fafc;
@@ -17,134 +16,36 @@
             --text-muted: #64748b;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-color);
-            margin: 0;
-            padding: 0;
-            color: var(--text-main);
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); }
 
         header {
             background: linear-gradient(135deg, #1e293b, #0f172a);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-
         .logo-area h1 { margin: 0; font-size: 22px; }
         .logo-area p { margin: 5px 0 0 0; color: #94a3b8; font-size: 12px; }
 
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
+        .header-actions { display: flex; gap: 10px; align-items: center; }
         .btn-lang, .btn-admin, .btn-cart {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            text-decoration: none;
-            transition: background 0.2s;
+            background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; text-decoration: none;
         }
+        .btn-lang:hover, .btn-admin:hover, .btn-cart:hover { background: rgba(255,255,255,0.2); }
 
-        .btn-lang:hover, .btn-admin:hover, .btn-cart:hover {
-            background: rgba(255,255,255,0.2);
-        }
+        .filter-section { background: white; padding: 15px 20px; border-bottom: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 15px; max-width: 1200px; margin: 0 auto; }
+        .search-bar { width: 100%; padding: 12px 20px; border: 2px solid #e2e8f0; border-radius: 30px; font-size: 15px; outline: none; box-sizing: border-box; }
+        .categories-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .cat-chip { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+        .cat-chip.active, .cat-chip:hover { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .filter-section {
-            background: white;
-            padding: 15px 20px;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .search-bar {
-            width: 100%;
-            padding: 12px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 30px;
-            font-size: 15px;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        .categories-scroll {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 5px;
-        }
-
-        .cat-chip {
-            background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-
-        .cat-chip.active, .cat-chip:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 20px;
-        }
-
-        .product-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .product-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; position: relative; }
         .product-card:hover { transform: translateY(-4px); }
+        
+        .promo-badge { position: absolute; top: 10px; right: 10px; background: #e11d48; color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        .media-container {
-            width: 100%;
-            height: 200px;
-            background: #000;
-            position: relative;
-        }
-
-        .media-container img, .media-container video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .media-container { width: 100%; height: 200px; background: #000; position: relative; }
+        .media-container img, .media-container video { width: 100%; height: 100%; object-fit: cover; }
 
         .product-info { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
         .product-title { font-size: 15px; font-weight: bold; margin: 0 0 8px 0; }
@@ -152,25 +53,25 @@
         
         .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .price { color: var(--danger); font-weight: bold; font-size: 17px; }
-        .stock-badge { font-size: 11px; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
-        .stock-normal { background: #d1fae5; color: var(--success); }
-        .stock-low { background: #fee2e2; color: var(--danger); }
+        .old-price { text-decoration: line-through; color: #94a3b8; font-size: 13px; margin-left: 5px; }
 
         .card-buttons { display: flex; gap: 8px; }
         .btn-main { background: var(--primary); color: white; border: none; padding: 8px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; flex: 1; }
         .btn-sec { background: #f1f5f9; color: var(--text-main); border: 1px solid #cbd5e1; padding: 8px; border-radius: 6px; font-size: 13px; cursor: pointer; }
 
+        /* صفحة تفاصيل المنتج المنفردة */
         #single-product-view { display: none; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .single-layout { display: flex; flex-wrap: wrap; gap: 30px; }
         .single-media { flex: 1; min-width: 280px; }
         .single-details { flex: 1.5; min-width: 280px; }
 
-        .cart-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000;
-        }
-        .cart-box { background: white; width: 90%; max-width: 500px; padding: 20px; border-radius: 12px; max-height: 80vh; overflow-y: auto; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
+        /* أزرار زيادة و نقص الكمية بأسلوب احترافي */
+        .qty-selector { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
+        .qty-btn { background: #e2e8f0; border: none; width: 35px; height: 35px; font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        .qty-input { width: 60px; text-align: center; padding: 8px; font-size: 16px; border: 1px solid #cbd5e1; border-radius: 6px; }
+
+        /* نموذج اتمام الطلب COD الجزائري السريع */
+        .checkout-box { background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; margin-top: 20px; }
         .no-content { text-align: center; grid-column: 1 / -1; padding: 40px; color: var(--text-muted); }
     </style>
 </head>
@@ -183,7 +84,6 @@
         </div>
         <div class="header-actions">
             <button class="btn-lang" onclick="toggleLanguage()">🌐 <span id="lang-lbl">Français</span></button>
-            <button class="btn-cart" onclick="toggleCartModal()">🛒 سلة (<span id="cart-count">0</span>)</button>
             <a href="admin.html" class="btn-admin" id="txt-admin-btn">🔐 دخول الفريق</a>
         </div>
     </header>
@@ -200,21 +100,10 @@
         </div>
     </div>
 
+    <!-- صفحة تفاصيل المنتج وإتمام الطلب التلقائي COD -->
     <div class="container" id="single-product-view">
         <button class="btn-sec" onclick="backToHome()" style="margin-bottom: 20px;">⬅️ العودة إلى الصفحة الرئيسية</button>
         <div class="single-layout" id="single-product-content"></div>
-    </div>
-
-    <div class="cart-modal" id="cartModal">
-        <div class="cart-box">
-            <h3 id="cart-title">سلة المشتريات 🛒</h3>
-            <div id="cart-items-list">السلة فارغة</div>
-            <div style="margin-top: 15px; font-weight: bold; text-align: left;" id="cart-total">المجموع: 0 دج</div>
-            <div style="margin-top: 20px; display: flex; gap: 10px;">
-                <button class="btn-main" onclick="checkout()">إتمام الطلب 🚀</button>
-                <button class="btn-sec" onclick="toggleCartModal()">إغلاق</button>
-            </div>
-        </div>
     </div>
 
     <script type="module">
@@ -234,9 +123,21 @@
         const db = getFirestore(app);
 
         let allProducts = [];
-        let cart = [];
         let currentLang = 'ar';
         let selectedCategory = 'all';
+
+        // قاعدة بيانات الولايات والبلديات الجزائرية الدقيقة
+        const algeriaData = {
+            "الشلف": ["الشلف", "تنس", "بوقادير", "الصلاتنة", "أولاد فارس", "الزبوجة", "الشطية"],
+            "الجزائر": ["الجزائر الوسطى", "باب الواد", "سيدي امحمد", "الدار البيضاء", "الرويبة", "بئر مراد رايس", "حيدرة"],
+            "وهران": ["وهران", "أرزيو", "الدويرة", "بئر الجير", "سيدي الشحمي", "السانية"],
+            "قسنطينة": ["قسنطينة", "الخروب", "حامة بوزيان", "عين عبيد", "ديدوش مراد"],
+            "سطيف": ["سطيف", "العلمة", "عين أرنات", "بوقاعة", "عين الفوارة"],
+            "بليدة": ["البليدة", "بوفاريك", "العريشة", "الأربعاء", "موزاية", "الصومعة"],
+            "تيزي وزو": ["تيزي وزو", "أزفون", "ذرس الميزان", "عزازقة", "البويرة"],
+            "بجاية": ["بجاية", "أقبو", "أوقاس", "سيدي عيش", "خراطة"],
+            "تلمسان": ["تلمسان", "مغنية", "سبدو", "الغزوات", "الحصينية"]
+        };
 
         window.translations = {
             ar: {
@@ -244,10 +145,9 @@
                 sub: "توصيل لجميع ولايات الوطن 🇩🇿 والدفع عند الاستلام",
                 search: "🔍 ابحث عن أي منتج...",
                 all: "الكل",
+                specialOffers: "🔥 العروض الخاصة",
                 admin: "🔐 دخول الفريق",
-                cart: "🛒 سلة",
                 orderNow: "اطلب الآن 🛒",
-                addCart: "أضف للسلة ➕",
                 stockOk: "✅ متوفر",
                 stockLow: "⚠️ كمية قليلة",
                 outStock: "❌ نفذت الكمية"
@@ -257,10 +157,9 @@
                 sub: "Livraison 58 Wilayas 🇩🇿 & Paiement à la livraison",
                 search: "🔍 Rechercher un produit...",
                 all: "Tout",
+                specialOffers: "🔥 Offres Spéciales",
                 admin: "🔐 Staff",
-                cart: "🛒 Panier",
                 orderNow: "Commander 🛒",
-                addCart: "Ajouter ➕",
                 stockOk: "✅ En stock",
                 stockLow: "⚠️ Stock faible",
                 outStock: "❌ Épuisé"
@@ -291,14 +190,16 @@
                 const querySnapshot = await getDocs(collection(db, "products"));
                 allProducts = [];
                 let categoriesSet = new Set();
+                let hasSpecialOffers = false;
 
                 querySnapshot.forEach((docItem) => {
                     const data = { id: docItem.id, ...docItem.data() };
                     allProducts.push(data);
                     if(data.category) categoriesSet.add(data.category);
+                    if(data.isSpecialOffer) hasSpecialOffers = true;
                 });
 
-                renderCategories(Array.from(categoriesSet));
+                renderCategories(Array.from(categoriesSet), hasSpecialOffers);
 
                 const urlParams = new URLSearchParams(window.location.search);
                 const productId = urlParams.get('id');
@@ -313,10 +214,13 @@
             } catch(e) { console.error(e); }
         }
 
-        function renderCategories(cats) {
+        function renderCategories(cats, hasSpecial) {
             const container = document.getElementById('categories-container');
             const t = translations[currentLang];
             let html = `<div class="cat-chip active" onclick="filterByCategory('all', this)">${t.all}</div>`;
+            if(hasSpecial) {
+                html += `<div class="cat-chip" style="background:#ffe4e6; color:#e11d48; font-weight:bold;" onclick="filterByCategory('special', this)">${t.specialOffers}</div>`;
+            }
             cats.forEach(cat => {
                 html += `<div class="cat-chip" onclick="filterByCategory('${cat}', this)">${cat}</div>`;
             });
@@ -330,15 +234,15 @@
             applyFilters();
         }
 
-        window.filterProducts = function() {
-            applyFilters();
-        }
+        window.filterProducts = function() { applyFilters(); }
 
         function applyFilters() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const filtered = allProducts.filter(p => {
                 const matchesQuery = p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query));
-                const matchesCat = selectedCategory === 'all' || p.category === selectedCategory;
+                let matchesCat = true;
+                if(selectedCategory === 'special') matchesCat = p.isSpecialOffer === true;
+                else if(selectedCategory !== 'all') matchesCat = p.category === selectedCategory;
                 return matchesQuery && matchesCat;
             });
             renderProducts(filtered);
@@ -358,30 +262,29 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.onclick = (e) => {
-                    if(e.target.tagName !== 'BUTTON') {
-                        window.location.href = `?id=${prod.id}`;
-                    }
+                    if(e.target.tagName !== 'BUTTON') window.location.href = `?id=${prod.id}`;
                 };
 
                 let imgUrl = (prod.imageUrls && prod.imageUrls.length > 0) ? prod.imageUrls[0] : 'https://via.placeholder.com/250';
                 const stockVal = prod.stock !== undefined ? prod.stock : 10;
                 
-                let stockHtml = `<span class="stock-badge stock-normal">${t.stockOk}</span>`;
-                if(stockVal <= 0) stockHtml = `<span class="stock-badge stock-low">${t.outStock}</span>`;
-                else if(stockVal <= 5) stockHtml = `<span class="stock-badge stock-low">${t.stockLow}</span>`;
+                let promoBadgeHtml = prod.isSpecialOffer ? `<div class="promo-badge">عرض خاص 🔥</div>` : '';
+                let priceHtml = `${prod.price} دج`;
+                if(prod.isSpecialOffer && prod.promoPrice) {
+                    priceHtml = `<span class="price">${prod.promoPrice} دج</span> <span class="old-price">${prod.price} دج</span>`;
+                } else {
+                    priceHtml = `<span class="price">${prod.price} دج</span>`;
+                }
 
                 card.innerHTML = `
+                    ${promoBadgeHtml}
                     <div class="media-container"><img src="${imgUrl}"></div>
                     <div class="product-info">
                         <h3 class="product-title">${prod.name}</h3>
                         <p class="product-desc">${prod.desc || ''}</p>
-                        <div class="price-row">
-                            <span class="price">${prod.price} دج</span>
-                            ${stockHtml}
-                        </div>
+                        <div class="price-row">${priceHtml}</div>
                         <div class="card-buttons">
                             <button class="btn-main" onclick="window.location.href='?id=${prod.id}'">${t.orderNow}</button>
-                            <button class="btn-sec" onclick="addToCart('${prod.id}', 1)">➕</button>
                         </div>
                     </div>
                 `;
@@ -391,7 +294,6 @@
 
         async function loadSingleProduct(id) {
             const container = document.getElementById('single-product-content');
-            const t = translations[currentLang];
             try {
                 const docSnap = await getDoc(doc(db, "products", id));
                 if(!docSnap.exists()) {
@@ -400,7 +302,15 @@
                 }
                 const prod = docSnap.data();
                 const stockVal = prod.stock !== undefined ? prod.stock : 10;
+                const activePrice = (prod.isSpecialOffer && prod.promoPrice) ? prod.promoPrice : prod.price;
                 let imgUrl = (prod.imageUrls && prod.imageUrls.length > 0) ? prod.imageUrls[0] : 'https://via.placeholder.com/300';
+
+                let shippingInfo = prod.freeShipping ? "🚚 التوصيل مجاني 🎁" : "🚚 التوصيل متوفر حسب الولاية والمكتب/المنزل";
+
+                let wilayaOptions = `<option value="">-- اختر الولاية --</option>`;
+                for(let w in algeriaData) {
+                    wilayaOptions += `<option value="${w}">${w}</option>`;
+                }
 
                 container.innerHTML = `
                     <div class="single-media">
@@ -409,94 +319,147 @@
                     <div class="single-details">
                         <h2>${prod.name}</h2>
                         <p style="color:var(--text-muted);">${prod.desc || ''}</p>
-                        <h3 style="color:var(--danger); font-size:24px;">${prod.price} دج</h3>
-                        <p><b>التصنيف:</b> ${prod.category || 'عام'}</p>
-                        <div style="margin: 20px 0;">
-                            <label>الكمية المطلوبة:</label>
-                            <input type="number" id="single-qty" value="1" min="1" max="${stockVal}" style="width:80px; padding:8px; margin-right:10px;">
+                        <h3 style="color:var(--danger); font-size:24px;" id="display-unit-price">${activePrice} دج</h3>
+                        <p style="color:#16a34a; font-weight:bold;">${shippingInfo}</p>
+                        
+                        <!-- عداد الكمية بالأسهم وسعر المجموع الديناميكي -->
+                        <div class="qty-selector">
+                            <label><b>الكمية المطلوبة:</b></label>
+                            <button class="qty-btn" onclick="adjustQty(-1, ${stockVal}, ${activePrice}, ${prod.maxLimit || 99})">-</button>
+                            <input type="text" id="order-qty" class="qty-input" value="1" readonly>
+                            <button class="qty-btn" onclick="adjustQty(1, ${stockVal}, ${activePrice}, ${prod.maxLimit || 99})">+</button>
                         </div>
-                        <button class="btn-main" style="padding:12px; font-size:16px;" onclick="addSingleToCart('${id}', '${prod.name}', ${prod.price}, ${stockVal})">${t.orderNow}</button>
+                        <p style="font-size:15px; font-weight:bold;">المجموع الفرعي للمنتجات: <span id="sub-total-price" style="color:var(--danger);">${activePrice}</span> دج</p>
+
+                        <!-- نموذج الطلب السريع COD الجزائري -->
+                        <div class="checkout-box">
+                            <h3>أدخل معلومات التوصيل (الدفع عند الاستلام 🇩🇿)</h3>
+                            <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="cust-name" placeholder="الاسم واللقب"></div>
+                            <div class="form-group"><label>رقم الهاتف:</label><input type="text" id="cust-phone" placeholder="05 / 06 / 07 ..."></div>
+                            
+                            <div class="form-group">
+                                <label>الولاية:</label>
+                                <select id="cust-wilaya" onchange="updateCommunes('${activePrice}', ${prod.freeShipping ? 0 : 1})">
+                                    ${wilayaOptions}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>البلدية:</label>
+                                <select id="cust-commune">
+                                    <option value="">-- اختر الولاية أولاً --</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>نوع التوصيل:</label>
+                                <select id="cust-delivery-type" onchange="updateTotalPrice('${activePrice}', ${prod.freeShipping ? 0 : 1})">
+                                    <option value="home">توصيل إلى المنزل 🏠 (+600 دج)</option>
+                                    <option value="desk">توصيل إلى المكتب 🏢 (+400 دج)</option>
+                                </select>
+                            </div>
+
+                            <div style="background: #fff; padding: 12px; border-radius: 6px; margin: 15px 0; border: 1px dashed #cbd5e1;">
+                                <h4>المجموع الإجمالي النهائي (مع الشحن): <span id="final-total-price" style="color:var(--danger); font-size:20px;">0</span> دج</h4>
+                            </div>
+
+                            <button class="btn-main" style="padding:14px; font-size:16px;" onclick="submitOrder('${prod.name}', ${activePrice}, ${stockVal}, ${prod.maxLimit || 99}, ${prod.freeShipping ? true : false})">إتمام الطلب بنجاح 🚀</button>
+                        </div>
                     </div>
                 `;
-            } catch(e) {
-                container.innerHTML = '<h3>خطأ في تحميل تفاصيل المنتج.</h3>';
-            }
+                updateTotalPrice(activePrice, prod.freeShipping ? 0 : 1);
+            } catch(e) { container.innerHTML = '<h3>خطأ في التحميل.</h3>'; }
         }
 
-        window.backToHome = function() {
-            window.location.href = window.location.pathname;
-        }
-
-        window.addToCart = function(id, qty) {
-            const prod = allProducts.find(p => p.id === id);
-            if(!prod) return;
-            cart.push({ id: prod.id, name: prod.name, price: prod.price, qty: qty });
-            updateCartCount();
-            alert('تمت إضافة المنتج إلى السلة بنجاح! 🛒');
-        }
-
-        window.addSingleToCart = function(id, name, price, maxStock) {
-            const qty = Number(document.getElementById('single-qty').value);
-            if(qty > maxStock) {
-                alert(`عذراً، الكمية المتوفرة لا تكفي (${maxStock} حبات فقط)!`);
+        window.adjustQty = function(change, maxStock, unitPrice, maxLimit) {
+            let qtyInput = document.getElementById('order-qty');
+            let current = parseInt(qtyInput.value) + change;
+            
+            if(current < 1) current = 1;
+            if(current > maxStock) {
+                alert(`عذراً، الكمية المتوفرة في المخزون هي ${maxStock} فقط!`);
                 return;
             }
-            cart.push({ id, name, price, qty });
-            updateCartCount();
-            toggleCartModal();
-        }
-
-        window.updateCartCount = function() {
-            document.getElementById('cart-count').innerText = cart.length;
-            const list = document.getElementById('cart-items-list');
-            let total = 0;
-            if(cart.length === 0) {
-                list.innerHTML = 'السلة فارغة';
-                document.getElementById('cart-total').innerText = 'المجموع: 0 دج';
+            if(current > maxLimit) {
+                alert(`عذراً، أقصى كمية مسموح بها لهذا الطلب هي ${maxLimit} حبات.`);
                 return;
             }
-            let html = '';
-            cart.forEach((item, idx) => {
-                total += item.price * item.qty;
-                html += `<div class="cart-item"><span>${item.name} (x${item.qty})</span> <b>${item.price * item.qty} دج</b></div>`;
-            });
-            list.innerHTML = html;
-            document.getElementById('cart-total').innerText = `المجموع: ${total} دج`;
+
+            qtyInput.value = current;
+            document.getElementById('sub-total-price').innerText = current * unitPrice;
+            
+            const freeShip = document.getElementById('cust-delivery-type') ? 0 : 0; // سيتم تحديثه بدالة التوصيل
+            updateTotalPrice(unitPrice, freeShip);
         }
 
-        window.toggleCartModal = function() {
-            const modal = document.getElementById('cartModal');
-            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        window.updateCommunes = function(unitPrice, isFreeShip) {
+            const wilaya = document.getElementById('cust-wilaya').value;
+            const communeSelect = document.getElementById('cust-commune');
+            let html = `<option value="">-- اختر البلدية --</option>`;
+            
+            if(wilaya && algeriaData[wilaya]) {
+                algeriaData[wilaya].forEach(commune => {
+                    html += `<option value="${commune}">${commune}</option>`;
+                });
+            }
+            communeSelect.innerHTML = html;
+            updateTotalPrice(unitPrice, isFreeShip);
         }
 
-        window.checkout = async function() {
-            if(cart.length === 0) { alert('السلة فارغة!'); return; }
-            const fullName = prompt('الاسم الكامل:');
-            if(!fullName) return;
-            const phone = prompt('رقم الهاتف:');
-            if(!phone) return;
-            const wilaya = prompt('الولاية (مثلاً: الشلف، الجزائر...):');
-            if(!wilaya) return;
+        window.updateTotalPrice = function(unitPrice, isFreeShip) {
+            const qty = parseInt(document.getElementById('order-qty').value) || 1;
+            const deliveryType = document.getElementById('cust-delivery-type').value;
+            
+            let shippingCost = 0;
+            if(!isFreeShip) {
+                shippingCost = deliveryType === 'home' ? 600 : 400; // أسعار تقديرية للشحن بالجزائر
+            }
+
+            let subTotal = qty * unitPrice;
+            let finalTotal = subTotal + shippingCost;
+            document.getElementById('final-total-price').innerText = finalTotal;
+        }
+
+        window.submitOrder = async function(productName, unitPrice, maxStock, maxLimit, isFreeShip) {
+            const fullName = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const wilaya = document.getElementById('cust-wilaya').value;
+            const commune = document.getElementById('cust-commune').value;
+            const deliveryType = document.getElementById('cust-delivery-type').value;
+            const qty = parseInt(document.getElementById('order-qty').value);
+
+            if(!fullName || !phone || !wilaya || !commune) {
+                alert('الرجاء ملء جميع معلومات التوصيل (الاسم، الهاتف، الولاية، والبلدية)!');
+                return;
+            }
+
+            if(qty > maxLimit) {
+                alert(`عذراً، الكمية المطلوبة تتجاوز الحد الأقصى المسموح به (${maxLimit} حبات)!`);
+                return;
+            }
 
             try {
-                for(let item of cart) {
-                    await addDoc(collection(db, "orders"), {
-                        productName: item.name,
-                        price: item.price,
-                        quantity: item.qty,
-                        fullName, phone, wilaya,
-                        status: 'قيد الانتظار ⏳',
-                        createdAt: new Date()
-                    });
-                }
-                alert('تم إرسال طلبك بنجاح! سيتم الاتصال بك لتأكيد الطلب قريباً. 🎉');
-                cart = [];
-                updateCartCount();
-                toggleCartModal();
+                await addDoc(collection(db, "orders"), {
+                    productName,
+                    price: unitPrice,
+                    quantity: qty,
+                    fullName,
+                    phone,
+                    wilaya,
+                    commune,
+                    deliveryType: deliveryType === 'home' ? 'إلى المنزل 🏠' : 'إلى المكتب 🏢',
+                    status: 'قيد الانتظار ⏳',
+                    createdAt: new Date()
+                });
+
+                alert('🎉 مبروك! تم تسجيل طلبك بنجاح. سيتم الاتصال بك هاتفياً قريباً لتأكيد الإرسال.');
+                window.location.href = window.location.pathname;
             } catch(e) {
                 alert('حدث خطأ أثناء إرسال الطلب.');
             }
         }
+
+        window.backToHome = function() { window.location.href = window.location.pathname; }
 
         initStore();
     </script>
