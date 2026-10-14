@@ -1,118 +1,105 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" class="js">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>معاينة قالب علامتي | Aperçu du thème</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Reem+Kufi:wght@600;700&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المتجر الجزائري | تسوق أونلاين</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
 <style>
-
-/* مظهر داكن ذهبي جزائري فوق قالب Dawn */
-:root{--dz-bg:#090d0b;--dz-card:rgba(255,255,255,.045);--dz-tx:#f5f2ea;--dz-mu:#9ba79f;--dz-gd:#d9b65c;--dz-gr:#006233;--dz-rd:#d21034;--dz-bd:rgba(255,255,255,.1)}
-body,.gradient,.color-scheme-1,.color-scheme-2,.color-scheme-3{background:var(--dz-bg)!important;color:var(--dz-tx)!important;font-family:Cairo,Tahoma,Arial,sans-serif!important}
-h1,h2,h3,.h0,.h1,.h2,.h3,.card__heading,.header__heading-link{font-family:"Reem Kufi",Cairo,sans-serif!important;color:var(--dz-tx)}
-
-.header-wrapper,.shopify-section-header-sticky .header-wrapper{background:rgba(9,13,11,.7)!important;backdrop-filter:blur(10px);border-bottom:1px solid var(--dz-bd)}
-.header__menu-item,.header__icon{color:var(--dz-tx)!important}
-.card-wrapper,.card,.card--card,.product-card-wrapper .card{background:var(--dz-card)!important;border:1px solid var(--dz-bd)!important;border-radius:22px!important;overflow:hidden;transition:transform .3s,box-shadow .3s}
-.card-wrapper:hover{transform:translateY(-6px);box-shadow:0 16px 32px rgba(0,0,0,.45),0 0 0 1px rgba(217,182,92,.35)}
-.card__media img{transition:transform .5s}.card-wrapper:hover .card__media img{transform:scale(1.07)}
-.button,.shopify-challenge__button,.customer button{background:linear-gradient(90deg,#d9b65c,#f2d98c)!important;color:#241c06!important;font-weight:800;border-radius:12px!important;border:0!important}
-.button:after,.button:before{display:none!important}
-.field__input,.select__select,.customer .field input{background:rgba(255,255,255,.05)!important;color:var(--dz-tx)!important;border-radius:10px}
-.product-form__input input[type=radio]+label{background:rgba(255,255,255,.05);color:var(--dz-tx);border-color:var(--dz-bd)}
-.product-form__input input[type=radio]:checked+label{background:var(--dz-gd);color:#241c06}
-.footer{background:#050806!important;border-top:1px solid var(--dz-bd)}
-.badge{background:var(--dz-rd)!important;color:#fff!important}
-h2.title:after,.collection-hero__title:after{content:"";display:block;width:90px;height:4px;margin:8px auto 0;border-radius:4px;background:linear-gradient(90deg,var(--dz-gd),transparent)}
-
-/* ===== DZ sections ===== */
-.dz-hero{position:relative;overflow:hidden;color:#fff;text-align:center;padding:96px 16px 60px;background:#090d0b}
-.dz-hero:before{content:"";position:absolute;inset:-25%;background:conic-gradient(from 0deg,#006233,#d9b65c55,#d21034,#006233);filter:blur(100px);opacity:.35;animation:dzspin 26s linear infinite}
-.dz-hero:after{content:"";position:absolute;inset:0;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 4l6 14 14-6-6 14 14 6-14 6 6 14-14-6-6 14-6-14-14 6 6-14-14-6 14-6-6-14 14 6z' fill='none' stroke='white' stroke-width='1.2'/%3E%3C/svg%3E")}
-@keyframes dzspin{to{transform:rotate(1turn)}}@keyframes dzfl{50%{transform:translateY(-14px)}}@keyframes dzup{from{opacity:0;transform:translateY(24px)}}
-@keyframes dzmq{to{transform:translateX(50%)}}@keyframes dzmq2{to{transform:translateX(-50%)}}@keyframes dzpulse{50%{transform:scale(1.08)}}
-.dz-in{position:relative;z-index:2;max-width:700px;margin:auto}
-.dz-tag{display:inline-block;border:1px solid rgba(217,182,92,.5);color:var(--dz-gd);border-radius:99px;padding:3px 16px;font-size:.9rem;margin-bottom:14px;animation:dzup .8s both}
-.dz-hero h1{font-size:clamp(2.4rem,9vw,4.8rem);line-height:1.15;margin:0 0 10px;font-weight:800;background:linear-gradient(180deg,#fff 30%,#d9b65c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:dzup .9s .15s both}
-.dz-hero p{margin:0;opacity:.9;animation:dzup .9s .3s both}
-.dz-doors{position:relative;z-index:2;max-width:780px;margin:36px auto 0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.dz-door{display:block;border-radius:22px;padding:30px 10px;color:#fff!important;text-decoration:none;border:1px solid rgba(255,255,255,.18);box-shadow:0 12px 40px rgba(0,0,0,.4);transition:transform .3s;animation:dzup .9s .45s both}
-.dz-door:hover{transform:translateY(-8px)}.dz-door.w{background:linear-gradient(150deg,rgba(210,16,52,.8),rgba(80,5,25,.9))}.dz-door.m{background:linear-gradient(150deg,rgba(0,98,51,.85),rgba(5,38,24,.9))}
-.dz-door span{display:block;font-size:2.6rem;animation:dzfl 6s ease-in-out infinite}.dz-door b{display:block;font-size:1.4rem}.dz-door small{opacity:.85}
-.dz-mq{overflow:hidden;white-space:nowrap;padding:12px 0;background:#0d1410;border-block:1px solid var(--dz-bd)}
-.dz-mq div{display:inline-block;animation:dzmq 32s linear infinite;color:var(--dz-gd);font-weight:600}html[dir=ltr] .dz-mq div{animation-name:dzmq2}.dz-mq i{font-style:normal;margin:0 22px}
-.dz-sec{max-width:1100px;margin:auto;padding:70px 16px}
-.dz-hd{text-align:center;margin-bottom:34px}.dz-hd small{display:block;color:var(--dz-gd);letter-spacing:.12em;font-weight:600}
-.dz-hd h2{font-size:clamp(1.7rem,5vw,2.6rem);margin:6px 0}.dz-hd p{color:var(--dz-mu);margin:0}
-.dz-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-.dz-card{background:var(--dz-card);border:1px solid var(--dz-bd);border-radius:22px;padding:24px;backdrop-filter:blur(10px);transition:transform .3s,border-color .3s}
-.dz-card:hover{transform:translateY(-6px);border-color:rgba(217,182,92,.45)}
-.dz-ic{font-size:2.2rem;display:block;margin-bottom:6px}.dz-card h3{margin:0 0 4px;font-size:1.15rem}.dz-card p{margin:0;color:var(--dz-mu);font-size:.92rem}
-.dz-rv{transition:all .8s}.js .dz-rv{opacity:0;transform:translateY(34px)}.js .dz-rv.on{opacity:1;transform:none}
-.dz-cmp .dz-card ul{list-style:none;padding:0;margin:14px 0 0}.dz-cmp li{padding:6px 0;border-top:1px solid var(--dz-bd)}.dz-cmp li:before{content:"✦ ";color:var(--dz-gd)}
-.dz-pr{display:inline-block;background:rgba(217,182,92,.15);color:var(--dz-gd);border-radius:99px;padding:2px 12px;font-size:.85rem;margin-bottom:8px}
-.dz-logo{display:grid;gap:28px;grid-template-columns:1fr;align-items:center}@media(min-width:800px){.dz-logo{grid-template-columns:1fr 1fr}}
-.dz-mock{background:radial-gradient(circle at 50% 40%,rgba(217,182,92,.25),transparent 70%);border-radius:30px;padding:20px}.dz-mock svg{width:100%;max-width:340px;display:block;margin:auto;filter:drop-shadow(0 18px 24px rgba(0,0,0,.5))}
-.dz-mock .lg{animation:dzpulse 3s ease-in-out infinite;transform-origin:center;transform-box:fill-box}
-.dz-steps{display:grid;gap:12px;margin:18px 0}.dz-step{display:flex;gap:12px;align-items:center;background:var(--dz-card);border:1px solid var(--dz-bd);border-radius:16px;padding:12px 16px}
-.dz-step b{width:34px;height:34px;border-radius:50%;background:var(--dz-gd);color:#241c06;display:grid;place-items:center;flex:none}
-.dz-btn{display:inline-block;background:linear-gradient(90deg,#d9b65c,#f2d98c);color:#241c06!important;font-weight:800;border-radius:14px;padding:13px 28px;text-decoration:none;box-shadow:0 8px 24px rgba(217,182,92,.3);transition:transform .2s}.dz-btn:hover{transform:translateY(-3px)}
-.dz-st{color:var(--dz-gd);letter-spacing:2px;margin-bottom:6px}.dz-who{margin-top:12px;font-weight:700}.dz-who small{display:block;color:var(--dz-mu);font-weight:400}
-.dz-faq details{background:var(--dz-card);border:1px solid var(--dz-bd);border-radius:16px;margin-bottom:10px;padding:14px 18px}.dz-faq summary{cursor:pointer;font-weight:700;list-style:none}.dz-faq summary:after{content:"+";float:inline-end;color:var(--dz-gd);font-size:1.3rem}.dz-faq details[open] summary:after{content:"–"}.dz-faq p{color:var(--dz-mu);margin:10px 0 0}
-.dz-wa{position:fixed;inset-inline-start:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:50;width:56px;height:56px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 8px 24px rgba(37,211,102,.45);animation:dzpulse 2.6s ease-in-out infinite}
-@media(prefers-reduced-motion:reduce){.dz-hero:before,.dz-mq div,.dz-wa,.dz-mock .lg,.dz-door span{animation:none!important}.js .dz-rv{opacity:1;transform:none}}
-
-html{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);scroll-behavior:smooth}
-*{box-sizing:border-box}body{margin:0;line-height:1.6;overflow-x:hidden}
-.hd{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:flex;align-items:center;justify-content:space-between;padding:10px 16px}
-.hd b{font-family:"Reem Kufi",Cairo,sans-serif;font-size:1.4rem;color:var(--dz-gd)}.hd div{display:flex;gap:12px;align-items:center}
-.hd a{color:var(--dz-tx)!important;text-decoration:none;font-size:.9rem;font-weight:600}
-.lg2{background:rgba(255,255,255,.08);border:1px solid var(--dz-bd);color:var(--dz-tx);border-radius:99px;padding:5px 14px;font:inherit;cursor:pointer}
-.ft{background:#050806;border-top:1px solid var(--dz-bd);text-align:center;padding:34px 16px;color:var(--dz-mu)}.ft b{color:var(--dz-gd)}
-.pc{padding:12px}.pc svg{width:100%;height:150px}.pc .pvv{border-radius:14px;background:radial-gradient(circle at 50% 40%,rgba(217,182,92,.22),transparent 70%)}
-.pc h3{margin:8px 0 2px;font-size:1rem}.pc .pr{color:var(--dz-gd);font-weight:800}.pc .ct{font-size:.75rem;color:#ff8a9c}
-.bar{background:linear-gradient(90deg,var(--dz-gr),#0a8a4a);text-align:center;font-size:.85rem;padding:6px;color:#fff}
-.note{max-width:1100px;margin:0 auto;padding:0 16px 20px;color:var(--dz-mu);font-size:.8rem;text-align:center}
+:root{--bg:#090d0b;--card:rgba(255,255,255,.045);--tx:#f5f2ea;--mu:#9ba79f;--accent:#d9b65c;--border:rgba(255,255,255,.1)}
+body{background:var(--bg);color:var(--tx);font-family:Cairo,sans-serif;margin:0;padding:0}
+header{display:flex;justify-content:space-between;align-items:center;padding:15px 30px;background:rgba(9,13,11,.95);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}
+header h1{margin:0;color:var(--accent);font-size:1.4rem}
+.hero{text-align:center;padding:40px 20px;background:radial-gradient(circle at center,rgba(217,182,92,.08),transparent 70%)}
+.hero h2{font-size:2.2rem;margin:0 0 10px;color:var(--accent)}
+.container{max-width:1200px;margin:auto;padding:20px;box-sizing:border-box}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;backdrop-filter:blur(10px);transition:.3s}
+.card:hover{border-color:var(--accent);transform:translateY(-3px)}
+.card h3{margin:15px 0 8px;font-size:1.2rem}
+.desc{color:var(--mu);font-size:.85rem;margin-bottom:15px;min-height:40px}
+.price{color:var(--accent);font-weight:800;font-size:1.3rem;margin-bottom:15px}
+.btn{background:linear-gradient(90deg,#d9b65c,#f2d98c);color:#111;border:0;padding:12px;font-weight:800;border-radius:10px;cursor:pointer;width:100%;font-family:inherit;transition:.2s}
+.btn:hover{opacity:.9}
+.admin-link{color:var(--mu);text-decoration:none;font-size:.85rem;border:1px solid var(--border);padding:6px 12px;border-radius:8px;transition:.2s}
+.admin-link:hover{color:var(--accent);border-color:var(--accent)}
 </style>
 </head>
 <body>
-<div id="app"></div>
+
+<header>
+  <h1>متجري الرقمي 🇩🇿</h1>
+  <a href="admin.html" class="admin-link">🔐 لوحة التحكم</a>
+</header>
+
+<div class="hero">
+  <h2>أفضل المنتجات بأسعار تنافسية</h2>
+  <p>اطلب الآن والدفع عند الاستلام لجميع ولايات الوطن 🚚</p>
+</div>
+
+<div class="container">
+  <div class="grid" id="storeGrid">
+    <!-- المنتجات تُعرض هنا ديناميكياً -->
+  </div>
+</div>
+
 <script>
-var L=(function(){try{return localStorage.getItem("l")||"ar"}catch(e){return"ar"}})();
-function tee(c){return '<svg viewBox="0 0 200 160"><path d="M70 10 L30 30 L8 70 L36 84 L48 66 L48 150 L152 150 L152 66 L164 84 L192 70 L170 30 L130 10 Q100 32 70 10Z" fill="'+c+'" stroke="rgba(0,0,0,.25)" stroke-width="2"/><circle cx="100" cy="85" r="20" fill="none" stroke="#d9b65c" stroke-width="3"/></svg>'}
-function robe(c){return '<svg viewBox="0 0 200 220"><path d="M80 8Q100 24 120 8L152 24L192 122L166 132L152 98L158 214L42 214L48 98L34 132L8 122L48 24Z" fill="'+c+'" stroke="rgba(0,0,0,.25)" stroke-width="2"/><path d="M100 24V212M52 196H148M52 176H148" stroke="#c9a24b" stroke-width="2" stroke-dasharray="4 4" fill="none"/><circle cx="100" cy="110" r="9" fill="none" stroke="#c9a24b" stroke-width="2"/></svg>'}
-function R(){
- var f=L==="fr",t=function(a,b){return f?b:a};
- document.documentElement.dir=f?"ltr":"rtl";document.documentElement.lang=L;
- var tk=t("طباعة بالحرارة|طرز بالمكينة|الدفع عند الاستلام|تصميم خاص بلوقو|توصيل لـ 69 ولاية","Transfert thermique|Broderie machine|Paiement à la livraison|Logo personnalisé|Livraison 69 wilayas").split("|"),tkh="";
- for(var i=0;i<2;i++)tk.forEach(function(x){tkh+="<i>✦</i>"+x});
- var trust=[["🚚","توصيل لـ 69 ولاية","Livraison 69 wilayas","نوصل طلبك لباب بيتك","Chez vous, partout en Algérie"],["💵","الدفع عند الاستلام","Paiement à la livraison","تدفع بعد استلام طلبك","Vous payez à la réception"],["🧵","طرز بالمكينة بدقة","Broderie machine précise","غرزات متينة وتفاصيل راقية","Points solides, finitions soignées"],["🎨","لوقو بطابعك","Votre propre logo","حرارة أو طرز حسب اختيارك","Thermique ou broderie, au choix"]];
- var prods=[["عباية دبي","Abaya Dubaï","عباءات","Abayas","#1b1b1b",6000,1],["كراكو","Karakou","لباس تقليدي","Traditionnel","#d21034",12000,1],["تريكو أوفرسايز","T-shirt oversize","تريكوات","T-shirts","#f4f1e8",1600,0],["بولو","Polo","تريكوات","T-shirts","#006233",1800,0]];
- var cmp=[["♨️","الطباعة بالحرارة","Transfert thermique","الأنسب سعراً","Meilleur prix","ألوان زاهية ودقيقة|تنفيذ سريع|مناسبة للتصاميم الملونة","Couleurs vives et précises|Réalisation rapide|Idéal pour les designs colorés"],["🧵","الطرز بالمكينة","Broderie machine","أغلى بـ 600 دج","+600 DA","مظهر فاخر وملمس بارز|تدوم لسنوات|الأنسب للشعارات والأسماء","Rendu premium en relief|Résiste des années|Parfait pour logos et noms"]];
- var faq=[["كم مدة التوصيل؟","Quel est le délai de livraison ?","اكتب هنا مدة التوصيل الفعلية حسب الولاية.","Indiquez ici le délai réel selon la wilaya."],["هل الدفع عند الاستلام؟","Le paiement se fait-il à la livraison ?","نعم، تدفع عند استلام طلبك.","Oui, vous payez à la réception de votre commande."],["ما الفرق بين الحرارة والطرز؟","Quelle différence entre thermique et broderie ?","الحرارة أنسب سعراً وبألوان زاهية، والطرز أفخم ويدوم أكثر وسعره أعلى.","Le thermique est économique et coloré ; la broderie est plus premium et durable."],["كيف أضع شعاري على التريكو؟","Comment mettre mon logo ?","اختر منتج اللوقو، وأرسل شعارك واختر الحرارة أو الطرز.","Choisissez le produit logo, envoyez votre logo, puis thermique ou broderie."]];
- var steps=t("ارفع شعارك|حدّد المكان والحجم|اختر حرارة أو طرز وأكّد الطلب","Envoyez votre logo|Choisissez emplacement et taille|Thermique ou broderie, puis validez").split("|");
- function hd(k,h){return '<div class="dz-hd dz-rv"><small>'+k+'</small><h2>'+h+'</h2></div>'}
- var h='<div class="bar">'+t("🇩🇿 صنع في الجزائر · الدفع عند الاستلام","🇩🇿 Made in Algeria · Paiement à la livraison")+'</div>'+
- '<div class="hd"><b>'+t("علامتي","Mon Brand")+'.dz</b><div><a href="#sh">'+t("المتجر","Boutique")+'</a><a href="#lg">'+t("لوقو","Logo")+'</a><button class="lg2" id="lb">'+(f?"العربية":"Français")+'</button><span>🛒</span></div></div>'+
- '<div class="dz-hero"><div class="dz-in"><span class="dz-tag">'+t("🇩🇿 صنع في الجزائر · نوصل لـ 69 ولاية","🇩🇿 Made in Algeria · Livraison 69 wilayas")+'</span><h1>'+t("أزياء مطرّزة ومطبوعة بلمسة جزائرية","Mode brodée et imprimée, signée Algérie")+'</h1><p>'+t("عباءات، لباس تقليدي، وتريكوات بالطباعة الحرارية أو الطرز بالمكينة.","Abayas, tenues traditionnelles et t-shirts en transfert thermique ou broderie machine.")+'</p></div>'+
- '<div class="dz-doors"><a class="dz-door w" href="#sh"><span>👗</span><b>'+t("للنساء","Femmes")+'</b><small>'+t("عباءات · لباس تقليدي · تريكوات","Abayas · Traditionnel · T-shirts")+'</small></a><a class="dz-door m" href="#sh"><span>👕</span><b>'+t("للرجال","Hommes")+'</b><small>'+t("تريكوات · ملابس جاهزة","T-shirts · Prêt-à-porter")+'</small></a></div></div>'+
- '<div class="dz-mq"><div>'+tkh+'</div></div>'+
- '<div class="dz-sec"><div class="dz-grid">'+trust.map(function(x){return '<div class="dz-card dz-rv"><span class="dz-ic">'+x[0]+'</span><h3>'+t(x[1],x[2])+'</h3><p>'+t(x[3],x[4])+'</p></div>'}).join("")+'</div></div>'+
- '<div class="dz-sec" id="sh">'+hd(t("مختارات","Sélection"),t("الأكثر طلباً","Les plus demandés"))+'<div class="dz-grid">'+prods.map(function(p){return '<div class="dz-card pc dz-rv"><div class="pvv">'+(p[6]?robe(p[4]):tee(p[4]))+'</div><span class="ct">'+t(p[2],p[3])+'</span><h3>'+t(p[0],p[1])+'</h3><div class="pr">'+p[5].toLocaleString("fr-DZ")+' '+t("دج","DA")+'</div></div>'}).join("")+'</div></div>'+
- '<div class="dz-sec" id="lg"><div class="dz-logo"><div class="dz-mock dz-rv"><svg viewBox="0 0 200 160"><path d="M70 10 L30 30 L8 70 L36 84 L48 66 L48 150 L152 150 L152 66 L164 84 L192 70 L170 30 L130 10 Q100 32 70 10Z" fill="#f4f1e8" stroke="#cfc8bd" stroke-width="2"/><g class="lg"><circle cx="100" cy="88" r="20" fill="none" stroke="#006233" stroke-width="3"/><path d="M92 88a8 8 0 1 0 8-8 6 6 0 1 1-8 8z" fill="#d21034"/></g></svg></div><div class="dz-rv"><div class="dz-hd" style="text-align:start"><small>'+t("تصميم خاص","Sur mesure")+'</small><h2>'+t("ضع لوقو علامتك على التريكو","Votre logo sur nos t-shirts")+'</h2><p>'+t("للشركات والجمعيات والفرق والمناسبات، بالحرارة أو الطرز.","Pour entreprises, associations, équipes et événements.")+'</p></div><div class="dz-steps">'+steps.map(function(s,i){return '<div class="dz-step"><b>'+(i+1)+'</b><span>'+s+'</span></div>'}).join("")+'</div><a class="dz-btn" href="#lg">'+t("ابدأ تصميمك","Créer mon design")+'</a></div></div></div>'+
- '<div class="dz-sec dz-cmp">'+hd(t("اختر أسلوبك","Choisissez votre style"),t("حرارة أم طرز؟","Thermique ou broderie ?"))+'<div class="dz-grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">'+cmp.map(function(c){return '<div class="dz-card dz-rv"><span class="dz-ic">'+c[0]+'</span><span class="dz-pr">'+t(c[3],c[4])+'</span><h3>'+t(c[1],c[2])+'</h3><ul>'+t(c[5],c[6]).split("|").map(function(x){return"<li>"+x+"</li>"}).join("")+'</ul></div>'}).join("")+'</div></div>'+
- '<div class="dz-sec">'+hd(t("آراء زبائننا","Avis clients"),t("ماذا يقولون عنا","Ils nous font confiance"))+'<div class="dz-grid">'+[1,2,3].map(function(){return '<div class="dz-card dz-rv"><div class="dz-st">★★★★★</div><p>'+t("مثال: استبدل هذا النص برأي زبون حقيقي.","Exemple : remplacez par un vrai avis client.")+'</p><div class="dz-who">'+t("اسم الزبون","Nom du client")+'<small>'+t("الولاية","Wilaya")+'</small></div></div>'}).join("")+'</div></div>'+
- '<div class="dz-sec dz-faq" style="max-width:780px">'+hd("FAQ",t("أسئلة شائعة","Questions fréquentes"))+faq.map(function(q){return '<details class="dz-rv"><summary>'+t(q[0],q[1])+'</summary><p>'+t(q[2],q[3])+'</p></details>'}).join("")+'</div>'+
- '<div class="note">'+t("هذه معاينة لتصميم القالب. الآراء والأجوبة أمثلة، والصور رسومات بديلة.","Aperçu du design du thème. Avis et réponses sont des exemples, images indicatives.")+'</div>'+
- '<div class="ft"><b>'+t("علامتي","Mon Brand")+'</b> · '+t("الجزائر","Algérie")+' 🇩🇿<br>'+t("الدفع عند الاستلام · توصيل لكل الولايات","Paiement à la livraison · Livraison toutes wilayas")+'</div>'+
- '<a class="dz-wa" href="#" aria-label="WhatsApp" style="font-size:1.7rem">💬</a>';
- document.getElementById("app").innerHTML=h;
- document.getElementById("lb").onclick=function(){L=f?"ar":"fr";try{localStorage.setItem("l",L)}catch(e){}R();window.scrollTo(0,0)};
- var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("on");io.unobserve(e.target)}})},{threshold:.1});
- document.querySelectorAll(".dz-rv").forEach(function(e){io.observe(e)});
+// محرك قاعدة البيانات المحلية للمتجر
+const DB = {
+  getProducts: function() {
+    let saved = localStorage.getItem("store_products");
+    if(saved) {
+      return JSON.parse(saved);
+    } else {
+      let defaults = [
+        {id: 1, name: "ساعة ذكية Ultra", price: 4500, desc: "شاشة عالية الدقة، تدعم المكالمات والرياضة."},
+        {id: 2, name: "سماعات بلوتوث لاسلكية", price: 2800, desc: "صوت نقي ستيريو مع بطارية تدوم طويلاً."},
+        {id: 3, name: "حامل هاتف للسيارة ذكي", price: 1600, desc: "ثبات قوي وقابل للتعديل بسهولة."}
+      ];
+      localStorage.setItem("store_products", JSON.stringify(defaults));
+      return defaults;
+    }
+  },
+  saveOrder: function(order) {
+    let orders = JSON.parse(localStorage.getItem("store_orders")) || [];
+    order.id = Date.now();
+    order.date = new Date().toLocaleString('ar-DZ');
+    order.status = "جديد";
+    orders.push(order);
+    localStorage.setItem("store_orders", JSON.stringify(orders));
+  }
+};
+
+function renderStore() {
+  let products = DB.getProducts();
+  let html = "";
+  products.forEach(function(p) {
+    html += `
+      <div class="card">
+        <h3>${p.name}</h3>
+        <p class="desc">${p.desc}</p>
+        <div class="price">${p.price.toLocaleString()} دج</div>
+        <button class="btn" onclick="makeOrder('${p.name}', ${p.price})">اطلب الآن 🛒</button>
+      </div>
+    `;
+  });
+  document.getElementById("storeGrid").innerHTML = html;
 }
-R();
+
+function makeOrder(name, price) {
+  let clientName = prompt(`أدخل اسمك الكامل لطلب "${name}" (${price} دج):`);
+  if(!clientName) return;
+  let phone = prompt("أدخل رقم هاتفك النقال:");
+  if(!phone) return;
+  let wilaya = prompt("أدخل ولايتك (مثلاً: 05 باتنة):");
+  if(!wilaya) return;
+
+  DB.saveOrder({product: name, price: price, client: clientName, phone: phone, wilaya: wilaya});
+  alert(`مرحباً بك يا ${clientName}! تم تسجيل طلبك بنجاح وسنتصل بك قريباً للتأكيد.`);
+}
+
+renderStore();
 </script>
+
 </body>
 </html>
