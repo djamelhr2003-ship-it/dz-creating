@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المتجر - المخزون الدقيق للأعضاء</title>
+    <title>إدارة المتجر - الروابط المباشرة المجانية</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
@@ -64,7 +64,7 @@
 
         <div id="store-tab" class="tab-content active">
             <div class="container">
-                <h2>إضافة منتج جديد والمخزون ➕</h2>
+                <h2>إضافة منتج جديد والمخزون (بالروابط) ➕</h2>
                 <div class="form-group">
                     <label>اسم المنتج:</label>
                     <input type="text" id="prod-name" placeholder="مثال: ساعة ذكية Ultra">
@@ -78,12 +78,12 @@
                     <input type="number" id="prod-stock" placeholder="مثال: 10">
                 </div>
                 <div class="form-group">
-                    <label>صور المنتج (اختر عدة صور):</label>
-                    <input type="file" id="prod-image-files" accept="image/*" multiple>
+                    <label>روابط الصور (افصل بينها بفواصل أو ضع رابطاً واحداً):</label>
+                    <input type="text" id="prod-image-urls" placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg">
                 </div>
                 <div class="form-group">
-                    <label>فيديو تعريفي (جودة 1080p):</label>
-                    <input type="file" id="prod-video-file" accept="video/mp4,video/quicktime">
+                    <label>رابط الفيديو التعريفي (اختياري - يوتيوب أو رابط مباشر):</label>
+                    <input type="text" id="prod-video-url" placeholder="https://www.youtube.com/embed/...">
                 </div>
                 <div class="form-group">
                     <label>وصف المنتج:</label>
@@ -138,7 +138,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDdJY7mI1DON...", 
@@ -151,7 +150,6 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = sessionStorage.getItem('ecom_logged_user');
@@ -245,54 +243,42 @@
         }
 
         window.addProduct = async function() {
-            const name = document.getElementById('prod-name').value;
-            const price = document.getElementById('prod-price').value;
-            const stock = document.getElementById('prod-stock').value;
-            const desc = document.getElementById('prod-desc').value;
-            const imageFiles = document.getElementById('prod-image-files').files;
-            const videoFile = document.getElementById('prod-video-file').files[0];
+            const name = document.getElementById('prod-name').value.trim();
+            const price = document.getElementById('prod-price').value.trim();
+            const stock = document.getElementById('prod-stock').value.trim();
+            const desc = document.getElementById('prod-desc').value.trim();
+            const urlsInput = document.getElementById('prod-image-urls').value.trim();
+            const videoUrl = document.getElementById('prod-video-url').value.trim();
 
             if(!name || !price || !stock) {
                 alert('الرجاء إدخال اسم المنتج، السعر، وكمية المخزون!');
                 return;
             }
 
+            // تحويل الروابط المدخلة إلى مصفوفة (منفصلة بفواصل)
+            let imageUrls = urlsInput ? urlsInput.split(',').map(u => u.trim()).filter(u => u.length > 0) : [];
+
             try {
-                let imageUrls = [];
-                let videoUrl = '';
-
-                if(imageFiles.length > 0) {
-                    alert(`جاري رفع الصور...`);
-                    for (let i = 0; i < imageFiles.length; i++) {
-                        const file = imageFiles[i];
-                        const storageRef = ref(storage, 'products/' + Date.now() + '_img_' + i + '_' + file.name);
-                        const snapshot = await uploadBytes(storageRef, file);
-                        const url = await getDownloadURL(snapshot.ref);
-                        imageUrls.push(url);
-                    }
-                }
-
-                if(videoFile) {
-                    alert('جاري رفع الفيديو...');
-                    const videoRef = ref(storage, 'products/' + Date.now() + '_vid_' + videoFile.name);
-                    const vidSnapshot = await uploadBytes(videoRef, videoFile);
-                    videoUrl = await getDownloadURL(vidSnapshot.ref);
-                }
-
                 await addDoc(collection(db, "products"), {
-                    name, price: Number(price), stock: Number(stock), desc, imageUrls, videoUrl, createdAt: new Date()
+                    name, 
+                    price: Number(price), 
+                    stock: Number(stock), 
+                    desc, 
+                    imageUrls, 
+                    videoUrl, 
+                    createdAt: new Date()
                 });
 
-                alert('تمت إضافة المنتج والمخزون بنجاح! 🚀');
+                alert('تمت إضافة المنتج والمخزون بنجاح إلى المتجر! 🚀');
                 document.getElementById('prod-name').value = '';
                 document.getElementById('prod-price').value = '';
                 document.getElementById('prod-stock').value = '';
                 document.getElementById('prod-desc').value = '';
-                document.getElementById('prod-image-files').value = '';
-                document.getElementById('prod-video-file').value = '';
+                document.getElementById('prod-image-urls').value = '';
+                document.getElementById('prod-video-url').value = '';
                 loadProductsManagement();
             } catch (e) {
-                alert('خطأ أثناء رفع الملفات.');
+                alert('خطأ أثناء نشر المنتج في قاعدة البيانات.');
             }
         }
 
