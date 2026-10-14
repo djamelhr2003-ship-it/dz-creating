@@ -40,7 +40,7 @@ header h1{margin:0;color:var(--accent);font-size:1.4rem}
 .btn{background:linear-gradient(90deg,#d9b65c,#f2d98c);color:#111;border:0;padding:12px;font-weight:800;border-radius:10px;cursor:pointer;width:100%;font-family:inherit;transition:.2s}
 .btn:hover{opacity:.9}
 
-/* السلة المنبثقة (Drawer) */
+/* السلة الجانبية المنبثقة */
 .cart-drawer{position:fixed;top:0;left:-400px;width:380px;height:100%;background:#0e1412;border-left:1px solid var(--border);z-index:1000;transition:.3s;display:flex;flex-direction:column;box-shadow:-5px 0 25px rgba(0,0,0,0.5)}
 .cart-drawer.open{left:0}
 .cart-header{padding:20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
@@ -133,70 +133,77 @@ select.form-control option{background:#131a17;color:#fff}
       <label>الولاية:</label>
       <select id="clientWilaya" class="form-control">
         <option value="">اختر ولايتك...</option>
-        <option value="01 أدرار">01 - أدرار</option>
         <option value="02 الشلف">02 - الشلف</option>
-        <option value="03 الأغواط">03 - الأغواط</option>
-        <option value="04 أم البواقي">04 - أم البواقي</option>
-        <option value="05 باتنة">05 - باتنة</option>
-        <option value="06 بجاية">06 - بجاية</option>
-        <option value="07 بسكرة">07 - بسكرة</option>
-        <option value="08 بشار">08 - بشار</option>
         <option value="09 البليدة">09 - البليدة</option>
-        <option value="10 البويرة">10 - البويرة</option>
         <option value="16 الجزائر">16 - الجزائر العاصمة</option>
         <option value="31 وهران">31 - وهران</option>
         <option value="أخرى">ولاية أخرى (تحديد في العنوان)</option>
       </select>
     </div>
     <div class="form-group">
-      <label>عنوان التوصيل المفصل (البلدية والحي):</label>
-      <input type="text" id="clientAddress" class="form-control" placeholder="العنوان بالتفصيل">
+      <label>عنوان التوصيل المفصل:</label>
+      <input type="text" id="clientAddress" class="form-control" placeholder="البلدية والحي">
     </div>
     <button class="btn" onclick="submitOrder()">تأكيد الطلب نهائياً 📦</button>
   </div>
 </div>
 
-<script>
-const DB = {
-  getProducts: function() {
-    let saved = localStorage.getItem("store_products");
-    if(saved) {
-      return JSON.parse(saved);
-    } else {
-      let defaults = [
-        {id: 1, name: "ساعة ذكية Ultra Series", price: 4500, category: "إلكترونيات", desc: "شاشة عالية الدقة، تدعم المكالمات والرياضة."},
-        {id: 2, name: "سماعات بلوتوث لاسلكية Pro", price: 2800, category: "إلكترونيات", desc: "صوت نقي ستيريو مع بطارية تدوم طويلاً."},
-        {id: 3, name: "حامل هاتف للسيارة ذكي", price: 1600, category: "إكسسوارات", desc: "ثبات قوي وقابل للتعديل بسهولة."},
-        {id: 4, name: "منظم مطبخ ابتكاري", price: 2200, category: "منزل", desc: "توفير مساحة أنيق وعملي للمطبخ."}
-      ];
-      localStorage.setItem("store_products", JSON.stringify(defaults));
-      return defaults;
-    }
-  },
-  saveOrder: function(order) {
-    let orders = JSON.parse(localStorage.getItem("store_orders")) || [];
-    order.id = Date.now();
-    order.date = new Date().toLocaleString('ar-DZ');
-    order.status = "جديد";
-    orders.push(order);
-    localStorage.setItem("store_orders", JSON.stringify(orders));
-  }
-};
+<!-- ربط Firebase SDK عبر CDN -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addFromServer, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyDdJY7mI1DOMKh7zTJs_Ve3d4Xp1YBdMYI",
+    authDomain: "creater-ecom.firebaseapp.com",
+    projectId: "creater-ecom",
+    storageBucket: "creater-ecom.firebasestorage.app",
+    messagingSenderId: "893449950593",
+    appId: "1:893449950593:web:22c5f6f220ea809efb8480",
+    measurementId: "G-MR5XLYXV0Q"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window.db = db;
+  window.loadStoreProducts();
+</script>
+
+<script>
+let productsList = [];
 let cart = JSON.parse(localStorage.getItem("store_cart")) || [];
 let currentCategory = "الكل";
 
-function renderStore(productsToRender) {
-  let products = productsToRender || DB.getProducts();
-  let grid = document.getElementById("storeGrid");
-  
-  if(products.length === 0) {
-    grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;color:var(--mu);padding:40px;">لا توجد منتجات مطابقة للبحث.</p>`;
+async function loadStoreProducts() {
+  if(!window.db) {
+    setTimeout(loadStoreProducts, 500);
     return;
   }
+  try {
+    const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+    const querySnapshot = await getDocs(collection(window.db, "products"));
+    productsList = [];
+    querySnapshot.forEach((doc) => {
+      productsList.push({ id: doc.id, ...doc.data() });
+    });
+    
+    // إذا كانت القاعدة فارغة في البداية، نعرض منتجات افتراضية
+    if(productsList.length === 0) {
+      productsList = [
+        {id: "1", name: "ساعة ذكية Ultra Series", price: 4500, category: "إلكترونيات", desc: "شاشة عالية الدقة، تدعم المكالمات والرياضة."},
+        {id: "2", name: "سماعات بلوتوث لاسلكية Pro", price: 2800, category: "إلكترونيات", desc: "صوت نقي ستيريو مع بطارية تدوم طويلاً."}
+      ];
+    }
+    renderStore(productsList);
+  } catch(e) {
+    console.error("Error loading products: ", e);
+  }
+}
 
+function renderStore(productsToRender) {
+  let grid = document.getElementById("storeGrid");
   let html = "";
-  products.forEach(p => {
+  productsToRender.forEach(p => {
     html += `
       <div class="card">
         <div>
@@ -208,7 +215,7 @@ function renderStore(productsToRender) {
           <div class="price-row">
             <span class="price">${Number(p.price).toLocaleString()} دج</span>
           </div>
-          <button class="btn" onclick="addToCart(${p.id})">أضف للسلة 🛒</button>
+          <button class="btn" onclick="addToCart('${p.id}')">أضف للسلة 🛒</button>
         </div>
       </div>
     `;
@@ -226,20 +233,16 @@ function filterCategory(cat, btn) {
 
 function filterProducts() {
   let query = document.getElementById("searchInput").value.toLowerCase();
-  let products = DB.getProducts();
-  
-  let filtered = products.filter(p => {
+  let filtered = productsList.filter(p => {
     let matchCat = (currentCategory === "الكل" || p.category === currentCategory);
     let matchQuery = p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query));
     return matchCat && matchQuery;
   });
-  
   renderStore(filtered);
 }
 
 function addToCart(productId) {
-  let products = DB.getProducts();
-  let product = products.find(p => p.id === productId);
+  let product = productsList.find(p => p.id === productId);
   if(!product) return;
 
   let existing = cart.find(item => item.id === productId);
@@ -291,9 +294,9 @@ function updateCartUI() {
           <b>${item.name}</b><br>
           <span style="color:var(--accent);">${item.price.toLocaleString()} دج</span>
           <div class="qty-controls">
-            <button class="qty-btn" onclick="changeQty(${item.id}, -1)">-</button>
+            <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
             <span>${item.qty}</span>
-            <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+            <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
           </div>
         </div>
         <div><b>${(item.price * item.qty).toLocaleString()} دج</b></div>
@@ -330,7 +333,7 @@ function closeCheckout() {
   document.getElementById("checkoutModal").style.display = "none";
 }
 
-function submitOrder() {
+async function submitOrder() {
   let name = document.getElementById("clientName").value.trim();
   let phone = document.getElementById("clientPhone").value.trim();
   let wilaya = document.getElementById("clientWilaya").value;
@@ -344,22 +347,28 @@ function submitOrder() {
   let totalAmount = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   let productsSummary = cart.map(i => `${i.name} (×${i.qty})`).join(", ");
 
-  DB.saveOrder({
-    client: name,
-    phone: phone,
-    wilaya: wilaya,
-    address: address,
-    product: productsSummary,
-    price: totalAmount
-  });
+  try {
+    const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+    await addDoc(collection(window.db, "orders"), {
+      client: name,
+      phone: phone,
+      wilaya: wilaya,
+      address: address,
+      product: productsSummary,
+      price: totalAmount,
+      date: new Date().toLocaleString('ar-DZ'),
+      status: "جديد"
+    });
 
-  alert(`مبروك يا ${name}! تم إرسال طلبك بنجاح وسيتصل بك فريقنا للتأكيد قريباً.`);
-  cart = [];
-  saveCart();
-  closeCheckout();
+    alert(`مبروك يا ${name}! تم إرسال طلبك سحابياً بنجاح.`);
+    cart = [];
+    saveCart();
+    closeCheckout();
+  } catch(e) {
+    alert("حدث خطأ أثناء إرسال الطلب، تأكد من الاتصال.");
+    console.error(e);
+  }
 }
-
-renderStore();
 </script>
 
 </body>
