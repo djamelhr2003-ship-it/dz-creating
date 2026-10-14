@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم الاحترافية - إدارة المتجر والأرشيف</title>
+    <title>لوحة التحكم الاحترافية - إدارة المتجر والأنشطة</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 950px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
         h2, h3 { color: #2c3e50; text-align: center; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
@@ -24,16 +24,16 @@
         .error { color: red; font-size: 14px; margin-top: 5px; }
         .success { color: green; font-size: 14px; margin-top: 5px; }
         
-        /* التبويبات */
-        .tabs-nav { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; background: #e2e8f0; padding: 6px; border-radius: 10px; }
-        .tab-btn { flex: 1; padding: 10px; background: transparent; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #475569; min-width: 130px; transition: all 0.2s; font-size: 13px; text-align: center; }
+        /* التبويبات المحدثة */
+        .tabs-nav { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; background: #e2e8f0; padding: 6px; border-radius: 10px; }
+        .tab-btn { flex: 1; padding: 10px 8px; background: transparent; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #475569; min-width: 120px; transition: all 0.2s; font-size: 12px; text-align: center; }
         .tab-btn.active { background: #2c3e50; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .product-row, .order-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px; }
-        .user-row { display: flex; justify-content: space-between; align-items: center; background: #eef2f7; padding: 10px; border-radius: 6px; margin-bottom: 8px; }
-        .low-stock-alert { color: #c0392b; font-weight: bold; background: #fee2e2; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .product-row, .order-row, .staff-activity-card { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px; }
+        .online-badge { background: #d1fae5; color: #065f46; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+        .offline-badge { background: #f1f5f9; color: #64748b; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: linear-gradient(135deg, #2c3e50, #1e293b); color: white; padding: 20px; border-radius: 10px; text-align: center; }
@@ -62,7 +62,7 @@
         <div id="login-error" class="error"></div>
     </div>
 
-    <!-- لوحة التحكم الرئيسية المنظمة -->
+    <!-- لوحة التحكم الرئيسية -->
     <div id="admin-content">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; background: #2c3e50; color: white;">
             <h2 style="margin: 0; color: white;">لوحة التحكم - <span id="welcome-role"></span></h2>
@@ -72,26 +72,25 @@
             </div>
         </div>
 
-        <!-- شريط التبويبات الرئيسي -->
+        <!-- شريط التبويبات المحدث -->
         <div class="container" style="padding: 10px;">
             <div class="tabs-nav">
                 <button class="tab-btn active" onclick="switchTab('orders-tab', event)">📦 الطلبات الجارية</button>
-                <button class="tab-btn" onclick="switchTab('archive-tab', event)">📂 أرشيف المؤكدة</button>
+                <button class="tab-btn" onclick="switchTab('archive-tab', event)">📂 الأرشيف</button>
                 <button class="tab-btn" onclick="switchTab('analytics-tab', event)">📊 التحليلات</button>
                 <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج</button>
-                <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ إدارة المنتجات</button>
+                <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المنتجات</button>
+                <button class="tab-btn" onclick="switchTab('staff-activity-tab', event)" id="staff-tab-btn" style="display:none;">👥 مراقبة الأفراد</button>
+                <button class="tab-btn" onclick="switchTab('settings-tab', event)">⚙️ إعدادات الحساب</button>
             </div>
         </div>
 
-        <!-- 1. تبويب الطلبات الجارية (غير المؤكدة) مع بوابة التنقل -->
+        <!-- 1. تبويب الطلبات الجارية -->
         <div id="orders-tab" class="tab-content active">
             <div class="container">
                 <h2>طلبات الزبائن قيد الانتظار ⏳</h2>
-                <input type="text" id="search-orders" class="search-box" placeholder="🔍 بحث شامل في الطلبات (الاسم، الهاتف، الولاية، التاريخ...)" onkeyup="filterOrders()">
-                
-                <div id="orders-list">جاري تحميل الطلبات...</div>
-
-                <!-- بوابة التنقل بين الطلبات -->
+                <input type="text" id="search-orders" class="search-box" placeholder="🔍 بحث شامل (الاسم، الهاتف، الولاية، التاريخ...)" onkeyup="filterOrders()">
+                <div id="orders-list">جاري التحميل...</div>
                 <div class="pagination-nav" id="orders-pagination" style="display:none;">
                     <button class="btn-secondary" style="width: auto; padding: 6px 15px;" onclick="changePage(-1)">السابق ⬅️</button>
                     <span id="page-info">الصفحة 1 من 1</span>
@@ -100,16 +99,16 @@
             </div>
         </div>
 
-        <!-- 2. تبويب أرشيف الطلبات المؤكدة مع بحث شامل -->
+        <!-- 2. تبويب الأرشيف -->
         <div id="archive-tab" class="tab-content">
             <div class="container">
                 <h2>أرشيف الطلبات المؤكدة والتاريخية 📂</h2>
-                <input type="text" id="search-archive" class="search-box" placeholder="🔍 بحث شامل في الأرشيف (بالاسم، التاريخ، الوقت، الهاتف، الولاية...)" onkeyup="filterArchive()">
-                <div id="archive-list">جاري تحميل الأرشيف...</div>
+                <input type="text" id="search-archive" class="search-box" placeholder="🔍 بحث شامل في الأرشيف (الاسم، المؤكد بواسطة، التاريخ...)" onkeyup="filterArchive()">
+                <div id="archive-list">جاري التحميل...</div>
             </div>
         </div>
 
-        <!-- 3. تبويب تحليل المتجر -->
+        <!-- 3. تبويب التحليلات -->
         <div id="analytics-tab" class="tab-content">
             <div class="container">
                 <h2>إحصائيات وتحليلات المتجر 📊</h2>
@@ -134,7 +133,7 @@
             </div>
         </div>
 
-        <!-- 4. تبويب إضافة المنتجات -->
+        <!-- 4. تبويب إضافة منتج -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد للمتجر ➕</h2>
@@ -152,7 +151,7 @@
                 </div>
                 <div class="form-group">
                     <label>تصنيف المنتج (Category):</label>
-                    <input type="text" id="prod-category" placeholder="مثال: إلكترونيات، ساعات، ملابس...">
+                    <input type="text" id="prod-category" placeholder="مثال: إلكترونيات، ساعات...">
                 </div>
                 <div class="form-group">
                     <label>روابط الصور المباشرة (مفصولة بفواصل):</label>
@@ -164,7 +163,7 @@
                 </div>
                 <div class="form-group">
                     <label>وصف المنتج:</label>
-                    <textarea id="prod-desc" rows="3" placeholder="تفاصيل ومميزات المنتج..."></textarea>
+                    <textarea id="prod-desc" rows="3" placeholder="تفاصيل المنتج..."></textarea>
                 </div>
                 <button onclick="addProduct()">نشر المنتج في المتجر 🚀</button>
             </div>
@@ -173,33 +172,47 @@
         <!-- 5. تبويب إدارة المنتجات -->
         <div id="manage-products-tab" class="tab-content">
             <div class="container">
-                <h2>تعديل الأسعار، المخزون، وحذف المنتجات 🏷️</h2>
-                <div id="products-list">جاري تحميل المنتجات...</div>
+                <h2>تعديل الأسعار والمخزون 🏷️</h2>
+                <div id="products-list">جاري التحميل...</div>
             </div>
         </div>
 
-        <!-- إعدادات الحسابات -->
-        <div class="container" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
-            <h3>⚙️ إعدادات الحساب والفريق</h3>
-            <div class="form-group" style="max-width: 400px; margin: 0 auto;">
-                <label>تغيير كلمة المرور الشخصية:</label>
-                <input type="password" id="my-new-pass" placeholder="كلمة المرور الجديدة">
-                <button class="btn-secondary" onclick="updateMyPassword()" style="margin-top: 8px; padding: 8px;">تحديث كلمة المرور</button>
-                <div id="my-pass-msg" class="success"></div>
+        <!-- 6. تبويب مراقبة الأفراد والأنشطة (للأدمن) -->
+        <div id="staff-activity-tab" class="tab-content">
+            <div class="container">
+                <h2>👥 مراقبة أفراد الفريق وتتبع الأنشطة بدقة</h2>
+                <p style="color: #64748b; font-size: 13px; text-align: center;">يظهر هنا حالة الاتصال الحالية، وقت وساعة الدخول، وإجمالي الطلبات والمنتجات التي أنجزها كل فرد.</p>
+                <div id="staff-activity-list">جاري التحميل...</div>
             </div>
-            
-            <div id="super-admin-section" style="display:none; margin-top: 25px; border-top: 1px solid #cbd5e1; padding-top: 15px;">
-                <h3>👥 إدارة حسابات فريق العمل (للأدمن فقط)</h3>
-                <div class="form-group" style="max-width: 400px; margin: 0 auto;">
-                    <label>اسم مستخدم العضو الجديد:</label>
-                    <input type="text" id="new-staff-user" placeholder="مثال: staff1">
-                    <label style="margin-top: 8px;">كلمة المرور:</label>
-                    <input type="password" id="new-staff-pass" placeholder="كلمة المرور">
-                    <button class="btn-secondary" onclick="addNewStaff()" style="margin-top: 8px; padding: 8px;">إنشاء حساب للعضو ➕</button>
-                    <div id="staff-msg" class="success"></div>
+        </div>
+
+        <!-- 7. تبويب إعدادات الحساب المستقل -->
+        <div id="settings-tab" class="tab-content">
+            <div class="container">
+                <h2>⚙️ إعدادات الحساب الشخصي والفريق</h2>
+                <div class="form-group" style="max-width: 450px; margin: 0 auto; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <label>تغيير كلمة المرور الشخصية:</label>
+                    <input type="password" id="my-new-pass" placeholder="كلمة المرور الجديدة">
+                    <button class="btn-secondary" onclick="updateMyPassword()" style="margin-top: 10px;">تحديث كلمة المرور 🔑</button>
+                    <div id="my-pass-msg" class="success"></div>
                 </div>
-                <h4 style="text-align: right; margin-top: 15px;">قائمة الأعضاء الحاليين:</h4>
-                <div id="staff-list" style="max-width: 500px; margin: 0 auto;">جاري التحميل...</div>
+                
+                <div id="super-admin-section" style="display:none; max-width: 450px; margin: 25px auto 0 auto; background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h3>إدارة حسابات أعضاء الفريق ➕</h3>
+                    <div class="form-group">
+                        <label>اسم مستخدم العضو الجديد:</label>
+                        <input type="text" id="new-staff-user" placeholder="مثال: staff1">
+                    </div>
+                    <div class="form-group">
+                        <label>كلمة المرور:</label>
+                        <input type="password" id="new-staff-pass" placeholder="كلمة المرور">
+                    </div>
+                    <button class="btn-secondary" onclick="addNewStaff()">إنشاء حساب للعضو 👥</button>
+                    <div id="staff-msg" class="success"></div>
+                    
+                    <h4 style="text-align: right; margin-top: 20px;">الأعضاء المسجلون:</h4>
+                    <div id="staff-list">جاري التحميل...</div>
+                </div>
             </div>
         </div>
     </div>
@@ -250,9 +263,12 @@
                 return;
             }
 
+            const nowString = new Date().toLocaleString('ar-DZ', { dateStyle: 'full', timeStyle: 'medium' });
+
             if(username === "admin" && pass === "dzstore2026") {
                 sessionStorage.setItem('ecom_logged_user', 'admin');
                 sessionStorage.setItem('ecom_logged_role', 'Super Admin');
+                await updateStaffLoginStatus('admin', nowString);
                 initDashboardDirect('admin', 'Super Admin');
                 return;
             }
@@ -264,6 +280,7 @@
                 if(userSnap.exists() && userSnap.data().password === pass) {
                     sessionStorage.setItem('ecom_logged_user', username);
                     sessionStorage.setItem('ecom_logged_role', 'فريق العمل (Staff)');
+                    await updateStaffLoginStatus(username, nowString);
                     initDashboardDirect(username, 'فريق العمل (Staff)');
                 } else {
                     errorBox.innerText = "اسم المستخدم أو كلمة المرور غير صحيحة!";
@@ -273,6 +290,17 @@
             }
         }
 
+        async function updateStaffLoginStatus(username, loginTime) {
+            try {
+                await setDoc(doc(db, "staffStatus", username), {
+                    username,
+                    isOnline: true,
+                    lastLogin: loginTime,
+                    lastActive: new Date()
+                }, { merge: true });
+            } catch(e) { console.error(e); }
+        }
+
         function initDashboardDirect(username, role) {
             document.getElementById('login-box').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
@@ -280,13 +308,21 @@
 
             if(username === "admin") {
                 document.getElementById('super-admin-section').style.display = 'block';
+                document.getElementById('staff-tab-btn').style.display = 'block';
+                loadStaffActivityMonitor();
                 loadStaffList();
             }
 
             loadAllData();
         }
 
-        window.logout = function() {
+        window.logout = async function() {
+            const currentUser = sessionStorage.getItem('ecom_logged_user');
+            if(currentUser) {
+                try {
+                    await updateDoc(doc(db, "staffStatus", currentUser), { isOnline: false });
+                } catch(e) {}
+            }
             sessionStorage.clear();
             location.reload();
         }
@@ -360,7 +396,7 @@
                     const stockVal = prod.stock !== undefined ? prod.stock : 0;
                     if(stockVal <= 5) lowStockCount++;
 
-                    let stockAlertHtml = stockVal <= 5 ? `<span class="low-stock-alert">⚠️ باقي ${stockVal} حبات!</span>` : '';
+                    let stockAlertHtml = stockVal <= 5 ? `<span style="color:#c0392b; font-weight:bold;">⚠️ باقي ${stockVal} حبات!</span>` : '';
 
                     const row = document.createElement('div');
                     row.className = 'product-row';
@@ -407,6 +443,9 @@
 
                 renderOrdersPage(allOrdersList);
                 renderArchiveList(allArchiveList);
+                if(sessionStorage.getItem('ecom_logged_user') === 'admin') {
+                    loadStaffActivityMonitor();
+                }
             } catch(e) {
                 console.error(e);
             }
@@ -442,7 +481,7 @@
                     <div>
                         <strong>الزبون:</strong> ${order.fullName} | <strong>الهاتف:</strong> ${order.phone}<br>
                         <strong>الولاية:</strong> ${order.wilaya} | <strong>المنتج:</strong> ${order.productName} (${quantity} حبات)<br>
-                        <small style="color:#64748b;">وقت الطلبية: ${orderTime} | معرف الطلب: #${orderId.substring(0,6)}</small>
+                        <small style="color:#64748b;">وقت الطلبية: ${orderTime}</small>
                     </div>
                     <div>
                         <button onclick="confirmOrder('${orderId}', '${order.productName}', ${quantity})" style="background: #27ae60; padding: 8px 12px; width: auto; font-size: 13px;">تأكيد ونقل للأرشيف ✅</button>
@@ -466,10 +505,7 @@
 
         window.filterOrders = function() {
             const queryText = document.getElementById('search-orders').value.toLowerCase();
-            const filtered = allOrdersList.filter(o => {
-                const searchString = `${o.fullName} ${o.phone} ${o.wilaya} ${o.productName} ${o.id} ${o.status || ''}`.toLowerCase();
-                return searchString.includes(queryText);
-            });
+            const filtered = allOrdersList.filter(o => `${o.fullName} ${o.phone} ${o.wilaya} ${o.productName} ${o.id}`.toLowerCase().includes(queryText));
             currentPage = 1;
             renderOrdersPage(filtered);
         }
@@ -479,13 +515,14 @@
             container.innerHTML = '';
 
             if(archive.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#64748b;">لا توجد طلبات مؤكدة في الأرشيف حتى الآن.</p>';
+                container.innerHTML = '<p style="text-align:center; color:#64748b;">لا توجد طلبات مؤكدة في الأرشيف.</p>';
                 return;
             }
 
             archive.forEach(order => {
                 const quantity = order.quantity || 1;
-                const confirmedTime = order.confirmedAt || (order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString('ar-DZ') : 'غير متوفر');
+                const confirmedTime = order.confirmedAt || 'غير متوفر';
+                const confirmedBy = order.confirmedBy || 'مشرف غير محدد';
 
                 const row = document.createElement('div');
                 row.className = 'order-row';
@@ -494,11 +531,11 @@
                     <div>
                         <strong>الزبون:</strong> ${order.fullName} | <strong>الهاتف:</strong> ${order.phone}<br>
                         <strong>الولاية:</strong> ${order.wilaya} | <strong>المنتج:</strong> ${order.productName} (${quantity} حبات)<br>
-                        <span style="color: green; font-weight: bold;">الحالة: مؤكد ومحفوظ في الأرشيف ✅</span><br>
-                        <small style="color:#047857;"><b>تاريخ ووقت التأكيد والأرشفة:</b> ${confirmedTime}</small>
+                        <span style="color: green; font-weight: bold;">تم التأكيد بواسطة: [${confirmedBy}] ✅</span><br>
+                        <small style="color:#047857;"><b>تاريخ ووقت الأرشفة:</b> ${confirmedTime}</small>
                     </div>
                     <div>
-                        <span style="background: #d1fae5; color: #065f46; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;">أرشيف رسمي</span>
+                        <span style="background: #d1fae5; color: #065f46; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;">أرشيف</span>
                     </div>
                 `;
                 container.appendChild(row);
@@ -507,15 +544,12 @@
 
         window.filterArchive = function() {
             const queryText = document.getElementById('search-archive').value.toLowerCase();
-            const filtered = allArchiveList.filter(o => {
-                const confirmedTimeStr = o.confirmedAt || '';
-                const searchString = `${o.fullName} ${o.phone} ${o.wilaya} ${o.productName} ${o.id} ${confirmedTimeStr}`.toLowerCase();
-                return searchString.includes(queryText);
-            });
+            const filtered = allArchiveList.filter(o => `${o.fullName} ${o.phone} ${o.wilaya} ${o.productName} ${o.confirmedBy || ''} ${o.confirmedAt || ''}`.toLowerCase().includes(queryText));
             renderArchiveList(filtered);
         }
 
         window.confirmOrder = async function(orderId, productName, quantity) {
+            const currentUser = sessionStorage.getItem('ecom_logged_user') || 'admin';
             try {
                 const productsRef = collection(db, "products");
                 const q = query(productsRef, where("name", "==", productName));
@@ -527,7 +561,7 @@
                     const currentStock = productData.stock !== undefined ? productData.stock : 10;
 
                     if(currentStock < quantity) {
-                        alert(`عذراً، المخزون الحالي (${currentStock}) أقل من الكمية المطلوبة (${quantity})!`);
+                        alert(`عذراً، المخزون الحالي (${currentStock}) أقل من الكمية المطلوبة!`);
                         return;
                     }
 
@@ -538,14 +572,69 @@
                 const nowString = new Date().toLocaleString('ar-DZ', { dateStyle: 'full', timeStyle: 'medium' });
                 await updateDoc(doc(db, "orders", orderId), { 
                     status: 'مؤكد ومؤرشف ✅',
-                    confirmedAt: nowString 
+                    confirmedAt: nowString,
+                    confirmedBy: currentUser
                 });
                 
-                alert(`تم تأكيد الطلب وخصم المخزون بنجاح، وتم نقله فوراً إلى الأرشيف مع التوقيت! 📂✅`);
+                alert(`تم تأكيد الطلب بواسطة (${currentUser}) ونقله للأرشيف بنجاح! 📂✅`);
                 loadAllData();
             } catch(e) {
                 console.error(e);
                 alert('حدث خطأ أثناء التأكيد.');
+            }
+        }
+
+        // مراقبة نشاط الأفراد وأداء العمل
+        async function loadStaffActivityMonitor() {
+            const container = document.getElementById('staff-activity-list');
+            container.innerHTML = 'جاري تحليل وتتبع أنشطة الأفراد...';
+            try {
+                const statusSnap = await getDocs(collection(db, "staffStatus"));
+                let staffMap = {};
+
+                // إضافة الأدمن الرئيسي افتراضياً
+                staffMap['admin'] = { username: 'admin', isOnline: true, lastLogin: 'مسؤول النظام الدائم' };
+
+                statusSnap.forEach(d => {
+                    staffMap[d.id] = d.data();
+                });
+
+                // حساب الأنشطة من الأرشيف (الطلبات المؤكدة لكل شخص)
+                let staffStats = {};
+                allArchiveList.forEach(order => {
+                    let agent = order.confirmedBy || 'admin';
+                    if(!staffStats[agent]) staffStats[agent] = { count: 0, products: {} };
+                    staffStats[agent].count++;
+                    staffStats[agent].products[order.productName] = (staffStats[agent].products[order.productName] || 0) + (order.quantity || 1);
+                });
+
+                container.innerHTML = '';
+                for(let username in staffMap) {
+                    let info = staffMap[username];
+                    let stats = staffStats[username] || { count: 0, products: {} };
+                    let onlineHtml = info.isOnline ? `<span class="online-badge">🟢 متصل الآن</span>` : `<span class="offline-badge">⚪ غير متصل</span>`;
+                    let loginTime = info.lastLogin || 'غير متوفر';
+
+                    let prodSummary = '';
+                    for(let pName in stats.products) {
+                        prodSummary += `<br>&nbsp;&nbsp;• ${pName}: (${stats.products[pName]} حبات)`;
+                    }
+                    if(!prodSummary) prodSummary = ' لا توجد طلبات مؤكدة حتى الآن.';
+
+                    let card = document.createElement('div');
+                    card.className = 'staff-activity-card';
+                    card.innerHTML = `
+                        <div>
+                            <b>👤 اسم العضو: ${username}</b> ${onlineHtml}<br>
+                            <small style="color:#475569;"><b>وقت وساعة الدخول:</b> ${loginTime}</small><br>
+                            <small style="color:#0284c7;"><b>إجمالي الطلبات المؤكدة والمنجزة:</b> ${stats.count} طلبات</small><br>
+                            <small style="color:#16a34a;"><b>المنتجات التي تم تأكيدها:</b> ${prodSummary}</small>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
+            } catch(e) {
+                container.innerHTML = '<p style="color:red;">خطأ في تحميل بيانات النشاط.</p>';
             }
         }
 
