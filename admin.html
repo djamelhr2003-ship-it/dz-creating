@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>لوحة التحكم المحمية | إدارة المتجر</title>
+<title>لوحة التحكم السحابية | إدارة المتجر</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
 <style>
 :root{--bg:#0b0f0e;--card:#131a17;--tx:#f5f2ea;--mu:#9ba79f;--accent:#d9b65c;--danger:#ef4444;--success:#22c55e;--border:rgba(255,255,255,.08)}
@@ -26,7 +26,6 @@ th{color:var(--accent)}
 .back-link{color:var(--mu);text-decoration:none;font-size:0.85rem;border:1px solid var(--border);padding:6px 14px;border-radius:8px}
 .back-link:hover{color:var(--accent);border-color:var(--accent)}
 
-/* شاشة تسجيل الدخول */
 #loginOverlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: var(--bg); z-index: 9999; display: flex;
@@ -40,28 +39,25 @@ th{color:var(--accent)}
 </head>
 <body>
 
-<!-- شاشة حماية لوحة التحكم -->
 <div id="loginOverlay">
   <div class="login-box">
     <h3 style="color:var(--accent);margin-top:0;">🔐 لوحة تحكم الفريق</h3>
-    <p style="color:var(--mu);font-size:0.85rem;margin-bottom:20px;">أدخل كلمة المرور السرية للدخول:</p>
-    <input type="password" id="adminPasswordInput" class="form-control" placeholder="كلمة المرور السرية" style="margin-bottom:15px;text-align:center;">
+    <p style="color:var(--mu);font-size:0.85rem;margin-bottom:20px;">أدخل كلمة المرور السرية:</p>
+    <input type="password" id="adminPasswordInput" class="form-control" placeholder="كلمة المرور" style="margin-bottom:15px;text-align:center;">
     <button class="btn" style="width:100%;" onclick="checkPassword()">دخول 🚀</button>
     <br><br>
-    <a href="index.html" style="color:var(--mu);font-size:0.8rem;text-decoration:none;">← العودة للمتجر الرئيسي</a>
+    <a href="index.html" style="color:var(--mu);font-size:0.8rem;text-decoration:none;">← العودة للمتجر</a>
   </div>
 </div>
 
-<!-- محتوى لوحة التحكم (مخفي حتى يتم إدخال كلمة المرور الصحيحة) -->
 <div class="container" id="adminMainContent" style="display:none;">
   <header>
-    <h2>🔐 لوحة تحكم الفريق وإدارة المتجر</h2>
+    <h2>🔐 لوحة التحكم السحابية للفريق</h2>
     <a href="index.html" class="back-link">← العودة للمتجر</a>
   </header>
 
-  <!-- إضافة منتج جديد -->
   <div class="box">
-    <h3 style="margin-top:0;color:var(--accent);">إضافة منتج جديد</h3>
+    <h3 style="margin-top:0;color:var(--accent);">إضافة منتج جديد سحابياً</h3>
     <div class="form-grid">
       <div class="form-group">
         <label>اسم المنتج:</label>
@@ -82,14 +78,13 @@ th{color:var(--accent)}
     </div>
     <div class="form-group" style="margin-bottom:15px;">
       <label>وصف المنتج:</label>
-      <input type="text" id="pDesc" class="form-control" placeholder="تفاصيل ومميزات المنتج...">
+      <input type="text" id="pDesc" class="form-control" placeholder="تفاصيل المنتج...">
     </div>
-    <button class="btn" onclick="addNewProduct()">إضافة المنتج للمتجر ➕</button>
+    <button class="btn" onclick="addNewProduct()">إضافة المنتج ➕</button>
   </div>
 
-  <!-- إدارة المنتجات الحالية -->
   <div class="box">
-    <h3 style="margin-top:0;color:var(--accent);">📦 المنتجات المعروضة حالياً</h3>
+    <h3 style="margin-top:0;color:var(--accent);">📦 المنتجات في القاعدة السحابية</h3>
     <table>
       <thead>
         <tr>
@@ -103,9 +98,8 @@ th{color:var(--accent)}
     </table>
   </div>
 
-  <!-- طلبات الزبائن -->
   <div class="box">
-    <h3 style="margin-top:0;color:var(--accent);">🚀 طلبات الزبائن الواردة</h3>
+    <h3 style="margin-top:0;color:var(--accent);">🚀 طلبات الزبائن الفورية</h3>
     <table>
       <thead>
         <tr>
@@ -122,96 +116,122 @@ th{color:var(--accent)}
   </div>
 </div>
 
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDdJY7mI1DOMKh7zTJs_Ve3d4Xp1YBdMYI",
+    authDomain: "creater-ecom.firebaseapp.com",
+    projectId: "creater-ecom",
+    storageBucket: "creater-ecom.firebasestorage.app",
+    messagingSenderId: "893449950593",
+    appId: "1:893449950593:web:22c5f6f220ea809efb8480",
+    measurementId: "G-MR5XLYXV0Q"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.db = getFirestore(app);
+</script>
+
 <script>
-// ضع هنا كلمة المرور الخاصة بك ولأصدقائك (يمكنك تغييرها متى شئت)
-const ADMIN_SECRET_PASS = "dzstore2026"; 
+const ADMIN_SECRET_PASS = "dzstore2026";
 
 function checkPassword() {
-  let inputVal = document.getElementById("adminPasswordInput").value.trim();
-  if(inputVal === ADMIN_SECRET_PASS) {
+  let val = document.getElementById("adminPasswordInput").value.trim();
+  if(val === ADMIN_SECRET_PASS) {
     document.getElementById("loginOverlay").style.display = "none";
     document.getElementById("adminMainContent").style.display = "block";
     loadAdminData();
   } else {
-    alert("كلمة المرور غير صحيحة! حاول مجدداً.");
-    document.getElementById("adminPasswordInput").value = "";
+    alert("كلمة المرور خاطئة!");
   }
 }
 
-function loadAdminData() {
-  let products = JSON.parse(localStorage.getItem("store_products")) || [];
-  let pTable = document.getElementById("adminProductsTable");
+async function loadAdminData() {
+  if(!window.db) {
+    setTimeout(loadAdminData, 500);
+    return;
+  }
+  const { collection, getDocs, deleteDoc, doc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
   
-  if(products.length === 0) {
-    pTable.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--mu);">لا توجد منتجات.</td></tr>`;
-  } else {
+  // تحميل المنتجات
+  let pTable = document.getElementById("adminProductsTable");
+  try {
+    let pSnap = await getDocs(collection(window.db, "products"));
     let pHtml = "";
-    products.forEach(p => {
+    pSnap.forEach(d => {
+      let p = d.data();
       pHtml += `
         <tr>
           <td><b>${p.name}</b></td>
           <td>${p.category || 'عام'}</td>
           <td style="color:var(--accent);">${Number(p.price).toLocaleString()} دج</td>
-          <td><button class="btn-danger" onclick="deleteProduct(${p.id})">حذف</button></td>
+          <td><button class="btn-danger" onclick="deleteProduct('${d.id}')">حذف</button></td>
         </tr>
       `;
     });
-    pTable.innerHTML = pHtml;
-  }
+    pTable.innerHTML = pHtml || `<tr><td colspan="4" style="text-align:center;color:var(--mu);">لا توجد منتجات سحابية.</td></tr>`;
+  } catch(e) { console.error(e); }
 
-  let orders = JSON.parse(localStorage.getItem("store_orders")) || [];
+  // تحميل الطلبات
   let oTable = document.getElementById("ordersTableBody");
-  
-  if(orders.length === 0) {
-    oTable.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--mu);">لا توجد طلبات جديدة حتى الآن.</td></tr>`;
-    return;
-  }
-
-  let oHtml = "";
-  orders.reverse().forEach(o => {
-    oHtml += `
-      <tr>
-        <td><b>${o.client}</b></td>
-        <td>${o.phone}</td>
-        <td>${o.wilaya} - ${o.address}</td>
-        <td>${o.product}</td>
-        <td style="color:var(--accent);font-weight:bold;">${Number(o.price).toLocaleString()} دج</td>
-        <td style="color:var(--mu);font-size:0.8rem;">${o.date}</td>
-      </tr>
-    `;
-  });
-  oTable.innerHTML = oHtml;
+  try {
+    let oSnap = await getDocs(collection(window.db, "orders"));
+    let oHtml = "";
+    oSnap.forEach(d => {
+      let o = d.data();
+      oHtml += `
+        <tr>
+          <td><b>${o.client}</b></td>
+          <td>${o.phone}</td>
+          <td>${o.wilaya} - ${o.address}</td>
+          <td>${o.product}</td>
+          <td style="color:var(--accent);font-weight:bold;">${Number(o.price).toLocaleString()} دج</td>
+          <td style="color:var(--mu);font-size:0.8rem;">${o.date}</td>
+        </tr>
+      `;
+    });
+    oTable.innerHTML = oHtml || `<tr><td colspan="6" style="text-align:center;color:var(--mu);">لا توجد طلبات واردة حالياً.</td></tr>`;
+  } catch(e) { console.error(e); }
 }
 
-function addNewProduct() {
+async function addNewProduct() {
   let name = document.getElementById("pName").value.trim();
   let price = Number(document.getElementById("pPrice").value);
   let category = document.getElementById("pCategory").value;
   let desc = document.getElementById("pDesc").value.trim();
 
   if(!name || !price) {
-    alert("الرجاء إدخال اسم المنتج والسعر على الأقل!");
+    alert("الرجاء إدخال اسم المنتج والسعر!");
     return;
   }
 
-  let products = JSON.parse(localStorage.getItem("store_products")) || [];
-  products.push({id: Date.now(), name, price, category, desc});
-  localStorage.setItem("store_products", JSON.stringify(products));
-
-  alert("تمت إضافة المنتج بنجاح!");
-  document.getElementById("pName").value = "";
-  document.getElementById("pPrice").value = "";
-  document.getElementById("pDesc").value = "";
-  loadAdminData();
+  try {
+    const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+    await addDoc(collection(window.db, "products"), { name, price, category, desc });
+    alert("تمت إضافة المنتج بنجاح إلى السحاب!");
+    document.getElementById("pName").value = "";
+    document.getElementById("pPrice").value = "";
+    document.getElementById("pDesc").value = "";
+    loadAdminData();
+  } catch(e) {
+    alert("حدث خطأ أثناء الإضافة.");
+    console.error(e);
+  }
 }
 
-function deleteProduct(id) {
-  if(!confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
-  let products = JSON.parse(localStorage.getItem("store_products")) || [];
-  products = products.filter(p => p.id !== id);
-  localStorage.setItem("store_products", JSON.stringify(products));
-  loadAdminData();
+async function deleteProduct(id) {
+  if(!confirm("هل أنت متأكد من الحذف؟")) return;
+  try {
+    const { doc, deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+    await deleteDoc(doc(window.db, "products", id));
+    loadAdminData();
+  } catch(e) {
+    console.error(e);
+  }
 }
+window.deleteProduct = deleteProduct;
 </script>
 
 </body>
