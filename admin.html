@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المتجر - جلسة مستمرة</title>
+    <title>إدارة المتجر - نظام الصلاحيات المتقدم</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .container { max-width: 750px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h2, h3 { color: #2c3e50; text-align: center; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
@@ -20,14 +20,19 @@
         .error { color: red; font-size: 14px; margin-top: 5px; }
         .success { color: green; font-size: 14px; margin-top: 5px; }
         .product-row, .order-row { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #eee; }
-        .user-row { display: flex; justify-content: space-between; align-items: center; background: #eef2f7; padding: 8px 12px; border-radius: 5px; margin-bottom: 8px; }
+        .user-row { display: flex; justify-content: space-between; align-items: center; background: #eef2f7; padding: 10px; border-radius: 5px; margin-bottom: 8px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; background: #bdc3c7; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: #333; }
+        .tab-btn.active { background: #2c3e50; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
 
     <!-- شاشة تسجيل الدخول -->
     <div id="login-box" class="container">
-        <h2>تسجيل دخول الفريق 🔐</h2>
+        <h2>تسجيل دخول النظام 🔐</h2>
         <div class="form-group" style="text-align: right;">
             <label>اسم المستخدم:</label>
             <input type="text" id="login-username" placeholder="أدخل اسم المستخدم">
@@ -47,64 +52,89 @@
             <button onclick="logout()" class="btn-danger" style="width: auto; padding: 8px 15px;">تسجيل الخروج</button>
         </div>
 
-        <!-- قسم إضافة المنتجات -->
-        <div class="container">
-            <h2>إضافة منتج جديد (صور + فيديو 1080p) ➕</h2>
-            <div class="form-group">
-                <label>اسم المنتج:</label>
-                <input type="text" id="prod-name" placeholder="مثال: ساعة ذكية Ultra">
+        <!-- أزرار التبويبات -->
+        <div class="container" style="padding: 10px; background: transparent; box-shadow: none;">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('store-tab')">📦 إدارة المتجر والطلبات</button>
+                <button class="tab-btn" onclick="switchTab('settings-tab')">⚙️ إعدادات الحساب وكلمة المرور</button>
+                <button class="tab-btn" id="admin-tab-btn" style="display:none;" onclick="switchTab('admin-tab')">👥 إدارة الأعضاء (خاص بالأدمن)</button>
             </div>
-            <div class="form-group">
-                <label>السعر (دج):</label>
-                <input type="number" id="prod-price" placeholder="مثال: 5500">
-            </div>
-            <div class="form-group">
-                <label>صور المنتج (اختر عدة صور):</label>
-                <input type="file" id="prod-image-files" accept="image/*" multiple>
-            </div>
-            <div class="form-group">
-                <label>فيديو تعريفي (جودة 1080p - أقل من 30 ثانية):</label>
-                <input type="file" id="prod-video-file" accept="video/mp4,video/quicktime">
-            </div>
-            <div class="form-group">
-                <label>وصف المنتج:</label>
-                <textarea id="prod-desc" rows="2" placeholder="تفاصيل المنتج..."></textarea>
-            </div>
-            <button onclick="addProduct()">نشر المنتج في المتجر 🚀</button>
         </div>
 
-        <!-- إدارة المنتجات والأسعار -->
-        <div class="container">
-            <h2>قائمة المنتجات وتعديل الأسعار 🏷️</h2>
-            <div id="products-list">جاري تحميل المنتجات...</div>
+        <!-- التبويب الأول: إدارة المتجر والطلبات -->
+        <div id="store-tab" class="tab-content active">
+            <div class="container">
+                <h2>إضافة منتج جديد (صور + فيديو 1080p) ➕</h2>
+                <div class="form-group">
+                    <label>اسم المنتج:</label>
+                    <input type="text" id="prod-name" placeholder="مثال: ساعة ذكية Ultra">
+                </div>
+                <div class="form-group">
+                    <label>السعر (دج):</label>
+                    <input type="number" id="prod-price" placeholder="مثال: 5500">
+                </div>
+                <div class="form-group">
+                    <label>صور المنتج (اختر عدة صور):</label>
+                    <input type="file" id="prod-image-files" accept="image/*" multiple>
+                </div>
+                <div class="form-group">
+                    <label>فيديو تعريفي (جودة 1080p):</label>
+                    <input type="file" id="prod-video-file" accept="video/mp4,video/quicktime">
+                </div>
+                <div class="form-group">
+                    <label>وصف المنتج:</label>
+                    <textarea id="prod-desc" rows="2" placeholder="تفاصيل المنتج..."></textarea>
+                </div>
+                <button onclick="addProduct()">نشر المنتج في المتجر 🚀</button>
+            </div>
+
+            <div class="container">
+                <h2>قائمة المنتجات وتعديل الأسعار 🏷️</h2>
+                <div id="products-list">جاري تحميل المنتجات...</div>
+            </div>
+
+            <div class="container">
+                <h2>متابعة طلبات الزبائن 📦</h2>
+                <div id="orders-list">جاري تحميل الطلبات...</div>
+            </div>
         </div>
 
-        <!-- متابعة الطلبات -->
-        <div class="container">
-            <h2>متابعة طلبات الزبائن 📦</h2>
-            <div id="orders-list">جاري تحميل الطلبات...</div>
+        <!-- التبويب الثاني: إعدادات الحساب الشخصي (لكل عضو وللأدمن) -->
+        <div id="settings-tab" class="tab-content">
+            <div class="container">
+                <h2>إعدادات الحساب الشخصي 🔑</h2>
+                <p>يمكنك تغيير كلمة المرور الخاصة بحسابك الحالي في أي وقت.</p>
+                <div class="form-group">
+                    <label>كلمة المرور الجديدة:</label>
+                    <input type="password" id="my-new-pass" placeholder="أدخل كلمة المرور الجديدة">
+                </div>
+                <button class="btn-secondary" onclick="updateMyPassword()">تحديث كلمة المرور الخاصة بي</button>
+                <div id="my-pass-msg" class="success"></div>
+            </div>
         </div>
 
-        <!-- إدارة حسابات الفريق (للأدمن الرئيسي) -->
-        <div class="container" id="admin-management-section" style="display: none; background: #eef9f2;">
-            <h2>إدارة حسابات فريق العمل 👥</h2>
-            <div class="form-group">
-                <label>اسم مستخدم العضو الجديد:</label>
-                <input type="text" id="new-staff-user" placeholder="مثال: staff1">
+        <!-- التبويب الثالث: إدارة الأعضاء (للأدمن الرئيسي admin فقط) -->
+        <div id="admin-tab" class="tab-content">
+            <div class="container" style="background: #eef9f2;">
+                <h2>إدارة حسابات فريق العمل 👥</h2>
+                <div class="form-group">
+                    <label>اسم مستخدم العضو الجديد:</label>
+                    <input type="text" id="new-staff-user" placeholder="مثال: staff1">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور المبدئية للعضو:</label>
+                    <input type="password" id="new-staff-pass" placeholder="كلمة المرور">
+                </div>
+                <button class="btn-secondary" onclick="addNewStaff()">إنشاء حساب للعضو الجديد ➕</button>
+                <div id="staff-msg" class="success"></div>
+                
+                <h3 style="margin-top: 20px; text-align: right;">قائمة أعضاء الفريق المسجلين:</h3>
+                <div id="staff-list">جاري التحميل...</div>
             </div>
-            <div class="form-group">
-                <label>كلمة المرور:</label>
-                <input type="password" id="new-staff-pass" placeholder="كلمة المرور">
-            </div>
-            <button class="btn-secondary" onclick="addNewStaff()">إنشاء حساب للعضو ➕</button>
-            <div id="staff-msg" class="success"></div>
-            
-            <h3 style="margin-top: 20px; text-align: right;">الحسابات الحالية:</h3>
-            <div id="staff-list">جاري التحميل...</div>
         </div>
     </div>
 
-    <!-- إعدادات Firebase SDK -->
+    <!-- إعدادات وقواعد Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -123,7 +153,7 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        // التحقق عند فتح الصفحة إذا كان هناك جلسة مسجلة مسبقاً
+        // التحقق من الجلسة عند التحميل
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = sessionStorage.getItem('ecom_logged_user');
             const savedRole = sessionStorage.getItem('ecom_logged_role');
@@ -131,6 +161,13 @@
                 initDashboardDirect(savedUser, savedRole);
             }
         });
+
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
 
         window.checkLogin = async function() {
             const username = document.getElementById('login-username').value.trim();
@@ -142,6 +179,7 @@
                 return;
             }
 
+            // الأدمن الرئيسي
             if(username === "admin" && pass === "dzstore2026") {
                 sessionStorage.setItem('ecom_logged_user', 'admin');
                 sessionStorage.setItem('ecom_logged_role', 'Super Admin');
@@ -149,6 +187,7 @@
                 return;
             }
 
+            // فحص أعضاء الفريق من قاعدة البيانات
             try {
                 const userDocRef = doc(db, "staffUsers", username);
                 const userSnap = await getDoc(userDocRef);
@@ -170,8 +209,9 @@
             document.getElementById('admin-content').style.display = 'block';
             document.getElementById('welcome-role').innerText = `${username} (${role})`;
 
+            // إذا كان هو الأدمن الرئيسي، نُظهر له تبويب إدارة الأعضاء
             if(username === "admin") {
-                document.getElementById('admin-management-section').style.display = 'block';
+                document.getElementById('admin-tab-btn').style.display = 'block';
                 loadStaffList();
             }
 
@@ -180,11 +220,40 @@
         }
 
         window.logout = function() {
-            sessionStorage.removeItem('ecom_logged_user');
-            sessionStorage.removeItem('ecom_logged_role');
+            sessionStorage.clear();
             location.reload();
         }
 
+        // تحديث كلمة المرور الخاصة بالمستخدم الحالي (سواء كان عضواً أو أدمن)
+        window.updateMyPassword = async function() {
+            const currentUser = sessionStorage.getItem('ecom_logged_user');
+            const newPass = document.getElementById('my-new-pass').value.trim();
+            const msgBox = document.getElementById('my-pass-msg');
+            msgBox.innerText = "";
+
+            if(!newPass || newPass.length < 4) {
+                alert('الرجاء إدخال كلمة مرور جديدة تتكون من 4 خانات على الأقل!');
+                return;
+            }
+
+            try {
+                if(currentUser === "admin") {
+                    // للأدمن الرئيسي (يمكن حفظها في وثيقة الإعدادات أو تحديثها)
+                    alert('كلمة مرور الأدمن الرئيسي يتم التحكم بها عبر إعدادات النظام أو الكود.');
+                } else {
+                    // لعضو الفريق
+                    await updateDoc(doc(db, "staffUsers", currentUser), {
+                        password: newPass
+                    });
+                    msgBox.innerText = "تم تحديث كلمة المرور الخاصة بك بنجاح! 🔑";
+                    document.getElementById('my-new-pass').value = '';
+                }
+            } catch(e) {
+                alert('حدث خطأ أثناء تحديث كلمة المرور.');
+            }
+        }
+
+        // إضافة منتج جديد
         window.addProduct = async function() {
             const name = document.getElementById('prod-name').value;
             const price = document.getElementById('prod-price').value;
@@ -202,7 +271,7 @@
                 let videoUrl = '';
 
                 if(imageFiles.length > 0) {
-                    alert(`جاري رفع الصور إلى السحابة...`);
+                    alert(`جاري رفع الصور...`);
                     for (let i = 0; i < imageFiles.length; i++) {
                         const file = imageFiles[i];
                         const storageRef = ref(storage, 'products/' + Date.now() + '_img_' + i + '_' + file.name);
@@ -220,12 +289,7 @@
                 }
 
                 await addDoc(collection(db, "products"), {
-                    name, 
-                    price: Number(price), 
-                    desc, 
-                    imageUrls, 
-                    videoUrl, 
-                    createdAt: new Date()
+                    name, price: Number(price), desc, imageUrls, videoUrl, createdAt: new Date()
                 });
 
                 alert('تمت إضافة المنتج بنجاح! 🚀');
@@ -236,11 +300,11 @@
                 document.getElementById('prod-video-file').value = '';
                 loadProductsManagement();
             } catch (e) {
-                console.error(e);
-                alert('حدث خطأ أثناء رفع الملفات.');
+                alert('خطأ أثناء رفع الملفات.');
             }
         }
 
+        // إدارة وتعديل الأسعار
         async function loadProductsManagement() {
             const container = document.getElementById('products-list');
             container.innerHTML = 'جاري التحميل...';
@@ -291,6 +355,7 @@
             }
         }
 
+        // متابعة الطلبات
         async function loadOrders() {
             const container = document.getElementById('orders-list');
             container.innerHTML = 'جاري التحميل...';
@@ -311,6 +376,7 @@
             } catch(e) { container.innerHTML = '<p>لا توجد طلبات.</p>'; }
         }
 
+        // إضافة أعضاء جدد (للأدمن الرئيسي فقط)
         window.addNewStaff = async function() {
             const username = document.getElementById('new-staff-user').value.trim();
             const pass = document.getElementById('new-staff-pass').value.trim();
@@ -318,7 +384,7 @@
             if(!username || !pass) { alert('أدخل اسم المستخدم وكلمة المرور!'); return; }
             try {
                 await setDoc(doc(db, "staffUsers", username), { password: pass });
-                msg.innerText = `تمت إضافة العضو (${username}) بنجاح!`;
+                msg.innerText = `تمت إضافة الحساب (${username}) بنجاح!`;
                 document.getElementById('new-staff-user').value = '';
                 document.getElementById('new-staff-pass').value = '';
                 loadStaffList();
@@ -330,13 +396,29 @@
             try {
                 const snap = await getDocs(collection(db, "staffUsers"));
                 listDiv.innerHTML = '';
+                if(snap.empty) {
+                    listDiv.innerHTML = '<p>لا توجد أعضاء إضافيون حالياً.</p>';
+                    return;
+                }
                 snap.forEach(d => {
                     const row = document.createElement('div');
                     row.className = 'user-row';
-                    row.innerHTML = `<span>👤 <b>${d.id}</b></span>`;
+                    row.innerHTML = `<span>👤 اسم العضو: <b>${d.id}</b></span> <button onclick="deleteStaff('${d.id}')" class="btn-danger" style="width: auto; padding: 4px 10px; font-size: 14px;">حذف الحساب</button>`;
                     listDiv.appendChild(row);
                 });
             } catch(e) { listDiv.innerHTML = ''; }
+        }
+
+        window.deleteStaff = async function(username) {
+            if(confirm(`هل تريد حقاً حذف حساب العضو (${username})؟`)) {
+                try {
+                    await deleteDoc(doc(db, "staffUsers", username));
+                    alert('تم حذف الحساب بنجاح.');
+                    loadStaffList();
+                } catch(e) {
+                    alert('فشل حذف الحساب.');
+                }
+            }
         }
     </script>
 </body>
