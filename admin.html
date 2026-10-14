@@ -28,9 +28,7 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .product-row, .order-row, .staff-activity-card { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px; }
-        .online-badge { background: #d1fae5; color: #065f46; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-        .offline-badge { background: #f1f5f9; color: #64748b; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+        .product-row, .order-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: linear-gradient(135deg, #2c3e50, #1e293b); color: white; padding: 20px; border-radius: 10px; text-align: center; }
@@ -38,7 +36,12 @@
         .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
 
         .search-box { margin-bottom: 15px; padding: 10px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; width: 100%; box-sizing: border-box; }
-        .pagination-nav { display: flex; justify-content: space-between; align-items: center; background: #edf2f7; padding: 10px; border-radius: 6px; margin-top: 15px; font-weight: bold; }
+        
+        /* تنسيق حقول روابط الصور مع زر الزائد */
+        .image-input-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .btn-add-img { background: #3b82f6; color: white; border: none; width: 45px; height: 42px; border-radius: 6px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .btn-add-img:hover { background: #2563eb; }
+        .btn-remove-img { background: #ef4444; color: white; border: none; width: 40px; height: 42px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -109,7 +112,7 @@
             </div>
         </div>
 
-        <!-- تبويب إضافة منتج مع خيارات الحد الأقصى والعروض الخاصة -->
+        <!-- تبويب إضافة منتج مع نظام إضافة روابط الصور بزر الزائد (+) -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد وتعيين العروض ➕</h2>
@@ -117,10 +120,9 @@
                 <div class="form-group"><label>السعر الأساسي (دج):</label><input type="number" id="prod-price" placeholder="5500"></div>
                 <div class="form-group"><label>الكمية في المخزون (Stock):</label><input type="number" id="prod-stock" placeholder="10"></div>
                 
-                <!-- الحد الأقصى للطلب غير المرئي للزبون -->
                 <div class="form-group">
                     <label>الحد الأقصى المسموح به للطلب الواحد (لا يظهر للزبون):</label>
-                    <input type="number" id="prod-max-limit" placeholder="مثال: 3 (إذا طلب أكثر تظهر له تنبيه)">
+                    <input type="number" id="prod-max-limit" placeholder="مثال: 3">
                 </div>
 
                 <div class="form-group">
@@ -131,7 +133,17 @@
                     <input type="text" id="prod-category-new" placeholder="أو اكتب تصنيفاً جديداً..." style="display:none; margin-top:5px;">
                 </div>
 
-                <!-- إعدادات العرض الخاص الاختياري -->
+                <!-- قسم روابط الصور الديناميكي مع زر الزائد (+) -->
+                <div class="form-group">
+                    <label>روابط الصور (انقر على زر (+) لإضافة رابط صورة جديد):</label>
+                    <div id="image-inputs-container">
+                        <div class="image-input-row">
+                            <input type="text" class="image-url-input" placeholder="https://i.postimg.cc/.../img1.jpg">
+                            <button type="button" class="btn-add-img" onclick="addImageInput()">＋</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div style="background: #fdf2f8; padding: 15px; border-radius: 8px; border: 1px dashed #f472b6; margin-bottom: 15px;">
                     <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
                         <input type="checkbox" id="prod-is-special" onchange="toggleSpecialOfferFields()" style="width:20px; height:20px;">
@@ -149,7 +161,6 @@
                     </div>
                 </div>
 
-                <div class="form-group"><label>روابط الصور (كل رابط في سطر):</label><textarea id="prod-image-urls" rows="3" placeholder="https://i.postimg.cc/..."></textarea></div>
                 <div class="form-group"><label>وصف المنتج:</label><textarea id="prod-desc" rows="2" placeholder="المواصفات..."></textarea></div>
                 <button onclick="addProduct()">نشر المنتج وإظهار رسالة النجاح 🚀</button>
             </div>
@@ -237,6 +248,23 @@
 
         window.logout = function() { sessionStorage.clear(); location.reload(); }
 
+        // دالة إضافة حقل رابط صورة جديد عند النقر على (+)
+        window.addImageInput = function() {
+            const container = document.getElementById('image-inputs-container');
+            const row = document.createElement('div');
+            row.className = 'image-input-row';
+            row.innerHTML = `
+                <input type="text" class="image-url-input" placeholder="https://i.postimg.cc/.../img.jpg">
+                <button type="button" class="btn-remove-img" onclick="removeImageInput(this)">✕</button>
+            `;
+            container.appendChild(row);
+        }
+
+        // دالة حذف حقل الرابط الإضافي
+        window.removeImageInput = function(button) {
+            button.parentElement.remove();
+        }
+
         window.toggleSpecialOfferFields = function() {
             const isChecked = document.getElementById('prod-is-special').checked;
             document.getElementById('special-offer-options').style.display = isChecked ? 'block' : 'none';
@@ -262,7 +290,14 @@
             const promoPrice = isSpecialOffer ? Number(document.getElementById('prod-promo-price').value) : null;
             const freeShipping = isSpecialOffer ? document.getElementById('prod-free-shipping').checked : false;
 
-            const urls = document.getElementById('prod-image-urls').value.trim().split('\n').filter(u => u.length > 0);
+            // جمع جميع روابط الصور المكتوبة في الحقول المتعددة
+            const urlInputs = document.querySelectorAll('.image-url-input');
+            let imageUrls = [];
+            urlInputs.forEach(input => {
+                let val = input.value.trim();
+                if(val) imageUrls.push(val);
+            });
+
             const desc = document.getElementById('prod-desc').value.trim();
 
             if(!name || !price || !stock) {
@@ -275,14 +310,21 @@
                     name, price, stock, maxLimit, category, isSpecialOffer, promoPrice, freeShipping, imageUrls, desc, createdAt: new Date()
                 });
 
-                // رسالة تأكيد النجاح المطلوبة
+                // رسالة تأكيد النجاح
                 alert(`🎉 تم إضافة المنتج "${name}" بنجاح إلى المتجر!`);
                 document.getElementById('prod-name').value = '';
                 document.getElementById('prod-price').value = '';
                 document.getElementById('prod-stock').value = '';
                 document.getElementById('prod-max-limit').value = '';
                 document.getElementById('prod-desc').value = '';
-                document.getElementById('prod-image-urls').value = '';
+                
+                // إعادة حقول الصور إلى حقل واحد فارغ
+                document.getElementById('image-inputs-container').innerHTML = `
+                    <div class="image-input-row">
+                        <input type="text" class="image-url-input" placeholder="https://i.postimg.cc/.../img1.jpg">
+                        <button type="button" class="btn-add-img" onclick="addImageInput()">＋</button>
+                    </div>
+                `;
                 loadAdminData();
             } catch(e) { alert('خطأ في النشر.'); }
         }
@@ -305,7 +347,6 @@
                 });
                 document.getElementById('prod-category-select').innerHTML = selectHtml;
 
-                // جلب الطلبات
                 const ordersSnap = await getDocs(collection(db, "orders"));
                 let pendingCount = 0;
                 let ordersListDiv = document.getElementById('orders-list');
@@ -320,7 +361,7 @@
                         ordersListDiv.innerHTML += `
                             <div class="order-row">
                                 <div><b>الزبون:</b> ${o.fullName} | <b>الهاتف:</b> ${o.phone}<br><b>الولاية:</b> ${o.wilaya} (${o.commune}) - <b>التوصيل:</b> ${o.deliveryType}<br><b>المنتج:</b> ${o.productName} (x${o.quantity})</div>
-                                <button onclick="confirmOrder('${d.id}', '${o.productName}', ${o.quantity})" style="background:#27ae60; width:auto; padding:6px 12px;">تأكيد ✅</button>
+                                <button onclick="confirmOrder('${d.id}')" style="background:#27ae60; width:auto; padding:6px 12px;">تأكيد ✅</button>
                             </div>
                         `;
                     }
@@ -330,7 +371,7 @@
             } catch(e) { console.error(e); }
         }
 
-        window.confirmOrder = async function(id, name, qty) {
+        window.confirmOrder = async function(id) {
             try {
                 await updateDoc(doc(db, "orders", id), { status: 'مؤكد ومؤرشف ✅', confirmedAt: new Date().toLocaleString() });
                 alert('تم التأكيد ونقل الطلب للأرشيف!');
