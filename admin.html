@@ -3,31 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المتجر - الروابط المباشرة المجانية</title>
+    <title>لوحة التحكم الاحترافية - إدارة المتجر والأرشيف</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .container { max-width: 950px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
         h2, h3 { color: #2c3e50; text-align: center; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { background: #27ae60; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; cursor: pointer; }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { background: #27ae60; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; }
         button:hover { background: #219653; }
-        .btn-secondary { background: #2980b9; margin-top: 10px; }
+        .btn-secondary { background: #2980b9; }
         .btn-danger { background: #c0392b; }
         .btn-warning { background: #e67e22; color: white; }
         #login-box { text-align: center; margin-top: 50px; max-width: 400px; }
         #admin-content { display: none; }
         .error { color: red; font-size: 14px; margin-top: 5px; }
         .success { color: green; font-size: 14px; margin-top: 5px; }
-        .product-row, .order-row { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #eee; flex-wrap: wrap; gap: 10px; }
-        .user-row { display: flex; justify-content: space-between; align-items: center; background: #eef2f7; padding: 10px; border-radius: 5px; margin-bottom: 8px; }
-        .low-stock-alert { color: #c0392b; font-weight: bold; background: #fadbd8; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 10px; background: #bdc3c7; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: #333; }
-        .tab-btn.active { background: #2c3e50; color: white; }
+        
+        /* التبويبات */
+        .tabs-nav { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; background: #e2e8f0; padding: 6px; border-radius: 10px; }
+        .tab-btn { flex: 1; padding: 10px; background: transparent; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #475569; min-width: 130px; transition: all 0.2s; font-size: 13px; text-align: center; }
+        .tab-btn.active { background: #2c3e50; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+
+        .product-row, .order-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px; }
+        .user-row { display: flex; justify-content: space-between; align-items: center; background: #eef2f7; padding: 10px; border-radius: 6px; margin-bottom: 8px; }
+        .low-stock-alert { color: #c0392b; font-weight: bold; background: #fee2e2; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, #2c3e50, #1e293b); color: white; padding: 20px; border-radius: 10px; text-align: center; }
+        .stat-card h4 { margin: 0 0 10px 0; font-size: 14px; color: #94a3b8; }
+        .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
+
+        .search-box { margin-bottom: 15px; padding: 10px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; width: 100%; box-sizing: border-box; }
+        .pagination-nav { display: flex; justify-content: space-between; align-items: center; background: #edf2f7; padding: 10px; border-radius: 6px; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -47,24 +58,79 @@
         <div id="login-error" class="error"></div>
     </div>
 
-    <!-- لوحة التحكم الرئيسية -->
+    <!-- لوحة التحكم الرئيسية المنظمة -->
     <div id="admin-content">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; background: #2c3e50; color: white;">
             <h2 style="margin: 0; color: white;">لوحة التحكم - <span id="welcome-role"></span></h2>
-            <button onclick="logout()" class="btn-danger" style="width: auto; padding: 8px 15px;">تسجيل الخروج</button>
+            <button onclick="logout()" class="btn-danger" style="width: auto; padding: 8px 15px; font-size: 13px;">تسجيل الخروج</button>
         </div>
 
-        <div class="container" style="padding: 10px; background: transparent; box-shadow: none;">
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('store-tab')">📦 إدارة المنتجات والمخزون والطلبات</button>
-                <button class="tab-btn" onclick="switchTab('settings-tab')">⚙️ إعدادات كلمة المرور</button>
-                <button class="tab-btn" id="admin-tab-btn" style="display:none;" onclick="switchTab('admin-tab')">👥 إدارة الأعضاء (للأدمن فقط)</button>
+        <!-- شريط التبويبات الرئيسي -->
+        <div class="container" style="padding: 10px;">
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchTab('orders-tab', event)">📦 الطلبات الجارية</button>
+                <button class="tab-btn" onclick="switchTab('archive-tab', event)">📂 أرشيف المؤكدة</button>
+                <button class="tab-btn" onclick="switchTab('analytics-tab', event)">📊 التحليلات</button>
+                <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج</button>
+                <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ إدارة المنتجات</button>
             </div>
         </div>
 
-        <div id="store-tab" class="tab-content active">
+        <!-- 1. تبويب الطلبات الجارية (غير المؤكدة) مع بوابة التنقل -->
+        <div id="orders-tab" class="tab-content active">
             <div class="container">
-                <h2>إضافة منتج جديد والمخزون (بالروابط) ➕</h2>
+                <h2>طلبات الزبائن قيد الانتظار ⏳</h2>
+                <input type="text" id="search-orders" class="search-box" placeholder="🔍 بحث شامل في الطلبات (الاسم، الهاتف، الولاية، التاريخ...)" onkeyup="filterOrders()">
+                
+                <div id="orders-list">جاري تحميل الطلبات...</div>
+
+                <!-- بوابة التنقل (Pagination) بين الطلبات -->
+                <div class="pagination-nav" id="orders-pagination" style="display:none;">
+                    <button class="btn-secondary" style="width: auto; padding: 6px 15px;" onclick="changePage(-1)">السابق ⬅️</button>
+                    <span id="page-info">الصفحة 1 من 1</span>
+                    <button class="btn-secondary" style="width: auto; padding: 6px 15px;" onclick="changePage(1)">التالي ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. تبويب أرشيف الطلبات المؤكدة مع بحث شامل -->
+        <div id="archive-tab" class="tab-content">
+            <div class="container">
+                <h2>أرشيف الطلبات المؤكدة والتاريخية 📂</h2>
+                <input type="text" id="search-archive" class="search-box" placeholder="🔍 بحث شامل في الأرشيف (بالاسم، التاريخ، الوقت، الهاتف، الولاية...)" onkeyup="filterArchive()">
+                <div id="archive-list">جاري تحميل الأرشيف...</div>
+            </div>
+        </div>
+
+        <!-- 3. تبويب تحليل المتجر -->
+        <div id="analytics-tab" class="tab-content">
+            <div class="container">
+                <h2>إحصائيات وتحليلات المتجر 📊</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>إجمالي المنتجات</h4>
+                        <span id="stat-total-products">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h4>الطلبات قيد الانتظار</h4>
+                        <span id="stat-pending-orders">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h4>الطلبات المؤكدة (الأرشيف)</h4>
+                        <span id="stat-archived-orders" style="color: #4ade80;">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h4>منتجات بمخزون منخفض (≤5)</h4>
+                        <span id="stat-low-stock" style="color: #f87171;">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. تبويب إضافة المنتجات -->
+        <div id="add-product-tab" class="tab-content">
+            <div class="container">
+                <h2>إضافة منتج جديد للمتجر ➕</h2>
                 <div class="form-group">
                     <label>اسم المنتج:</label>
                     <input type="text" id="prod-name" placeholder="مثال: ساعة ذكية Ultra">
@@ -78,59 +144,55 @@
                     <input type="number" id="prod-stock" placeholder="مثال: 10">
                 </div>
                 <div class="form-group">
-                    <label>روابط الصور (افصل بينها بفواصل أو ضع رابطاً واحداً):</label>
-                    <input type="text" id="prod-image-urls" placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg">
+                    <label>تصنيف المنتج (Category):</label>
+                    <input type="text" id="prod-category" placeholder="مثال: إلكترونيات، ساعات، ملابس...">
                 </div>
                 <div class="form-group">
-                    <label>رابط الفيديو التعريفي (اختياري - يوتيوب أو رابط مباشر):</label>
+                    <label>روابط الصور المباشرة (مفصولة بفواصل):</label>
+                    <input type="text" id="prod-image-urls" placeholder="https://i.postimg.cc/.../img1.jpg">
+                </div>
+                <div class="form-group">
+                    <label>رابط الفيديو التعريفي (اختياري):</label>
                     <input type="text" id="prod-video-url" placeholder="https://www.youtube.com/embed/...">
                 </div>
                 <div class="form-group">
                     <label>وصف المنتج:</label>
-                    <textarea id="prod-desc" rows="2" placeholder="تفاصيل المنتج..."></textarea>
+                    <textarea id="prod-desc" rows="3" placeholder="تفاصيل ومميزات المنتج..."></textarea>
                 </div>
                 <button onclick="addProduct()">نشر المنتج في المتجر 🚀</button>
             </div>
+        </div>
 
+        <!-- 5. تبويب إدارة المنتجات -->
+        <div id="manage-products-tab" class="tab-content">
             <div class="container">
-                <h2>قائمة المنتجات وتعديل الأسعار والمخزون 🏷️</h2>
+                <h2>تعديل الأسعار، المخزون، وحذف المنتجات 🏷️</h2>
                 <div id="products-list">جاري تحميل المنتجات...</div>
             </div>
-
-            <div class="container">
-                <h2>متابعة وتأكيد طلبات الزبائن 📦</h2>
-                <div id="orders-list">جاري تحميل الطلبات...</div>
-            </div>
         </div>
 
-        <div id="settings-tab" class="tab-content">
-            <div class="container">
-                <h2>تغيير كلمة المرور الشخصية 🔑</h2>
-                <div class="form-group">
-                    <label>كلمة المرور الجديدة:</label>
-                    <input type="password" id="my-new-pass" placeholder="أدخل كلمة المرور الجديدة">
-                </div>
-                <button class="btn-secondary" onclick="updateMyPassword()">تحديث كلمة المرور</button>
+        <!-- إعدادات الحسابات -->
+        <div class="container" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+            <h3>⚙️ إعدادات الحساب والفريق</h3>
+            <div class="form-group" style="max-width: 400px; margin: 0 auto;">
+                <label>تغيير كلمة المرور الشخصية:</label>
+                <input type="password" id="my-new-pass" placeholder="كلمة المرور الجديدة">
+                <button class="btn-secondary" onclick="updateMyPassword()" style="margin-top: 8px; padding: 8px;">تحديث كلمة المرور</button>
                 <div id="my-pass-msg" class="success"></div>
             </div>
-        </div>
-
-        <div id="admin-tab" class="tab-content">
-            <div class="container" style="background: #eef9f2;">
-                <h2>إدارة حسابات فريق العمل 👥</h2>
-                <div class="form-group">
+            
+            <div id="super-admin-section" style="display:none; margin-top: 25px; border-top: 1px solid #cbd5e1; padding-top: 15px;">
+                <h3>👥 إدارة حسابات فريق العمل (للأدمن فقط)</h3>
+                <div class="form-group" style="max-width: 400px; margin: 0 auto;">
                     <label>اسم مستخدم العضو الجديد:</label>
                     <input type="text" id="new-staff-user" placeholder="مثال: staff1">
-                </div>
-                <div class="form-group">
-                    <label>كلمة المرور المبدئية:</label>
+                    <label style="margin-top: 8px;">كلمة المرور:</label>
                     <input type="password" id="new-staff-pass" placeholder="كلمة المرور">
+                    <button class="btn-secondary" onclick="addNewStaff()" style="margin-top: 8px; padding: 8px;">إنشاء حساب للعضو ➕</button>
+                    <div id="staff-msg" class="success"></div>
                 </div>
-                <button class="btn-secondary" onclick="addNewStaff()">إنشاء حساب للعضو ➕</button>
-                <div id="staff-msg" class="success"></div>
-                
-                <h3 style="margin-top: 20px; text-align: right;">قائمة أعضاء الفريق:</h3>
-                <div id="staff-list">جاري التحميل...</div>
+                <h4 style="text-align: right; margin-top: 15px;">قائمة الأعضاء الحاليين:</h4>
+                <div id="staff-list" style="max-width: 500px; margin: 0 auto;">جاري التحميل...</div>
             </div>
         </div>
     </div>
@@ -151,6 +213,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        let allOrdersList = [];
+        let allArchiveList = [];
+        let currentPage = 1;
+        const itemsPerPage = 5; // عدد الطلبات في كل صفحة ببوابة التنقل
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedUser = sessionStorage.getItem('ecom_logged_user');
             const savedRole = sessionStorage.getItem('ecom_logged_role');
@@ -159,7 +226,7 @@
             }
         });
 
-        window.switchTab = function(tabId) {
+        window.switchTab = function(tabId, event) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
@@ -205,12 +272,11 @@
             document.getElementById('welcome-role').innerText = `${username} (${role})`;
 
             if(username === "admin") {
-                document.getElementById('admin-tab-btn').style.display = 'block';
+                document.getElementById('super-admin-section').style.display = 'block';
                 loadStaffList();
             }
 
-            loadProductsManagement();
-            loadOrders();
+            loadAllData();
         }
 
         window.logout = function() {
@@ -218,34 +284,16 @@
             location.reload();
         }
 
-        window.updateMyPassword = async function() {
-            const currentUser = sessionStorage.getItem('ecom_logged_user');
-            const newPass = document.getElementById('my-new-pass').value.trim();
-            const msgBox = document.getElementById('my-pass-msg');
-            msgBox.innerText = "";
-
-            if(!newPass || newPass.length < 4) {
-                alert('الرجاء إدخال كلمة مرور تتكون من 4 خانات على الأقل!');
-                return;
-            }
-
-            try {
-                if(currentUser === "admin") {
-                    alert('كلمة مرور الأدمن الرئيسي يتم التحكم بها عبر إعدادات النظام.');
-                } else {
-                    await updateDoc(doc(db, "staffUsers", currentUser), { password: newPass });
-                    msgBox.innerText = "تم تحديث كلمة المرور الخاصة بك بنجاح! 🔑";
-                    document.getElementById('my-new-pass').value = '';
-                }
-            } catch(e) {
-                alert('حدث خطأ أثناء التحديث.');
-            }
+        async function loadAllData() {
+            loadProductsManagement();
+            loadOrdersAndArchive();
         }
 
         window.addProduct = async function() {
             const name = document.getElementById('prod-name').value.trim();
             const price = document.getElementById('prod-price').value.trim();
             const stock = document.getElementById('prod-stock').value.trim();
+            const category = document.getElementById('prod-category').value.trim() || 'عام';
             const desc = document.getElementById('prod-desc').value.trim();
             const urlsInput = document.getElementById('prod-image-urls').value.trim();
             const videoUrl = document.getElementById('prod-video-url').value.trim();
@@ -255,7 +303,6 @@
                 return;
             }
 
-            // تحويل الروابط المدخلة إلى مصفوفة (منفصلة بفواصل)
             let imageUrls = urlsInput ? urlsInput.split(',').map(u => u.trim()).filter(u => u.length > 0) : [];
 
             try {
@@ -263,22 +310,24 @@
                     name, 
                     price: Number(price), 
                     stock: Number(stock), 
+                    category,
                     desc, 
                     imageUrls, 
                     videoUrl, 
                     createdAt: new Date()
                 });
 
-                alert('تمت إضافة المنتج والمخزون بنجاح إلى المتجر! 🚀');
+                alert('تمت إضافة المنتج بنجاح! 🚀');
                 document.getElementById('prod-name').value = '';
                 document.getElementById('prod-price').value = '';
                 document.getElementById('prod-stock').value = '';
+                document.getElementById('prod-category').value = '';
                 document.getElementById('prod-desc').value = '';
                 document.getElementById('prod-image-urls').value = '';
                 document.getElementById('prod-video-url').value = '';
-                loadProductsManagement();
+                loadAllData();
             } catch (e) {
-                alert('خطأ أثناء نشر المنتج في قاعدة البيانات.');
+                alert('خطأ أثناء نشر المنتج.');
             }
         }
 
@@ -288,8 +337,13 @@
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
                 container.innerHTML = '';
+                let totalProd = querySnapshot.size;
+                let lowStockCount = 0;
+
                 if(querySnapshot.empty) {
                     container.innerHTML = '<p>لا توجد منتجات حالياً.</p>';
+                    document.getElementById('stat-total-products').innerText = '0';
+                    document.getElementById('stat-low-stock').innerText = '0';
                     return;
                 }
 
@@ -297,104 +351,173 @@
                     const prod = docItem.data();
                     const id = docItem.id;
                     const stockVal = prod.stock !== undefined ? prod.stock : 0;
-                    
-                    let stockAlertHtml = '';
-                    if(stockVal <= 5) {
-                        stockAlertHtml = `<span class="low-stock-alert">⚠️ تنبيه: باقي ${stockVal} حبات فقط!</span>`;
-                    }
+                    if(stockVal <= 5) lowStockCount++;
+
+                    let stockAlertHtml = stockVal <= 5 ? `<span class="low-stock-alert">⚠️ باقي ${stockVal} حبات!</span>` : '';
 
                     const row = document.createElement('div');
                     row.className = 'product-row';
                     row.innerHTML = `
                         <div>
-                            <b>${prod.name}</b> ${stockAlertHtml}<br>
-                            <small>المخزون الحالي الدقيق: <b>${stockVal}</b></small>
+                            <b>${prod.name}</b> [${prod.category || 'عام'}] ${stockAlertHtml}<br>
+                            <small>المخزون: <b>${stockVal}</b> | الرابط: <a href="index.html?id=${id}" target="_blank">فتح 🔗</a></small>
                         </div>
                         <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
-                            السعر: <input type="number" id="price-${id}" value="${prod.price}" style="width: 80px; padding: 5px;">
-                            <button onclick="updatePrice('${id}')" style="padding: 6px 10px; width: auto;">تعديل السعر</button>
-                            الكمية: <input type="number" id="stock-${id}" value="${stockVal}" style="width: 70px; padding: 5px;">
-                            <button onclick="updateStock('${id}')" class="btn-warning" style="padding: 6px 10px; width: auto;">تحديث المخزون</button>
-                            <button onclick="deleteProduct('${id}')" class="btn-danger" style="padding: 6px 10px; width: auto;">حذف</button>
+                            السعر: <input type="number" id="price-${id}" value="${prod.price}" style="width: 70px; padding: 4px;">
+                            <button onclick="updatePrice('${id}')" style="padding: 5px 8px; width: auto;">سعر</button>
+                            المخزون: <input type="number" id="stock-${id}" value="${stockVal}" style="width: 60px; padding: 4px;">
+                            <button onclick="updateStock('${id}')" class="btn-warning" style="padding: 5px 8px; width: auto;">تحديث</button>
+                            <button onclick="deleteProduct('${id}')" class="btn-danger" style="padding: 5px 8px; width: auto;">حذف</button>
                         </div>
                     `;
                     container.appendChild(row);
                 });
+
+                document.getElementById('stat-total-products').innerText = totalProd;
+                document.getElementById('stat-low-stock').innerText = lowStockCount;
             } catch(e) {
-                container.innerHTML = '<p style="color:red;">خطأ في تحميل المنتجات.</p>';
+                container.innerHTML = '<p style="color:red;">خطأ في التحميل.</p>';
             }
         }
 
-        window.updatePrice = async function(id) {
-            const newPrice = document.getElementById(`price-${id}`).value;
-            if(!newPrice) return;
-            try {
-                await updateDoc(doc(db, "products", id), { price: Number(newPrice) });
-                alert('تم تحديث السعر بنجاح! 💰');
-                loadProductsManagement();
-            } catch(e) { alert('فشل تحديث السعر.'); }
-        }
-
-        window.updateStock = async function(id) {
-            const newStock = document.getElementById(`stock-${id}`).value;
-            if(newStock === '') return;
-            try {
-                await updateDoc(doc(db, "products", id), { stock: Number(newStock) });
-                alert('تم تحديث المخزون بنجاح! 📦');
-                loadProductsManagement();
-            } catch(e) { alert('فشل تحديث المخزون.'); }
-        }
-
-        window.deleteProduct = async function(id) {
-            if(confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
-                try {
-                    await deleteDoc(doc(db, "products", id));
-                    loadProductsManagement();
-                } catch(e) { alert('فشل الحذف.'); }
-            }
-        }
-
-        async function loadOrders() {
-            const container = document.getElementById('orders-list');
-            container.innerHTML = 'جاري التحميل...';
+        async function loadOrdersAndArchive() {
             try {
                 const querySnapshot = await getDocs(collection(db, "orders"));
-                container.innerHTML = '';
-                if(querySnapshot.empty) {
-                    container.innerHTML = '<p>لا توجد طلبات جديدة.</p>';
-                    return;
-                }
+                allOrdersList = [];
+                allArchiveList = [];
+
                 querySnapshot.forEach((docItem) => {
-                    const order = docItem.data();
-                    const orderId = docItem.id;
-                    const status = order.status || 'قيد الانتظار ⏳';
-                    const statusColor = status.includes('مؤكد') ? 'green' : '#e67e22';
-                    const quantity = order.quantity || 1;
-
-                    let actionButtonHtml = `<button onclick="confirmOrder('${orderId}', '${order.productName}', ${quantity})" style="background: #27ae60; padding: 8px 12px; width: auto; font-size: 14px;">تأكيد الطلب ✅</button>`;
-                    if(status.includes('مؤكد')) {
-                        actionButtonHtml = `<span style="color: green; font-weight: bold;">تم التأكيد والخصم</span>`;
+                    const orderData = { id: docItem.id, ...docItem.data() };
+                    // التحقق مما إذا كان الطلب مؤكداً ومأرشفة
+                    if(orderData.status && orderData.status.includes('مؤكد')) {
+                        allArchiveList.push(orderData);
+                    } else {
+                        allOrdersList.push(orderData);
                     }
-
-                    const row = document.createElement('div');
-                    row.className = 'order-row';
-                    row.innerHTML = `
-                        <div>
-                            <strong>الزبون:</strong> ${order.fullName} | <strong>الهاتف:</strong> ${order.phone} | <strong>الولاية:</strong> ${order.wilaya}<br>
-                            <strong>المنتج:</strong> ${order.productName} | <strong>الكمية المطلوبة:</strong> <span style="color: #e74c3c; font-weight: bold;">${quantity} حبات</span><br>
-                            الحالة: <span style="color: ${statusColor}; font-weight: bold;">${status}</span>
-                        </div>
-                        <div>
-                            ${actionButtonHtml}
-                        </div>
-                    `;
-                    container.appendChild(row);
                 });
-            } catch(e) { container.innerHTML = '<p>لا توجد طلبات.</p>'; }
+
+                // تحديث العدادات والإحصائيات
+                document.getElementById('stat-pending-orders').innerText = allOrdersList.length;
+                document.getElementById('stat-archived-orders').innerText = allArchiveList.length;
+
+                renderOrdersPage(allOrdersList);
+                renderArchiveList(allArchiveList);
+            } catch(e) {
+                console.error(e);
+            }
         }
 
+        // عرض الطلبات الجارية مع بوابة التنقل (Pagination)
+        function renderOrdersPage(orders) {
+            const container = document.getElementById('orders-list');
+            const paginationNav = document.getElementById('orders-pagination');
+            container.innerHTML = '';
+
+            if(orders.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#64748b;">لا توجد طلبات جديدة قيد الانتظار.</p>';
+                paginationNav.style.display = 'none';
+                return;
+            }
+
+            const totalPages = Math.ceil(orders.length / itemsPerPage);
+            if(currentPage > totalPages) currentPage = totalPages;
+            if(currentPage < 1) currentPage = 1;
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedItems = orders.slice(start, end);
+
+            paginatedItems.forEach(order => {
+                const orderId = order.id;
+                const quantity = order.quantity || 1;
+                const orderTime = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString('ar-DZ') : 'وقت غير متوفر';
+
+                const row = document.createElement('div');
+                row.className = 'order-row';
+                row.innerHTML = `
+                    <div>
+                        <strong>الزبون:</strong> ${order.fullName} | <strong>الهاتف:</strong> ${order.phone}<br>
+                        <strong>الولاية:</strong> ${order.wilaya} | <strong>المنتج:</strong> ${order.productName} (${quantity} حبات)<br>
+                        <small style="color:#64748b;">وقت الطلبية: ${orderTime} | معرف الطلب: #${orderId.substring(0,6)}</small>
+                    </div>
+                    <div>
+                        <button onclick="confirmOrder('${orderId}', '${order.productName}', ${quantity})" style="background: #27ae60; padding: 8px 12px; width: auto; font-size: 13px;">تأكيد ونقل للأرشيف ✅</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+
+            if(totalPages > 1) {
+                paginationNav.style.display = 'flex';
+                document.getElementById('page-info').innerText = `الصفحة ${currentPage} من ${totalPages}`;
+            } else {
+                paginationNav.style.display = 'none';
+            }
+        }
+
+        window.changePage = function(direction) {
+            currentPage += direction;
+            renderOrdersPage(allOrdersList);
+        }
+
+        // فلترة وبحث الطلبات الجارية الشامل
+        window.filterOrders = function() {
+            const queryText = document.getElementById('search-orders').value.toLowerCase();
+            const filtered = allOrdersList.filter(o => {
+                const searchString = `${o.fullName} ${o.phone} ${o.wilaya} ${o.productName} ${o.id} ${o.status || ''}`.toLowerCase();
+                return searchString.includes(queryText);
+            });
+            currentPage = 1;
+            renderOrdersPage(filtered);
+        }
+
+        // عرض الأرشيف مع بحث شامل
+        function renderArchiveList(archive) {
+            const container = document.getElementById('archive-list');
+            container.innerHTML = '';
+
+            if(archive.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#64748b;">لا توجد طلبات مؤكدة في الأرشيف حتى الآن.</p>';
+                return;
+            }
+
+            archive.forEach(order => {
+                const quantity = order.quantity || 1;
+                const confirmedTime = order.confirmedAt || (order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString('ar-DZ') : 'غير متوفر');
+
+                const row = document.createElement('div');
+                row.className = 'order-row';
+                row.style.background = '#f0fdf4';
+                row.innerHTML = `
+                    <div>
+                        <strong>الزبون:</strong> ${order.fullName} | <strong>الهاتف:</strong> ${order.phone}<br>
+                        <strong>الولاية:</strong> ${order.wilaya} | <strong>المنتج:</strong> ${order.productName} (${quantity} حبات)<br>
+                        <span style="color: green; font-weight: bold;">الحالة: مؤكد ومحفوظ في الأرشيف ✅</span><br>
+                        <small style="color:#047857;"><b>تاريخ ووقت التأكيد والأرشفة:</b> ${confirmedTime}</small>
+                    </div>
+                    <div>
+                        <span style="background: #d1fae5; color: #065f46; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;">أرشيف رسمي</span>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // فلترة الأرشيف بحث شامل
+        window.filterArchive = function() {
+            const queryText = document.getElementById('search-archive').value.toLowerCase();
+            const filtered = allArchiveList.filter(o => {
+                const confirmedTimeStr = o.confirmedAt || '';
+                const searchString = `${o.fullName} ${o.phone} ${o.wilaya} ${o.productName} ${o.id} ${confirmedTimeStr}`.toLowerCase();
+                return searchString.includes(queryText);
+            });
+            renderArchiveList(filtered);
+        }
+
+        // تأكيد الطلب ونقله تلقائياً للأرشيف مع توقيت ووقت التأكيد
         window.confirmOrder = async function(orderId, productName, quantity) {
             try {
+                // 1. خصم المخزون أولاً
                 const productsRef = collection(db, "products");
                 const q = query(productsRef, where("name", "==", productName));
                 const querySnapshot = await getDocs(q);
@@ -405,7 +528,7 @@
                     const currentStock = productData.stock !== undefined ? productData.stock : 10;
 
                     if(currentStock < quantity) {
-                        alert(`عذراً، الكمية في المخزون (${currentStock}) أقل من الكمية المطلوبة (${quantity})! لا يمكن تأكيد الطلب.`);
+                        alert(`عذراً، المخزون الحالي (${currentStock}) أقل من الكمية المطلوبة (${quantity})!`);
                         return;
                     }
 
@@ -413,29 +536,78 @@
                     await updateDoc(doc(db, "products", productDoc.id), { stock: newStock });
                 }
 
-                await updateDoc(doc(db, "orders", orderId), { status: 'مؤكد من الفريق ✅' });
+                // 2. تحديث الطلب وتثبيت وقت التأكيد والأرشفة
+                const nowString = new Date().toLocaleString('ar-DZ', { dateStyle: 'full', timeStyle: 'medium' });
+                await updateDoc(doc(db, "orders", orderId), { 
+                    status: 'مؤكد ومؤرشف ✅',
+                    confirmedAt: nowString 
+                });
                 
-                alert(`تم تأكيد الطلب بنجاح وخصم (${quantity}) حبات من المخزون تلقائياً! 📉📦`);
-                loadOrders();
-                loadProductsManagement();
+                alert(`تم تأكيد الطلب وخصم المخزون بنجاح، وتم نقله فوراً إلى الأرشيف مع التوقيت! 📂✅`);
+                loadAllData();
             } catch(e) {
                 console.error(e);
-                alert('حدث خطأ أثناء تأكيد الطلب وخصم المخزون.');
+                alert('حدث خطأ أثناء التأكيد.');
             }
+        }
+
+        window.updatePrice = async function(id) {
+            const newPrice = document.getElementById(`price-${id}`).value;
+            if(!newPrice) return;
+            try {
+                await updateDoc(doc(db, "products", id), { price: Number(newPrice) });
+                alert('تم تحديث السعر بنجاح! 💰');
+                loadAllData();
+            } catch(e) { alert('فشل التحديث.'); }
+        }
+
+        window.updateStock = async function(id) {
+            const newStock = document.getElementById(`stock-${id}`).value;
+            if(newStock === '') return;
+            try {
+                await updateDoc(doc(db, "products", id), { stock: Number(newStock) });
+                alert('تم تحديث المخزون! 📦');
+                loadAllData();
+            } catch(e) { alert('فشل التحديث.'); }
+        }
+
+        window.deleteProduct = async function(id) {
+            if(confirm('هل تريد حذف هذا المنتج؟')) {
+                try {
+                    await deleteDoc(doc(db, "products", id));
+                    loadAllData();
+                } catch(e) { alert('فشل الحذف.'); }
+            }
+        }
+
+        window.updateMyPassword = async function() {
+            const currentUser = sessionStorage.getItem('ecom_logged_user');
+            const newPass = document.getElementById('my-new-pass').value.trim();
+            const msgBox = document.getElementById('my-pass-msg');
+            if(!newPass || newPass.length < 4) { alert('أدخل 4 خانات على الأقل!'); return; }
+            try {
+                if(currentUser === "admin") {
+                    alert('كلمة مرور الأدمن الرئيسي تُدار من إعدادات النظام.');
+                } else {
+                    await updateDoc(doc(db, "staffUsers", currentUser), { password: newPass });
+                    msgBox.innerText = "تم التحديث بنجاح! 🔑";
+                    document.getElementById('my-new-pass').value = '';
+                }
+            } catch(e) { alert('خطأ في التحديث.'); }
         }
 
         window.addNewStaff = async function() {
             const username = document.getElementById('new-staff-user').value.trim();
             const pass = document.getElementById('new-staff-pass').value.trim();
             const msg = document.getElementById('staff-msg');
-            if(!username || !pass) { alert('أدخل اسم المستخدم وكلمة المرور!'); return; }
+            if(!username || !pass) { alert('أدخل الاسم وكلمة المرور!'); return; }
             try {
                 await setDoc(doc(db, "staffUsers", username), { password: pass });
-                msg.innerText = `تمت إضافة الحساب (${username}) بنجاح!`;
+                msg.innerText = `تمت إضافة العضو (${username}) بنجاح!`;
                 document.getElementById('new-staff-user').value = '';
                 document.getElementById('new-staff-pass').value = '';
                 loadStaffList();
-            } catch(e) { alert('خطأ في إضافة الحساب.'); }
+            } catch(e) { alert('خطأ في الإضافة.'); }
         }
 
         async function loadStaffList() {
@@ -443,24 +615,20 @@
             try {
                 const snap = await getDocs(collection(db, "staffUsers"));
                 listDiv.innerHTML = '';
-                if(snap.empty) {
-                    listDiv.innerHTML = '<p>لا توجد أعضاء إضافيون حالياً.</p>';
-                    return;
-                }
+                if(snap.empty) { listDiv.innerHTML = '<p>لا توجد أعضاء إضافيون.</p>'; return; }
                 snap.forEach(d => {
                     const row = document.createElement('div');
                     row.className = 'user-row';
-                    row.innerHTML = `<span>👤 اسم العضو: <b>${d.id}</b></span> <button onclick="deleteStaff('${d.id}')" class="btn-danger" style="width: auto; padding: 4px 10px; font-size: 14px;">حذف الحساب</button>`;
+                    row.innerHTML = `<span>👤 <b>${d.id}</b></span> <button onclick="deleteStaff('${d.id}')" class="btn-danger" style="width: auto; padding: 3px 8px; font-size: 13px;">حذف</button>`;
                     listDiv.appendChild(row);
                 });
             } catch(e) { listDiv.innerHTML = ''; }
         }
 
         window.deleteStaff = async function(username) {
-            if(confirm(`هل تريد حقاً حذف حساب العضو (${username})؟`)) {
+            if(confirm(`حذف حساب (${username})؟`)) {
                 try {
                     await deleteDoc(doc(db, "staffUsers", username));
-                    alert('تم حذف الحساب بنجاح.');
                     loadStaffList();
                 } catch(e) { alert('فشل الحذف.'); }
             }
