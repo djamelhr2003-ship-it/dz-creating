@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>لوحة التحكم الاحترافية - إدارة المتجر والأرشيف الشامل</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
@@ -24,7 +24,6 @@
         .error { color: red; font-size: 14px; margin-top: 5px; }
         .success { color: green; font-size: 14px; margin-top: 5px; }
         
-        /* التبويبات المحدثة */
         .tabs-nav { display: flex; gap: 3px; margin-bottom: 20px; flex-wrap: wrap; background: #e2e8f0; padding: 6px; border-radius: 10px; }
         .tab-btn { flex: 1; padding: 10px 4px; background: transparent; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #475569; min-width: 100px; transition: all 0.2s; font-size: 11px; text-align: center; }
         .tab-btn.active { background: #2c3e50; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -46,7 +45,6 @@
 </head>
 <body>
 
-    <!-- شاشة تسجيل الدخول -->
     <div id="login-box" class="container">
         <h2>تسجيل دخول الفريق 🔐</h2>
         <div class="form-group" style="text-align: right;">
@@ -62,7 +60,6 @@
         <div id="login-error" class="error"></div>
     </div>
 
-    <!-- لوحة التحكم الرئيسية -->
     <div id="admin-content">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; background: #2c3e50; color: white;">
             <h2 style="margin: 0; color: white;">لوحة التحكم - <span id="welcome-role"></span></h2>
@@ -72,7 +69,6 @@
             </div>
         </div>
 
-        <!-- شريط التبويبات المحدث -->
         <div class="container" style="padding: 10px;">
             <div class="tabs-nav">
                 <button class="tab-btn active" onclick="switchTab('orders-tab', event)">📦 الطلبات</button>
@@ -86,7 +82,6 @@
             </div>
         </div>
 
-        <!-- 1. تبويب الطلبات الجارية -->
         <div id="orders-tab" class="tab-content active">
             <div class="container">
                 <h2>طلبات الزبائن قيد الانتظار ⏳</h2>
@@ -100,7 +95,6 @@
             </div>
         </div>
 
-        <!-- 2. تبويب أرشيف الطلبات -->
         <div id="archive-tab" class="tab-content">
             <div class="container">
                 <h2>أرشيف الطلبات المؤكدة والتاريخية 📂</h2>
@@ -109,7 +103,6 @@
             </div>
         </div>
 
-        <!-- 3. تبويب أرشيف المستخدمين والفريق -->
         <div id="staff-archive-tab" class="tab-content">
             <div class="container">
                 <h2>📂 أرشيف المستخدمين وأعضاء الفريق والسجلات</h2>
@@ -118,7 +111,6 @@
             </div>
         </div>
 
-        <!-- 4. تبويب التحليلات -->
         <div id="analytics-tab" class="tab-content">
             <div class="container">
                 <h2>إحصائيات وتحليلات المتجر العامة 📊</h2>
@@ -143,7 +135,6 @@
             </div>
         </div>
 
-        <!-- 5. تبويب إضافة منتج (مع جدول واختيار التصنيفات) -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد للمتجر ➕</h2>
@@ -159,8 +150,6 @@
                     <label>الكمية المتوفرة في المخزون (Stock):</label>
                     <input type="number" id="prod-stock" placeholder="مثال: 10">
                 </div>
-                
-                <!-- قائمة اختيار التصنيفات أو إضافة تصنيف جديد -->
                 <div class="form-group">
                     <label>اختر تصنيف المنتج أو أضف تصنيفاً جديداً:</label>
                     <select id="prod-category-select" onchange="checkCategorySelection()" style="margin-bottom: 8px;">
@@ -168,7 +157,6 @@
                     </select>
                     <input type="text" id="prod-category-new" placeholder="أو اكتب تصنيفاً جديداً هنا (اختياري)..." style="display:none;">
                 </div>
-
                 <div class="form-group">
                     <label>روابط الصور المباشرة (مفصولة بفواصل):</label>
                     <input type="text" id="prod-image-urls" placeholder="https://i.postimg.cc/.../img1.jpg">
@@ -185,7 +173,6 @@
             </div>
         </div>
 
-        <!-- 6. تبويب تعديل المنتجات -->
         <div id="manage-products-tab" class="tab-content">
             <div class="container">
                 <h2>تعديل الأسعار، الكميات، وإدارة المنتجات 🏷️</h2>
@@ -193,7 +180,6 @@
             </div>
         </div>
 
-        <!-- 7. تبويب الأفراد اونلاين والنشاط الحالي -->
         <div id="staff-activity-tab" class="tab-content">
             <div class="container">
                 <h2>🟢 مراقبة الأفراد المتواجدين الآن في النظام</h2>
@@ -202,7 +188,6 @@
             </div>
         </div>
 
-        <!-- 8. تبويب الإعدادات والحسابات -->
         <div id="settings-tab" class="tab-content">
             <div class="container">
                 <h2>⚙️ إعدادات الحساب الشخصي والفريق</h2>
@@ -360,7 +345,6 @@
             loadStaffArchiveData();
         }
 
-        // تحديث قائمة التصنيفات في القائمة المنسدلة بناءً على المنتجات المسجلة
         function updateCategoryDropdown() {
             const select = document.getElementById('prod-category-select');
             let optionsHtml = `<option value="">-- اختر من التصنيفات الموجودة --</option>`;
@@ -516,9 +500,7 @@
                 if(sessionStorage.getItem('ecom_logged_user') === 'admin') {
                     loadStaffActivityMonitor();
                 }
-            } catch(e) {
-                console.error(e);
-            }
+            } catch(e) { console.error(e); }
         }
 
         function renderOrdersPage(orders) {
