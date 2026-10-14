@@ -109,7 +109,7 @@
             </div>
         </div>
 
-        <!-- 3. تبويب أرشيف المستخدمين والفريق الجديد -->
+        <!-- 3. تبويب أرشيف المستخدمين والفريق -->
         <div id="staff-archive-tab" class="tab-content">
             <div class="container">
                 <h2>📂 أرشيف المستخدمين وأعضاء الفريق والسجلات</h2>
@@ -143,7 +143,7 @@
             </div>
         </div>
 
-        <!-- 5. تبويب إضافة منتج -->
+        <!-- 5. تبويب إضافة منتج (مع جدول واختيار التصنيفات) -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد للمتجر ➕</h2>
@@ -159,10 +159,16 @@
                     <label>الكمية المتوفرة في المخزون (Stock):</label>
                     <input type="number" id="prod-stock" placeholder="مثال: 10">
                 </div>
+                
+                <!-- قائمة اختيار التصنيفات أو إضافة تصنيف جديد -->
                 <div class="form-group">
-                    <label>تصنيف المنتج (Category):</label>
-                    <input type="text" id="prod-category" placeholder="مثال: إلكترونيات، ساعات...">
+                    <label>اختر تصنيف المنتج أو أضف تصنيفاً جديداً:</label>
+                    <select id="prod-category-select" onchange="checkCategorySelection()" style="margin-bottom: 8px;">
+                        <option value="">-- اختر من التصنيفات الموجودة --</option>
+                    </select>
+                    <input type="text" id="prod-category-new" placeholder="أو اكتب تصنيفاً جديداً هنا (اختياري)..." style="display:none;">
                 </div>
+
                 <div class="form-group">
                     <label>روابط الصور المباشرة (مفصولة بفواصل):</label>
                     <input type="text" id="prod-image-urls" placeholder="https://i.postimg.cc/.../img1.jpg">
@@ -246,6 +252,7 @@
         let allOrdersList = [];
         let allArchiveList = [];
         let allStaffListForArchive = [];
+        let existingCategories = new Set(['إلكترونيات', 'ساعات', 'ملابس', 'أجهزة منزلية']);
         let currentPage = 1;
         const itemsPerPage = 5;
 
@@ -353,11 +360,46 @@
             loadStaffArchiveData();
         }
 
+        // تحديث قائمة التصنيفات في القائمة المنسدلة بناءً على المنتجات المسجلة
+        function updateCategoryDropdown() {
+            const select = document.getElementById('prod-category-select');
+            let optionsHtml = `<option value="">-- اختر من التصنيفات الموجودة --</option>`;
+            optionsHtml += `<option value="NEW_CAT">➕ إضافة تصنيف جديد...</option>`;
+            
+            existingCategories.forEach(cat => {
+                optionsHtml += `<option value="${cat}">${cat}</option>`;
+            });
+            select.innerHTML = optionsHtml;
+        }
+
+        window.checkCategorySelection = function() {
+            const selectVal = document.getElementById('prod-category-select').value;
+            const newCatInput = document.getElementById('prod-category-new');
+            if(selectVal === 'NEW_CAT') {
+                newCatInput.style.display = 'block';
+                newCatInput.focus();
+            } else {
+                newCatInput.style.display = 'none';
+                newCatInput.value = '';
+            }
+        }
+
         window.addProduct = async function() {
             const name = document.getElementById('prod-name').value.trim();
             const price = document.getElementById('prod-price').value.trim();
             const stock = document.getElementById('prod-stock').value.trim();
-            const category = document.getElementById('prod-category').value.trim() || 'عام';
+            
+            const selectCat = document.getElementById('prod-category-select').value;
+            const newCat = document.getElementById('prod-category-new').value.trim();
+            let category = 'عام';
+
+            if(selectCat === 'NEW_CAT' && newCat) {
+                category = newCat;
+                existingCategories.add(newCat);
+            } else if(selectCat && selectCat !== 'NEW_CAT') {
+                category = selectCat;
+            }
+
             const desc = document.getElementById('prod-desc').value.trim();
             const urlsInput = document.getElementById('prod-image-urls').value.trim();
             const videoUrl = document.getElementById('prod-video-url').value.trim();
@@ -385,10 +427,13 @@
                 document.getElementById('prod-name').value = '';
                 document.getElementById('prod-price').value = '';
                 document.getElementById('prod-stock').value = '';
-                document.getElementById('prod-category').value = '';
+                document.getElementById('prod-category-select').value = '';
+                document.getElementById('prod-category-new').value = '';
+                document.getElementById('prod-category-new').style.display = 'none';
                 document.getElementById('prod-desc').value = '';
                 document.getElementById('prod-image-urls').value = '';
                 document.getElementById('prod-video-url').value = '';
+                updateCategoryDropdown();
                 loadAllData();
             } catch (e) {
                 alert('خطأ أثناء نشر المنتج.');
@@ -408,12 +453,15 @@
                     container.innerHTML = '<p>لا توجد منتجات حالياً.</p>';
                     document.getElementById('stat-total-products').innerText = '0';
                     document.getElementById('stat-low-stock').innerText = '0';
+                    updateCategoryDropdown();
                     return;
                 }
 
                 querySnapshot.forEach((docItem) => {
                     const prod = docItem.data();
                     const id = docItem.id;
+                    if(prod.category) existingCategories.add(prod.category);
+
                     const stockVal = prod.stock !== undefined ? prod.stock : 0;
                     if(stockVal <= 5) lowStockCount++;
 
@@ -439,6 +487,7 @@
 
                 document.getElementById('stat-total-products').innerText = totalProd;
                 document.getElementById('stat-low-stock').innerText = lowStockCount;
+                updateCategoryDropdown();
             } catch(e) {
                 container.innerHTML = '<p style="color:red;">خطأ في التحميل.</p>';
             }
@@ -524,7 +573,6 @@
             renderOrdersPage(allOrdersList);
         }
 
-        // محرك البحث الشامل والعام للطلبات الجارية (يشمل كل شيء)
         window.filterOrders = function() {
             const queryText = document.getElementById('search-orders').value.toLowerCase();
             const filtered = allOrdersList.filter(o => {
@@ -557,7 +605,7 @@
                         <strong>الزبون:</strong> ${order.fullName} | <strong>الهاتف:</strong> ${order.phone}<br>
                         <strong>الولاية:</strong> ${order.wilaya} | <strong>المنتج:</strong> ${order.productName} (${quantity} حبات)<br>
                         <span style="color: green; font-weight: bold;">تم التأكيد بواسطة: [${confirmedBy}] ✅</span><br>
-                        <small style="color:#047857;"><b>وقت ووقت الأرشفة:</b> ${confirmedTime}</small>
+                        <small style="color:#047857;"><b>وقت الأرشفة:</b> ${confirmedTime}</small>
                     </div>
                     <div>
                         <span style="background: #d1fae5; color: #065f46; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;">أرشيف</span>
@@ -567,7 +615,6 @@
             });
         }
 
-        // محرك البحث الشامل للأرشيف (يشمل كل شيء)
         window.filterArchive = function() {
             const queryText = document.getElementById('search-archive').value.toLowerCase();
             const filtered = allArchiveList.filter(o => {
@@ -577,7 +624,6 @@
             renderArchiveList(filtered);
         }
 
-        // جماهير وعرض أرشيف الفريق والمستخدمين بالتفصيل
         async function loadStaffArchiveData() {
             const container = document.getElementById('staff-archive-list');
             container.innerHTML = 'جاري جلب سجلات أرشيف الفريق...';
@@ -649,7 +695,6 @@
             });
         }
 
-        // محرك البحث الشامل لأرشيف الفريق (يشمل كل شيء)
         window.filterStaffArchive = function() {
             const queryText = document.getElementById('search-staff-archive').value.toLowerCase();
             const filtered = allStaffListForArchive.filter(s => {
