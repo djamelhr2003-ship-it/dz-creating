@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم الاحترافية - إدارة المتجر والأنشطة</title>
+    <title>لوحة التحكم الاحترافية - إدارة المتجر والأرشيف الشامل</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .container { max-width: 1050px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
         h2, h3 { color: #2c3e50; text-align: center; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
@@ -25,8 +25,8 @@
         .success { color: green; font-size: 14px; margin-top: 5px; }
         
         /* التبويبات المحدثة */
-        .tabs-nav { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; background: #e2e8f0; padding: 6px; border-radius: 10px; }
-        .tab-btn { flex: 1; padding: 10px 8px; background: transparent; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #475569; min-width: 120px; transition: all 0.2s; font-size: 12px; text-align: center; }
+        .tabs-nav { display: flex; gap: 3px; margin-bottom: 20px; flex-wrap: wrap; background: #e2e8f0; padding: 6px; border-radius: 10px; }
+        .tab-btn { flex: 1; padding: 10px 4px; background: transparent; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #475569; min-width: 100px; transition: all 0.2s; font-size: 11px; text-align: center; }
         .tab-btn.active { background: #2c3e50; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
@@ -75,13 +75,14 @@
         <!-- شريط التبويبات المحدث -->
         <div class="container" style="padding: 10px;">
             <div class="tabs-nav">
-                <button class="tab-btn active" onclick="switchTab('orders-tab', event)">📦 الطلبات الجارية</button>
-                <button class="tab-btn" onclick="switchTab('archive-tab', event)">📂 الأرشيف</button>
+                <button class="tab-btn active" onclick="switchTab('orders-tab', event)">📦 الطلبات</button>
+                <button class="tab-btn" onclick="switchTab('archive-tab', event)">📂 أرشيف الطلبات</button>
+                <button class="tab-btn" onclick="switchTab('staff-archive-tab', event)" id="staff-arch-btn" style="display:none;">👥 أرشيف الفريق</button>
                 <button class="tab-btn" onclick="switchTab('analytics-tab', event)">📊 التحليلات</button>
                 <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج</button>
                 <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المنتجات</button>
-                <button class="tab-btn" onclick="switchTab('staff-activity-tab', event)" id="staff-tab-btn" style="display:none;">👥 مراقبة الأفراد</button>
-                <button class="tab-btn" onclick="switchTab('settings-tab', event)">⚙️ إعدادات الحساب</button>
+                <button class="tab-btn" onclick="switchTab('staff-activity-tab', event)" id="staff-tab-btn" style="display:none;">🟢 الأفراد اونلاين</button>
+                <button class="tab-btn" onclick="switchTab('settings-tab', event)">⚙️ الإعدادات</button>
             </div>
         </div>
 
@@ -89,7 +90,7 @@
         <div id="orders-tab" class="tab-content active">
             <div class="container">
                 <h2>طلبات الزبائن قيد الانتظار ⏳</h2>
-                <input type="text" id="search-orders" class="search-box" placeholder="🔍 بحث شامل (الاسم، الهاتف، الولاية، التاريخ...)" onkeyup="filterOrders()">
+                <input type="text" id="search-orders" class="search-box" placeholder="🔍 بحث شامل يشمل كل شيء (الاسم، الهاتف، الولاية، المنتج، التاريخ، الوقت...)" onkeyup="filterOrders()">
                 <div id="orders-list">جاري التحميل...</div>
                 <div class="pagination-nav" id="orders-pagination" style="display:none;">
                     <button class="btn-secondary" style="width: auto; padding: 6px 15px;" onclick="changePage(-1)">السابق ⬅️</button>
@@ -99,22 +100,31 @@
             </div>
         </div>
 
-        <!-- 2. تبويب الأرشيف -->
+        <!-- 2. تبويب أرشيف الطلبات -->
         <div id="archive-tab" class="tab-content">
             <div class="container">
                 <h2>أرشيف الطلبات المؤكدة والتاريخية 📂</h2>
-                <input type="text" id="search-archive" class="search-box" placeholder="🔍 بحث شامل في الأرشيف (الاسم، المؤكد بواسطة، التاريخ...)" onkeyup="filterArchive()">
+                <input type="text" id="search-archive" class="search-box" placeholder="🔍 بحث شامل في الأرشيف (الاسم، الهاتف، الولاية، المنتج، المشرف، وقت الأرشفة...)" onkeyup="filterArchive()">
                 <div id="archive-list">جاري التحميل...</div>
             </div>
         </div>
 
-        <!-- 3. تبويب التحليلات -->
+        <!-- 3. تبويب أرشيف المستخدمين والفريق الجديد -->
+        <div id="staff-archive-tab" class="tab-content">
+            <div class="container">
+                <h2>📂 أرشيف المستخدمين وأعضاء الفريق والسجلات</h2>
+                <input type="text" id="search-staff-archive" class="search-box" placeholder="🔍 بحث شامل في سجلات الفريق (اسم العضو، تاريخ الالتحاق، الأنشطة، الطلبات...)" onkeyup="filterStaffArchive()">
+                <div id="staff-archive-list">جاري تحميل أرشيف الفريق...</div>
+            </div>
+        </div>
+
+        <!-- 4. تبويب التحليلات -->
         <div id="analytics-tab" class="tab-content">
             <div class="container">
-                <h2>إحصائيات وتحليلات المتجر 📊</h2>
+                <h2>إحصائيات وتحليلات المتجر العامة 📊</h2>
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <h4>إجمالي المنتجات</h4>
+                        <h4>إجمالي المنتجات المضافة</h4>
                         <span id="stat-total-products">0</span>
                     </div>
                     <div class="stat-card">
@@ -133,7 +143,7 @@
             </div>
         </div>
 
-        <!-- 4. تبويب إضافة منتج -->
+        <!-- 5. تبويب إضافة منتج -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد للمتجر ➕</h2>
@@ -169,24 +179,24 @@
             </div>
         </div>
 
-        <!-- 5. تبويب إدارة المنتجات -->
+        <!-- 6. تبويب تعديل المنتجات -->
         <div id="manage-products-tab" class="tab-content">
             <div class="container">
-                <h2>تعديل الأسعار والمخزون 🏷️</h2>
+                <h2>تعديل الأسعار، الكميات، وإدارة المنتجات 🏷️</h2>
                 <div id="products-list">جاري التحميل...</div>
             </div>
         </div>
 
-        <!-- 6. تبويب مراقبة الأفراد والأنشطة (للأدمن) -->
+        <!-- 7. تبويب الأفراد اونلاين والنشاط الحالي -->
         <div id="staff-activity-tab" class="tab-content">
             <div class="container">
-                <h2>👥 مراقبة أفراد الفريق وتتبع الأنشطة بدقة</h2>
-                <p style="color: #64748b; font-size: 13px; text-align: center;">يظهر هنا حالة الاتصال الحالية، وقت وساعة الدخول، وإجمالي الطلبات والمنتجات التي أنجزها كل فرد.</p>
+                <h2>🟢 مراقبة الأفراد المتواجدين الآن في النظام</h2>
+                <p style="color: #64748b; font-size: 13px; text-align: center;">حالة الاتصال المباشرة ووقت آخر نشاط لأعضاء الفريق.</p>
                 <div id="staff-activity-list">جاري التحميل...</div>
             </div>
         </div>
 
-        <!-- 7. تبويب إعدادات الحساب المستقل -->
+        <!-- 8. تبويب الإعدادات والحسابات -->
         <div id="settings-tab" class="tab-content">
             <div class="container">
                 <h2>⚙️ إعدادات الحساب الشخصي والفريق</h2>
@@ -235,6 +245,7 @@
 
         let allOrdersList = [];
         let allArchiveList = [];
+        let allStaffListForArchive = [];
         let currentPage = 1;
         const itemsPerPage = 5;
 
@@ -292,10 +303,19 @@
 
         async function updateStaffLoginStatus(username, loginTime) {
             try {
+                const userRef = doc(db, "staffUsers", username);
+                const userSnap = await getDoc(userRef);
+                let joinedTime = userSnap.exists() && userSnap.data().joinedAt ? userSnap.data().joinedAt : loginTime;
+
+                if(!userSnap.exists() || !userSnap.data().joinedAt) {
+                    await updateDoc(userRef, { joinedAt: loginTime }).catch(() => {});
+                }
+
                 await setDoc(doc(db, "staffStatus", username), {
                     username,
                     isOnline: true,
                     lastLogin: loginTime,
+                    joinedAt: joinedTime,
                     lastActive: new Date()
                 }, { merge: true });
             } catch(e) { console.error(e); }
@@ -309,7 +329,7 @@
             if(username === "admin") {
                 document.getElementById('super-admin-section').style.display = 'block';
                 document.getElementById('staff-tab-btn').style.display = 'block';
-                loadStaffActivityMonitor();
+                document.getElementById('staff-arch-btn').style.display = 'block';
                 loadStaffList();
             }
 
@@ -330,6 +350,7 @@
         async function loadAllData() {
             loadProductsManagement();
             loadOrdersAndArchive();
+            loadStaffArchiveData();
         }
 
         window.addProduct = async function() {
@@ -503,9 +524,13 @@
             renderOrdersPage(allOrdersList);
         }
 
+        // محرك البحث الشامل والعام للطلبات الجارية (يشمل كل شيء)
         window.filterOrders = function() {
             const queryText = document.getElementById('search-orders').value.toLowerCase();
-            const filtered = allOrdersList.filter(o => `${o.fullName} ${o.phone} ${o.wilaya} ${o.productName} ${o.id}`.toLowerCase().includes(queryText));
+            const filtered = allOrdersList.filter(o => {
+                const searchString = `${o.fullName || ''} ${o.phone || ''} ${o.wilaya || ''} ${o.productName || ''} ${o.id || ''} ${o.quantity || ''} ${o.status || ''}`.toLowerCase();
+                return searchString.includes(queryText);
+            });
             currentPage = 1;
             renderOrdersPage(filtered);
         }
@@ -532,7 +557,7 @@
                         <strong>الزبون:</strong> ${order.fullName} | <strong>الهاتف:</strong> ${order.phone}<br>
                         <strong>الولاية:</strong> ${order.wilaya} | <strong>المنتج:</strong> ${order.productName} (${quantity} حبات)<br>
                         <span style="color: green; font-weight: bold;">تم التأكيد بواسطة: [${confirmedBy}] ✅</span><br>
-                        <small style="color:#047857;"><b>تاريخ ووقت الأرشفة:</b> ${confirmedTime}</small>
+                        <small style="color:#047857;"><b>وقت ووقت الأرشفة:</b> ${confirmedTime}</small>
                     </div>
                     <div>
                         <span style="background: #d1fae5; color: #065f46; padding: 5px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;">أرشيف</span>
@@ -542,10 +567,97 @@
             });
         }
 
+        // محرك البحث الشامل للأرشيف (يشمل كل شيء)
         window.filterArchive = function() {
             const queryText = document.getElementById('search-archive').value.toLowerCase();
-            const filtered = allArchiveList.filter(o => `${o.fullName} ${o.phone} ${o.wilaya} ${o.productName} ${o.confirmedBy || ''} ${o.confirmedAt || ''}`.toLowerCase().includes(queryText));
+            const filtered = allArchiveList.filter(o => {
+                const searchString = `${o.fullName || ''} ${o.phone || ''} ${o.wilaya || ''} ${o.productName || ''} ${o.confirmedBy || ''} ${o.confirmedAt || ''} ${o.quantity || ''} ${o.id || ''}`.toLowerCase();
+                return searchString.includes(queryText);
+            });
             renderArchiveList(filtered);
+        }
+
+        // جماهير وعرض أرشيف الفريق والمستخدمين بالتفصيل
+        async function loadStaffArchiveData() {
+            const container = document.getElementById('staff-archive-list');
+            container.innerHTML = 'جاري جلب سجلات أرشيف الفريق...';
+            try {
+                const statusSnap = await getDocs(collection(db, "staffStatus"));
+                let staffMap = {};
+                staffMap['admin'] = { username: 'admin', joinedAt: 'بداية إنشاء النظام (مدير عام)' };
+
+                statusSnap.forEach(d => {
+                    staffMap[d.id] = d.data();
+                });
+
+                let staffStats = {};
+                allArchiveList.forEach(order => {
+                    let agent = order.confirmedBy || 'admin';
+                    if(!staffStats[agent]) staffStats[agent] = { count: 0, products: {} };
+                    staffStats[agent].count++;
+                    staffStats[agent].products[order.productName] = (staffStats[agent].products[order.productName] || 0) + (order.quantity || 1);
+                });
+
+                allStaffListForArchive = [];
+                for(let username in staffMap) {
+                    let info = staffMap[username];
+                    let stats = staffStats[username] || { count: 0, products: {} };
+                    allStaffListForArchive.push({
+                        username,
+                        joinedAt: info.joinedAt || info.lastLogin || 'غير متوفر',
+                        totalOrders: stats.count,
+                        products: stats.products
+                    });
+                }
+
+                renderStaffArchiveList(allStaffListForArchive);
+            } catch(e) {
+                container.innerHTML = '<p style="color:red;">خطأ في تحميل أرشيف الفريق.</p>';
+            }
+        }
+
+        function renderStaffArchiveList(staffList) {
+            const container = document.getElementById('staff-archive-list');
+            container.innerHTML = '';
+
+            if(staffList.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#64748b;">لا توجد سجلات للأعضاء حالياً.</p>';
+                return;
+            }
+
+            staffList.forEach(staff => {
+                let prodDetails = '';
+                for(let pName in staff.products) {
+                    prodDetails += `<br>&nbsp;&nbsp;• ${pName}: (${staff.products[pName]} حبات)`;
+                }
+                if(!prodDetails) prodDetails = ' لم يقم بتأكيد أي طلب بعد.';
+
+                let row = document.createElement('div');
+                row.className = 'staff-activity-card';
+                row.innerHTML = `
+                    <div>
+                        <strong>👤 اسم العضو / المستخدم:</strong> <span style="color:#2563eb; font-weight:bold;">${staff.username}</span><br>
+                        <small style="color:#0f172a;"><b>📅 تاريخ ووقت الالتحاق بالنظام:</b> ${staff.joinedAt}</small><br>
+                        <small style="color:#0284c7;"><b>📊 إجمالي الطلبات المؤكدة والمنجزة:</b> ${staff.totalOrders} طلبات</small><br>
+                        <small style="color:#16a34a;"><b>📦 تفاصيل المنتجات المنجزة:</b> ${prodDetails}</small>
+                    </div>
+                    <div>
+                        <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold;">سجل رسمي</span>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // محرك البحث الشامل لأرشيف الفريق (يشمل كل شيء)
+        window.filterStaffArchive = function() {
+            const queryText = document.getElementById('search-staff-archive').value.toLowerCase();
+            const filtered = allStaffListForArchive.filter(s => {
+                let prodsStr = JSON.stringify(s.products);
+                let searchString = `${s.username} ${s.joinedAt} ${s.totalOrders} ${prodsStr}`.toLowerCase();
+                return searchString.includes(queryText);
+            });
+            renderStaffArchiveList(filtered);
         }
 
         window.confirmOrder = async function(orderId, productName, quantity) {
@@ -584,57 +696,36 @@
             }
         }
 
-        // مراقبة نشاط الأفراد وأداء العمل
         async function loadStaffActivityMonitor() {
             const container = document.getElementById('staff-activity-list');
-            container.innerHTML = 'جاري تحليل وتتبع أنشطة الأفراد...';
+            container.innerHTML = 'جاري تتبع النشاط الحالي...';
             try {
                 const statusSnap = await getDocs(collection(db, "staffStatus"));
                 let staffMap = {};
-
-                // إضافة الأدمن الرئيسي افتراضياً
                 staffMap['admin'] = { username: 'admin', isOnline: true, lastLogin: 'مسؤول النظام الدائم' };
 
                 statusSnap.forEach(d => {
                     staffMap[d.id] = d.data();
                 });
 
-                // حساب الأنشطة من الأرشيف (الطلبات المؤكدة لكل شخص)
-                let staffStats = {};
-                allArchiveList.forEach(order => {
-                    let agent = order.confirmedBy || 'admin';
-                    if(!staffStats[agent]) staffStats[agent] = { count: 0, products: {} };
-                    staffStats[agent].count++;
-                    staffStats[agent].products[order.productName] = (staffStats[agent].products[order.productName] || 0) + (order.quantity || 1);
-                });
-
                 container.innerHTML = '';
                 for(let username in staffMap) {
                     let info = staffMap[username];
-                    let stats = staffStats[username] || { count: 0, products: {} };
                     let onlineHtml = info.isOnline ? `<span class="online-badge">🟢 متصل الآن</span>` : `<span class="offline-badge">⚪ غير متصل</span>`;
                     let loginTime = info.lastLogin || 'غير متوفر';
-
-                    let prodSummary = '';
-                    for(let pName in stats.products) {
-                        prodSummary += `<br>&nbsp;&nbsp;• ${pName}: (${stats.products[pName]} حبات)`;
-                    }
-                    if(!prodSummary) prodSummary = ' لا توجد طلبات مؤكدة حتى الآن.';
 
                     let card = document.createElement('div');
                     card.className = 'staff-activity-card';
                     card.innerHTML = `
                         <div>
-                            <b>👤 اسم العضو: ${username}</b> ${onlineHtml}<br>
-                            <small style="color:#475569;"><b>وقت وساعة الدخول:</b> ${loginTime}</small><br>
-                            <small style="color:#0284c7;"><b>إجمالي الطلبات المؤكدة والمنجزة:</b> ${stats.count} طلبات</small><br>
-                            <small style="color:#16a34a;"><b>المنتجات التي تم تأكيدها:</b> ${prodSummary}</small>
+                            <b>👤 العضو: ${username}</b> ${onlineHtml}<br>
+                            <small style="color:#475569;"><b>آخر دخول:</b> ${loginTime}</small>
                         </div>
                     `;
                     container.appendChild(card);
                 }
             } catch(e) {
-                container.innerHTML = '<p style="color:red;">خطأ في تحميل بيانات النشاط.</p>';
+                container.innerHTML = '<p style="color:red;">خطأ في تحميل النشاط.</p>';
             }
         }
 
@@ -688,12 +779,15 @@
             const pass = document.getElementById('new-staff-pass').value.trim();
             const msg = document.getElementById('staff-msg');
             if(!username || !pass) { alert('أدخل الاسم وكلمة المرور!'); return; }
+            
+            const joinString = new Date().toLocaleString('ar-DZ', { dateStyle: 'full', timeStyle: 'medium' });
             try {
-                await setDoc(doc(db, "staffUsers", username), { password: pass });
+                await setDoc(doc(db, "staffUsers", username), { password: pass, joinedAt: joinString });
                 msg.innerText = `تمت إضافة العضو (${username}) بنجاح!`;
                 document.getElementById('new-staff-user').value = '';
                 document.getElementById('new-staff-pass').value = '';
                 loadStaffList();
+                loadStaffArchiveData();
             } catch(e) { alert('خطأ في الإضافة.'); }
         }
 
@@ -717,6 +811,7 @@
                 try {
                     await deleteDoc(doc(db, "staffUsers", username));
                     loadStaffList();
+                    loadStaffArchiveData();
                 } catch(e) { alert('فشل الحذف.'); }
             }
         }
