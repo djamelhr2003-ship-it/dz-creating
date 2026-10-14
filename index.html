@@ -3,38 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجري الجزائري - متوفر / كمية قليلة</title>
+    <title>متجر الجزائر السحابي - المتجر العصري</title>
     <style>
-        body { font-family: Tahoma, sans-serif; background: #f9f9f9; margin: 0; padding: 10px; color: #333; }
-        header { background: #2c3e50; color: white; padding: 15px; text-align: center; border-radius: 8px; }
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; }
-        .product-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .media-container { width: 100%; height: 220px; background: #000; border-radius: 5px; overflow: hidden; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
-        .media-container img, .media-container video { width: 100%; height: 100%; object-fit: contain; display: none; background: #000; }
-        .media-container img.active, .media-container video.active { display: block; }
-        .thumbs-container { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 5px; }
-        .thumb-item { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 2px solid transparent; cursor: pointer; background: #ddd; flex-shrink: 0; }
-        .thumb-item.active { border-color: #27ae60; }
-        .thumb-video { display: flex; align-items: center; justify-content: center; background: #222; color: #fff; font-size: 10px; font-weight: bold; text-align: center; }
-        .price { color: #e74c3c; font-weight: bold; font-size: 18px; margin: 5px 0; text-align: center; }
-        .stock-badge { text-align: center; font-size: 14px; margin-bottom: 10px; font-weight: bold; }
-        .stock-normal { color: #27ae60; background: #eafaf1; padding: 5px; border-radius: 4px; }
-        .stock-low { color: #c0392b; background: #fadbd8; padding: 5px; border-radius: 4px; }
-        button { background: #27ae60; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; }
-        button:hover { background: #219653; }
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+        }
+
+        /* الهيدر العصري */
+        header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            letter-spacing: 0.5px;
+        }
+
+        header p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* قسم تعريف المتجر (Hero Section) */
+        .hero-banner {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .hero-banner h3 {
+            margin: 0 0 8px 0;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .hero-banner p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 13px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+
+        /* شريط البحث */
+        .search-container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 30px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            background: #fff;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* حاوية المنتجات */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* بطاقة المنتج العصرية */
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e2e8f0;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .media-container {
+            width: 100%;
+            height: 220px;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .media-container img, .media-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .media-container img.active, .media-container video.active {
+            display: block;
+        }
+
+        .thumbs-container {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 8px;
+            background: #f1f5f9;
+        }
+
+        .thumb-item {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            background: #cbd5e1;
+            flex-shrink: 0;
+            transition: border-color 0.2s;
+        }
+
+        .thumb-item.active {
+            border-color: var(--primary);
+        }
+
+        .thumb-video {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #334155;
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .product-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+            color: var(--text-main);
+        }
+
+        .product-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0 0 12px 0;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .price-stock-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .price {
+            color: var(--danger);
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .stock-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .stock-normal {
+            color: var(--success);
+            background: #d1fae5;
+        }
+
+        .stock-low {
+            color: var(--danger);
+            background: #fee2e2;
+        }
+
+        .order-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .order-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .no-products {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
 
     <header>
         <h1>🛍️ متجر الجزائر السحابي</h1>
-        <p>توصيل متوفر لجميع ولايات الوطن 🇩🇿 والدفع عند الاستلام</p>
+        <p>وجهتك الأولى للتسوق الذكي عبر الإنترنت في الجزائر 🇩🇿</p>
     </header>
 
-    <div class="products-grid" id="products-container">
-        <p style="text-align: center; grid-column: 1 / -1;">جاري تحميل المنتجات...</p>
+    <!-- قسم تعريف المتجر العصري -->
+    <section class="hero-banner">
+        <h3>✨ جودة عالية وتوصيل سريع لجميع ولايات الوطن</h3>
+        <p>نقدم لك أحدث المنتجات المختارة بعناية فائقة مع ضمان الجودة، وخاصية الدفع عند الاستلام بكل أمان وراحة.</p>
+    </section>
+
+    <!-- شريط البحث الفوري -->
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 ابحث عن أي منتج تريده هنا..." onkeyup="filterProducts()">
     </div>
 
+    <div class="container">
+        <div class="products-grid" id="products-container">
+            <div class="no-products">جاري تحميل المنتجات السحابية...</div>
+        </div>
+    </div>
+
+    <!-- جلب البيانات وعرض المتجر -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -51,75 +296,98 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        let allProducts = [];
+
         async function loadProducts() {
             const container = document.getElementById('products-container');
-            container.innerHTML = '';
             
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
-                if(querySnapshot.empty) {
-                    container.innerHTML = '<p style="text-align: center; grid-column: 1 / -1;">لا توجد منتجات مضافة حالياً.</p>';
-                    return;
+                allProducts = [];
+                
+                querySnapshot.forEach((docItem) => {
+                    allProducts.push({ id: docItem.id, ...docItem.data() });
+                });
+
+                renderProducts(allProducts);
+            } catch (error) {
+                console.error("خطأ في الاتصال بقاعدة البيانات:", error);
+                container.innerHTML = `<div class="no-products" style="color: var(--danger);">عذراً، تحقق من تفعيل قواعد الأمان في Firebase (Firestore Rules).</div>`;
+            }
+        }
+
+        window.renderProducts = function(products) {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+
+            if(products.length === 0) {
+                container.innerHTML = '<div class="no-products">لا توجد منتجات مطابقة للبحث أو مضافة حالياً.</div>';
+                return;
+            }
+
+            products.forEach((prod) => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+
+                let images = prod.imageUrls || (prod.imageUrl ? [prod.imageUrl] : []);
+                let videoUrl = prod.videoUrl || '';
+                const cardId = prod.id;
+                const stockVal = prod.stock !== undefined ? prod.stock : 10;
+
+                let mediaHtml = '';
+                let thumbsHtml = '';
+
+                images.forEach((imgUrl, index) => {
+                    const activeClass = (index === 0 && !videoUrl) ? 'active' : '';
+                    mediaHtml += `<img id="img-${cardId}-${index}" src="${imgUrl}" class="${activeClass}">`;
+                    thumbsHtml += `<img src="${imgUrl}" class="thumb-item ${activeClass}" onclick="switchMedia('${cardId}', 'img', ${index}, this)">`;
+                });
+
+                if(videoUrl) {
+                    const activeClass = images.length === 0 ? 'active' : '';
+                    mediaHtml += `<video id="vid-${cardId}" src="${videoUrl}" controls playsinline preload="metadata" class="${activeClass}"></video>`;
+                    thumbsHtml += `<div class="thumb-item thumb-video ${activeClass}" onclick="switchMedia('${cardId}', 'vid', 0, this)">1080p ▶️</div>`;
                 }
 
-                querySnapshot.forEach((docItem) => {
-                    const prod = docItem.data();
-                    const card = document.createElement('div');
-                    card.className = 'product-card';
+                if(images.length === 0 && !videoUrl) {
+                    mediaHtml = `<img src="https://via.placeholder.com/300?text=No+Image" class="active">`;
+                }
 
-                    let images = prod.imageUrls || (prod.imageUrl ? [prod.imageUrl] : []);
-                    let videoUrl = prod.videoUrl || '';
-                    const cardId = docItem.id;
-                    const stockVal = prod.stock !== undefined ? prod.stock : 10;
+                let stockHtml = '';
+                if(stockVal <= 0) {
+                    stockHtml = `<span class="stock-badge stock-low">❌ نفذت الكمية</span>`;
+                } else if(stockVal <= 5) {
+                    stockHtml = `<span class="stock-badge stock-low">⚠️ كمية قليلة</span>`;
+                } else {
+                    stockHtml = `<span class="stock-badge stock-normal">✅ متوفر</span>`;
+                }
 
-                    let mediaHtml = '';
-                    let thumbsHtml = '';
-
-                    images.forEach((imgUrl, index) => {
-                        const activeClass = (index === 0 && !videoUrl) ? 'active' : '';
-                        mediaHtml += `<img id="img-${cardId}-${index}" src="${imgUrl}" class="${activeClass}">`;
-                        thumbsHtml += `<img src="${imgUrl}" class="thumb-item ${activeClass}" onclick="switchMedia('${cardId}', 'img', ${index}, this)">`;
-                    });
-
-                    if(videoUrl) {
-                        const activeClass = images.length === 0 ? 'active' : '';
-                        mediaHtml += `<video id="vid-${cardId}" src="${videoUrl}" controls playsinline preload="metadata" class="${activeClass}"></video>`;
-                        thumbsHtml += `<div class="thumb-item thumb-video ${activeClass}" onclick="switchMedia('${cardId}', 'vid', 0, this)">1080p ▶️</div>`;
-                    }
-
-                    if(images.length === 0 && !videoUrl) {
-                        mediaHtml = `<img src="https://via.placeholder.com/150" class="active">`;
-                    }
-
-                    // طريقة عرض المخزون للزبون (بدون إظهار الرقم الدقيق، فقط متوفر أو كمية قليلة)
-                    let stockHtml = '';
-                    if(stockVal <= 0) {
-                        stockHtml = `<div class="stock-badge stock-low">❌ نفذت الكمية تماماً</div>`;
-                    } else if(stockVal <= 5) {
-                        stockHtml = `<div class="stock-badge stock-low">⚠️ تنبيه: الكمية قليلة جداً! اطلب الآن قبل النفاد</div>`;
-                    } else {
-                        stockHtml = `<div class="stock-badge stock-normal">✅ متوفر في المخزون</div>`;
-                    }
-
-                    card.innerHTML = `
-                        <div class="media-container" id="container-${cardId}">
-                            ${mediaHtml}
+                card.innerHTML = `
+                    <div class="media-container" id="container-${cardId}">
+                        ${mediaHtml}
+                    </div>
+                    <div class="thumbs-container">
+                        ${thumbsHtml}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${prod.name}</h3>
+                        <p class="product-desc">${prod.desc || 'لا يوجد وصف متاح للمنتج حالياً.'}</p>
+                        <div class="price-stock-row">
+                            <span class="price">${prod.price} دج</span>
+                            ${stockHtml}
                         </div>
-                        <div class="thumbs-container">
-                            ${thumbsHtml}
-                        </div>
-                        <h3>${prod.name}</h3>
-                        <p>${prod.desc || ''}</p>
-                        <div class="price">${prod.price} دج</div>
-                        ${stockHtml}
-                        <button onclick="orderProduct('${prod.name}', ${prod.price}, ${stockVal})">اطلب الآن 🛒</button>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: red;">فشل في تحميل المنتجات.</p>';
-            }
+                        <button class="order-btn" onclick="orderProduct('${prod.name}', ${prod.price}, ${stockVal})">اطلب الآن 🛒</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // دالة البحث الفوري
+        window.filterProducts = function() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
+            renderProducts(filtered);
         }
 
         window.switchMedia = function(cardId, type, index, thumbElement) {
@@ -175,7 +443,7 @@
                     status: 'قيد الانتظار ⏳', 
                     createdAt: new Date()
                 });
-                alert(`تم إرسال طلبك (${quantity} حبات) بنجاح! سيقوم فريقنا بالاتصال بك قريباً. 🎉`);
+                alert(`تم إرسال طلبك (${quantity} حبات) بنجاح! سيقوم فريقنا بالاتصال بك قريباً للتأكيد. 🎉`);
             } catch(e) {
                 alert('حدث خطأ أثناء إرسال الطلب.');
             }
