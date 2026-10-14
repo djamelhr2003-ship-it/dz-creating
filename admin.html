@@ -3,61 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم المتجر - الإدارة السحابية</title>
+    <title>إدارة المتجر - نظام الصلاحيات</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #2c3e50; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2, h3 { color: #2c3e50; text-align: center; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         button { background: #27ae60; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; cursor: pointer; }
         button:hover { background: #219653; }
-        #login-box { text-align: center; margin-top: 50px; }
+        .btn-secondary { background: #2980b9; margin-top: 10px; }
+        .btn-secondary:hover { background: #1f618d; }
+        .btn-danger { background: #c0392b; }
+        .btn-danger:hover { background: #962d22; }
+        #login-box { text-align: center; margin-top: 50px; max-width: 400px; }
         #admin-content { display: none; }
         .error { color: red; font-size: 14px; margin-top: 5px; }
+        .success { color: green; font-size: 14px; margin-top: 5px; }
+        .product-row, .order-row { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 10px; border: 1px solid #eee; }
+        .user-row { display: flex; justify-content: space-between; align-items: center; background: #eef2f7; padding: 8px 12px; border-radius: 5px; margin-bottom: 8px; }
     </style>
 </head>
 <body>
 
     <!-- شاشة تسجيل الدخول -->
     <div id="login-box" class="container">
-        <h2>تسجيل دخول الإدارة</h2>
-        <input type="password" id="admin-pass" placeholder="أدخل كلمة المرور السرية">
-        <button onclick="checkLogin()" style="margin-top: 15px;">دخول</button>
+        <h2>تسجيل دخول الفريق 🔐</h2>
+        <div class="form-group" style="text-align: right;">
+            <label>اسم المستخدم:</label>
+            <input type="text" id="login-username" placeholder="أدخل اسم المستخدم">
+        </div>
+        <div class="form-group" style="text-align: right;">
+            <label>كلمة المرور:</label>
+            <input type="password" id="login-pass" placeholder="أدخل كلمة المرور">
+        </div>
+        <button onclick="checkLogin()">دخول للنظام</button>
         <div id="login-error" class="error"></div>
     </div>
 
-    <!-- لوحة التحكم الحقيقية -->
-    <div id="admin-content" class="container">
-        <h2>لوحة تحكم المتجر السحابي 🛠️</h2>
-        <div class="form-group">
-            <label>اسم المنتج:</label>
-            <input type="text" id="prod-name" placeholder="مثال: ساعة ذكية Ultra">
+    <!-- لوحة التحكم الرئيسية -->
+    <div id="admin-content">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; background: #2c3e50; color: white;">
+            <h2 style="margin: 0; color: white;">لوحة التحكم - <span id="welcome-role"></span></h2>
+            <button onclick="logout()" class="btn-danger" style="width: auto; padding: 8px 15px;">تسجيل الخروج</button>
         </div>
-        <div class="form-group">
-            <label>السعر (دج):</label>
-            <input type="number" id="prod-price" placeholder="مثال: 4500">
+
+        <!-- قسم إضافة المنتجات -->
+        <div class="container">
+            <h2>إضافة منتج جديد ➕</h2>
+            <div class="form-group">
+                <label>اسم المنتج:</label>
+                <input type="text" id="prod-name" placeholder="مثال: ساعة ذكية">
+            </div>
+            <div class="form-group">
+                <label>السعر (دج):</label>
+                <input type="number" id="prod-price" placeholder="مثال: 4500">
+            </div>
+            <div class="form-group">
+                <label>صورة المنتج:</label>
+                <input type="file" id="prod-image-file" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label>وصف المنتج:</label>
+                <textarea id="prod-desc" rows="2" placeholder="وصف مختصر..."></textarea>
+            </div>
+            <button onclick="addProduct()">نشر المنتج في المتجر</button>
         </div>
-        <div class="form-group">
-            <label>صورة المنتج (من الهاتف مباشرة):</label>
-            <input type="file" id="prod-image-file" accept="image/*">
+
+        <!-- قسم إدارة المنتجات وتعديل الأسعار -->
+        <div class="container">
+            <h2>قائمة المنتجات وتعديل الأسعار 🏷️</h2>
+            <div id="products-list">جاري تحميل المنتجات...</div>
         </div>
-        <div class="form-group">
-            <label>وصف المنتج:</label>
-            <textarea id="prod-desc" rows="3" placeholder="تفاصيل المنتج ومزاياه..."></textarea>
+
+        <!-- قسم متابعة الطلبات -->
+        <div class="container">
+            <h2>متابعة طلبات الزبائن 📦</h2>
+            <div id="orders-list">جاري تحميل الطلبات...</div>
         </div>
-        <button onclick="addProduct()">إضافة المنتج للسحابة ➕</button>
+
+        <!-- قسم إدارة الحسابات (خاص بالأدمن الرئيسي فقط) -->
+        <div class="container" id="admin-management-section" style="display: none; background: #eef9f2;">
+            <h2>إدارة حسابات فريق العمل 👥 (للأدمن فقط)</h2>
+            <div class="form-group">
+                <label>اسم مستخدم العضو الجديد:</label>
+                <input type="text" id="new-staff-user" placeholder="مثال: ahmed_staff">
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور:</label>
+                <input type="password" id="new-staff-pass" placeholder="كلمة المرور الخاصة به">
+            </div>
+            <button class="btn-secondary" onclick="addNewStaff()">إنشاء حساب للعضو ➕</button>
+            <div id="staff-msg" class="success"></div>
+            
+            <h3 style="margin-top: 20px; text-align: right;">الحسابات الحالية:</h3>
+            <div id="staff-list">جاري التحميل...</div>
+        </div>
     </div>
 
     <!-- إعدادات Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDdJY7mI1DON...", // استبدلها بكودك السحابي إن لم يتم حفظه تلقائياً
+            apiKey: "AIzaSyDdJY7mI1DON...", 
             authDomain: "creater-ecom.firebaseapp.com",
             projectId: "creater-ecom",
             storageBucket: "creater-ecom.appspot.com",
@@ -69,16 +121,62 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        window.checkLogin = function() {
-            const pass = document.getElementById('admin-pass').value;
-            if(pass === 'dzstore2026') {
-                document.getElementById('login-box').style.display = 'none';
-                document.getElementById('admin-content').style.display = 'block';
-            } else {
-                document.getElementById('login-error').innerText = 'كلمة المرور غير صحيحة!';
+        let currentUser = null;
+
+        // تسجيل الدخول
+        window.checkLogin = async function() {
+            const username = document.getElementById('login-username').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            const errorBox = document.getElementById('login-error');
+
+            if(!username || !pass) {
+                errorBox.innerText = "الرجاء إدخال اسم المستخدم وكلمة المرور!";
+                return;
+            }
+
+            // فحص الأدمن الرئيسي الافتراضي
+            if(username === "admin" && pass === "dzstore2026") {
+                currentUser = { username: "admin", role: "Super Admin" };
+                initDashboard();
+                return;
+            }
+
+            // فحص حسابات الفريق من قاعدة البيانات
+            try {
+                const userDocRef = doc(db, "staffUsers", username);
+                const userSnap = await getDoc(userDocRef);
+
+                if(userSnap.exists() && userSnap.data().password === pass) {
+                    currentUser = { username: username, role: "فريق العمل (Staff)" };
+                    initDashboard();
+                } else {
+                    errorBox.innerText = "اسم المستخدم أو كلمة المرور غير صحيحة!";
+                }
+            } catch (e) {
+                errorBox.innerText = "حدث خطأ في الاتصال بقاعدة البيانات.";
             }
         }
 
+        function initDashboard() {
+            document.getElementById('login-box').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+            document.getElementById('welcome-role').innerText = `${currentUser.username} (${currentUser.role})`;
+
+            // إذا كان الأدمن الرئيسي، نظهر له قسم إدارة المستخدمين
+            if(currentUser.username === "admin") {
+                document.getElementById('admin-management-section').style.display = 'block';
+                loadStaffList();
+            }
+
+            loadProductsManagement();
+            loadOrders();
+        }
+
+        window.logout = function() {
+            location.reload();
+        }
+
+        // إضافة منتج جديد
         window.addProduct = async function() {
             const name = document.getElementById('prod-name').value;
             const price = document.getElementById('prod-price').value;
@@ -86,36 +184,162 @@
             const imageFile = document.getElementById('prod-image-file').files[0];
 
             if(!name || !price) {
-                alert('الرجاء إدخال اسم المنتج والسعر على الأقل!');
+                alert('الرجاء إدخال اسم المنتج والسعر!');
                 return;
             }
 
-            let imageUrl = '';
-            
             try {
+                let imageUrl = '';
                 if(imageFile) {
-                    alert('جاري رفع الصورة للسحابة...');
+                    alert('جاري رفع الصورة...');
                     const storageRef = ref(storage, 'products/' + Date.now() + '_' + imageFile.name);
                     const snapshot = await uploadBytes(storageRef, imageFile);
                     imageUrl = await getDownloadURL(snapshot.ref);
                 }
 
                 await addDoc(collection(db, "products"), {
-                    name: name,
-                    price: Number(price),
-                    desc: desc,
-                    imageUrl: imageUrl,
-                    createdAt: new Date()
+                    name, price: Number(price), desc, imageUrl, createdAt: new Date()
                 });
 
-                alert('تمت إضافة المنتج بنجاح وتخزينه سحابياً! 🚀');
+                alert('تمت إضافة المنتج بنجاح! 🚀');
                 document.getElementById('prod-name').value = '';
                 document.getElementById('prod-price').value = '';
                 document.getElementById('prod-desc').value = '';
                 document.getElementById('prod-image-file').value = '';
-            } catch (error) {
-                console.error("خطأ أثناء الإضافة: ", error);
-                alert('حدث خطأ أثناء رفع المنتج، تأكد من إعدادات Storage.');
+                loadProductsManagement();
+            } catch (e) {
+                alert('خطأ أثناء إضافة المنتج.');
+            }
+        }
+
+        // تحميل وتعديل منتجات المتجر
+        async function loadProductsManagement() {
+            const container = document.getElementById('products-list');
+            container.innerHTML = 'جاري التحميل...';
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                container.innerHTML = '';
+                if(querySnapshot.empty) {
+                    container.innerHTML = '<p>لا توجد منتجات حالياً.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((docItem) => {
+                    const prod = docItem.data();
+                    const id = docItem.id;
+                    const row = document.createElement('div');
+                    row.className = 'product-row';
+                    row.innerHTML = `
+                        <span><b>${prod.name}</b></span>
+                        <div style="display: flex; gap: 5px; align-items: center;">
+                            <input type="number" id="price-${id}" value="${prod.price}" style="width: 100px; padding: 5px;">
+                            <button onclick="updatePrice('${id}')" style="padding: 6px 10px; width: auto;">تعديل السعر</button>
+                            <button onclick="deleteProduct('${id}')" class="btn-danger" style="padding: 6px 10px; width: auto;">حذف</button>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+            } catch(e) {
+                container.innerHTML = '<p style="color:red;">خطأ في تحميل المنتجات.</p>';
+            }
+        }
+
+        window.updatePrice = async function(id) {
+            const newPrice = document.getElementById(`price-${id}`).value;
+            if(!newPrice) return;
+            try {
+                await updateDoc(doc(db, "products", id), { price: Number(newPrice) });
+                alert('تم تحديث السعر بنجاح! 💰');
+                loadProductsManagement();
+            } catch(e) {
+                alert('فشل تحديث السعر.');
+            }
+        }
+
+        window.deleteProduct = async function(id) {
+            if(confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+                try {
+                    await deleteDoc(doc(db, "products", id));
+                    loadProductsManagement();
+                } catch(e) {
+                    alert('فشل الحذف.');
+                }
+            }
+        }
+
+        // متابعة الطلبات
+        async function loadOrders() {
+            const container = document.getElementById('orders-list');
+            container.innerHTML = 'جاري تحميل الطلبات...';
+            try {
+                const querySnapshot = await getDocs(collection(db, "orders"));
+                container.innerHTML = '';
+                if(querySnapshot.empty) {
+                    container.innerHTML = '<p>لا توجد طلبات جديدة حتى الآن.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((docItem) => {
+                    const order = docItem.data();
+                    const row = document.createElement('div');
+                    row.className = 'order-row';
+                    row.innerHTML = `
+                        <div>
+                            <strong>الزبون:</strong> ${order.fullName || 'غير متوفر'} | 
+                            <strong>الهاتف:</strong> ${order.phone || ''} | 
+                            <strong>الولاية:</strong> ${order.wilaya || ''} | 
+                            <strong>المنتج:</strong> ${order.productName || ''} (${order.price || 0} دج)
+                        </div>
+                        <span style="color: green; font-weight: bold;">جديد 📌</span>
+                    `;
+                    container.appendChild(row);
+                });
+            } catch(e) {
+                container.innerHTML = '<p>لا توجد طلبات أو قيد الاعداد.</p>';
+            }
+        }
+
+        // إضافة أفراد العمل (خاص بالأدمن الرئيسي)
+        window.addNewStaff = async function() {
+            const username = document.getElementById('new-staff-user').value.trim();
+            const pass = document.getElementById('new-staff-pass').value.trim();
+            const msg = document.getElementById('staff-msg');
+            msg.innerText = "";
+
+            if(!username || !pass) {
+                alert('أدخل اسم المستخدم وكلمة المرور!');
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, "staffUsers", username), { password: pass });
+                msg.innerText = `تمت إضافة حساب العضو (${username}) بنجاح!`;
+                document.getElementById('new-staff-user').value = '';
+                document.getElementById('new-staff-pass').value = '';
+                loadStaffList();
+            } catch(e) {
+                alert('حدث خطأ أثناء إضافة الحساب.');
+            }
+        }
+
+        async function loadStaffList() {
+            const listDiv = document.getElementById('staff-list');
+            listDiv.innerHTML = 'جاري التحميل...';
+            try {
+                const snap = await getDocs(collection(db, "staffUsers"));
+                listDiv.innerHTML = '';
+                if(snap.empty) {
+                    listDiv.innerHTML = '<p>لا توجد حسابات إضافية مسجلة.</p>';
+                    return;
+                }
+                snap.forEach(d => {
+                    const row = document.createElement('div');
+                    row.className = 'user-row';
+                    row.innerHTML = `<span>👤 اسم المستخدم: <b>${d.id}</b></span>`;
+                    listDiv.appendChild(row);
+                });
+            } catch(e) {
+                listDiv.innerHTML = '';
             }
         }
     </script>
