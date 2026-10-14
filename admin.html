@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المتجر - نظام الصلاحيات</title>
+    <title>إدارة المتجر - جودة 1080p</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 700px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h2, h3 { color: #2c3e50; text-align: center; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
         button { background: #27ae60; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; font-size: 16px; cursor: pointer; }
         button:hover { background: #219653; }
         .btn-secondary { background: #2980b9; margin-top: 10px; }
-        .btn-secondary:hover { background: #1f618d; }
         .btn-danger { background: #c0392b; }
-        .btn-danger:hover { background: #962d22; }
         #login-box { text-align: center; margin-top: 50px; max-width: 400px; }
         #admin-content { display: none; }
         .error { color: red; font-size: 14px; margin-top: 5px; }
@@ -51,48 +49,53 @@
 
         <!-- قسم إضافة المنتجات -->
         <div class="container">
-            <h2>إضافة منتج جديد ➕</h2>
+            <h2>إضافة منتج جديد (صور + فيديو بجودة 1080p) ➕</h2>
             <div class="form-group">
                 <label>اسم المنتج:</label>
-                <input type="text" id="prod-name" placeholder="مثال: ساعة ذكية">
+                <input type="text" id="prod-name" placeholder="مثال: ساعة ذكية Ultra">
             </div>
             <div class="form-group">
                 <label>السعر (دج):</label>
-                <input type="number" id="prod-price" placeholder="مثال: 4500">
+                <input type="number" id="prod-price" placeholder="مثال: 5500">
             </div>
             <div class="form-group">
-                <label>صورة المنتج:</label>
-                <input type="file" id="prod-image-file" accept="image/*">
+                <label>صور المنتج (اختر عدة صور):</label>
+                <input type="file" id="prod-image-files" accept="image/*" multiple>
+            </div>
+            <div class="form-group">
+                <label>فيديو تعريفي (جودة 1080p - أقل من 30 ثانية):</label>
+                <input type="file" id="prod-video-file" accept="video/mp4,video/quicktime">
+                <small style="color: #666;">يدعم ملفات MP4 بدقة 1080p لتوضيح تفاصيل المنتج.</small>
             </div>
             <div class="form-group">
                 <label>وصف المنتج:</label>
-                <textarea id="prod-desc" rows="2" placeholder="وصف مختصر..."></textarea>
+                <textarea id="prod-desc" rows="2" placeholder="تفاصيل المنتج..."></textarea>
             </div>
-            <button onclick="addProduct()">نشر المنتج في المتجر</button>
+            <button onclick="addProduct()">نشر المنتج في المتجر 🚀</button>
         </div>
 
-        <!-- قسم إدارة المنتجات وتعديل الأسعار -->
+        <!-- إدارة المنتجات والأسعار -->
         <div class="container">
             <h2>قائمة المنتجات وتعديل الأسعار 🏷️</h2>
             <div id="products-list">جاري تحميل المنتجات...</div>
         </div>
 
-        <!-- قسم متابعة الطلبات -->
+        <!-- متابعة الطلبات -->
         <div class="container">
             <h2>متابعة طلبات الزبائن 📦</h2>
             <div id="orders-list">جاري تحميل الطلبات...</div>
         </div>
 
-        <!-- قسم إدارة الحسابات (خاص بالأدمن الرئيسي فقط) -->
+        <!-- إدارة حسابات الفريق (للأدمن الرئيسي) -->
         <div class="container" id="admin-management-section" style="display: none; background: #eef9f2;">
-            <h2>إدارة حسابات فريق العمل 👥 (للأدمن فقط)</h2>
+            <h2>إدارة حسابات فريق العمل 👥</h2>
             <div class="form-group">
                 <label>اسم مستخدم العضو الجديد:</label>
-                <input type="text" id="new-staff-user" placeholder="مثال: ahmed_staff">
+                <input type="text" id="new-staff-user" placeholder="مثال: staff1">
             </div>
             <div class="form-group">
                 <label>كلمة المرور:</label>
-                <input type="password" id="new-staff-pass" placeholder="كلمة المرور الخاصة به">
+                <input type="password" id="new-staff-pass" placeholder="كلمة المرور">
             </div>
             <button class="btn-secondary" onclick="addNewStaff()">إنشاء حساب للعضو ➕</button>
             <div id="staff-msg" class="success"></div>
@@ -123,7 +126,6 @@
 
         let currentUser = null;
 
-        // تسجيل الدخول
         window.checkLogin = async function() {
             const username = document.getElementById('login-username').value.trim();
             const pass = document.getElementById('login-pass').value.trim();
@@ -134,14 +136,12 @@
                 return;
             }
 
-            // فحص الأدمن الرئيسي الافتراضي
             if(username === "admin" && pass === "dzstore2026") {
                 currentUser = { username: "admin", role: "Super Admin" };
                 initDashboard();
                 return;
             }
 
-            // فحص حسابات الفريق من قاعدة البيانات
             try {
                 const userDocRef = doc(db, "staffUsers", username);
                 const userSnap = await getDoc(userDocRef);
@@ -153,7 +153,7 @@
                     errorBox.innerText = "اسم المستخدم أو كلمة المرور غير صحيحة!";
                 }
             } catch (e) {
-                errorBox.innerText = "حدث خطأ في الاتصال بقاعدة البيانات.";
+                errorBox.innerText = "خطأ في الاتصال بقاعدة البيانات.";
             }
         }
 
@@ -162,7 +162,6 @@
             document.getElementById('admin-content').style.display = 'block';
             document.getElementById('welcome-role').innerText = `${currentUser.username} (${currentUser.role})`;
 
-            // إذا كان الأدمن الرئيسي، نظهر له قسم إدارة المستخدمين
             if(currentUser.username === "admin") {
                 document.getElementById('admin-management-section').style.display = 'block';
                 loadStaffList();
@@ -172,47 +171,64 @@
             loadOrders();
         }
 
-        window.logout = function() {
-            location.reload();
-        }
+        window.logout = function() { location.reload(); }
 
-        // إضافة منتج جديد
         window.addProduct = async function() {
             const name = document.getElementById('prod-name').value;
             const price = document.getElementById('prod-price').value;
             const desc = document.getElementById('prod-desc').value;
-            const imageFile = document.getElementById('prod-image-file').files[0];
+            const imageFiles = document.getElementById('prod-image-files').files;
+            const videoFile = document.getElementById('prod-video-file').files[0];
 
             if(!name || !price) {
-                alert('الرجاء إدخال اسم المنتج والسعر!');
+                alert('الرجاء إدخال اسم المنتج والسعر على الأقل!');
                 return;
             }
 
             try {
-                let imageUrl = '';
-                if(imageFile) {
-                    alert('جاري رفع الصورة...');
-                    const storageRef = ref(storage, 'products/' + Date.now() + '_' + imageFile.name);
-                    const snapshot = await uploadBytes(storageRef, imageFile);
-                    imageUrl = await getDownloadURL(snapshot.ref);
+                let imageUrls = [];
+                let videoUrl = '';
+
+                if(imageFiles.length > 0) {
+                    alert(`جاري رفع الصور إلى السحابة...`);
+                    for (let i = 0; i < imageFiles.length; i++) {
+                        const file = imageFiles[i];
+                        const storageRef = ref(storage, 'products/' + Date.now() + '_img_' + i + '_' + file.name);
+                        const snapshot = await uploadBytes(storageRef, file);
+                        const url = await getDownloadURL(snapshot.ref);
+                        imageUrls.push(url);
+                    }
+                }
+
+                if(videoFile) {
+                    alert('جاري رفع فيديو 1080p إلى السحابة (قد يستغرق بضع ثوانٍ)...');
+                    const videoRef = ref(storage, 'products/' + Date.now() + '_vid_1080p_' + videoFile.name);
+                    const vidSnapshot = await uploadBytes(videoRef, videoFile);
+                    videoUrl = await getDownloadURL(vidSnapshot.ref);
                 }
 
                 await addDoc(collection(db, "products"), {
-                    name, price: Number(price), desc, imageUrl, createdAt: new Date()
+                    name, 
+                    price: Number(price), 
+                    desc, 
+                    imageUrls, 
+                    videoUrl, 
+                    createdAt: new Date()
                 });
 
-                alert('تمت إضافة المنتج بنجاح! 🚀');
+                alert('تمت إضافة المنتج والفيديو بجودة عالية بنجاح! 🚀');
                 document.getElementById('prod-name').value = '';
                 document.getElementById('prod-price').value = '';
                 document.getElementById('prod-desc').value = '';
-                document.getElementById('prod-image-file').value = '';
+                document.getElementById('prod-image-files').value = '';
+                document.getElementById('prod-video-file').value = '';
                 loadProductsManagement();
             } catch (e) {
-                alert('خطأ أثناء إضافة المنتج.');
+                console.error(e);
+                alert('حدث خطأ أثناء رفع الملفات.');
             }
         }
 
-        // تحميل وتعديل منتجات المتجر
         async function loadProductsManagement() {
             const container = document.getElementById('products-list');
             container.innerHTML = 'جاري التحميل...';
@@ -232,7 +248,7 @@
                     row.innerHTML = `
                         <span><b>${prod.name}</b></span>
                         <div style="display: flex; gap: 5px; align-items: center;">
-                            <input type="number" id="price-${id}" value="${prod.price}" style="width: 100px; padding: 5px;">
+                            <input type="number" id="price-${id}" value="${prod.price}" style="width: 90px; padding: 5px;">
                             <button onclick="updatePrice('${id}')" style="padding: 6px 10px; width: auto;">تعديل السعر</button>
                             <button onclick="deleteProduct('${id}')" class="btn-danger" style="padding: 6px 10px; width: auto;">حذف</button>
                         </div>
@@ -251,9 +267,7 @@
                 await updateDoc(doc(db, "products", id), { price: Number(newPrice) });
                 alert('تم تحديث السعر بنجاح! 💰');
                 loadProductsManagement();
-            } catch(e) {
-                alert('فشل تحديث السعر.');
-            }
+            } catch(e) { alert('فشل تحديث السعر.'); }
         }
 
         window.deleteProduct = async function(id) {
@@ -261,86 +275,56 @@
                 try {
                     await deleteDoc(doc(db, "products", id));
                     loadProductsManagement();
-                } catch(e) {
-                    alert('فشل الحذف.');
-                }
+                } catch(e) { alert('فشل الحذف.'); }
             }
         }
 
-        // متابعة الطلبات
         async function loadOrders() {
             const container = document.getElementById('orders-list');
-            container.innerHTML = 'جاري تحميل الطلبات...';
+            container.innerHTML = 'جاري التحميل...';
             try {
                 const querySnapshot = await getDocs(collection(db, "orders"));
                 container.innerHTML = '';
                 if(querySnapshot.empty) {
-                    container.innerHTML = '<p>لا توجد طلبات جديدة حتى الآن.</p>';
+                    container.innerHTML = '<p>لا توجد طلبات جديدة.</p>';
                     return;
                 }
-
                 querySnapshot.forEach((docItem) => {
                     const order = docItem.data();
                     const row = document.createElement('div');
                     row.className = 'order-row';
-                    row.innerHTML = `
-                        <div>
-                            <strong>الزبون:</strong> ${order.fullName || 'غير متوفر'} | 
-                            <strong>الهاتف:</strong> ${order.phone || ''} | 
-                            <strong>الولاية:</strong> ${order.wilaya || ''} | 
-                            <strong>المنتج:</strong> ${order.productName || ''} (${order.price || 0} دج)
-                        </div>
-                        <span style="color: green; font-weight: bold;">جديد 📌</span>
-                    `;
+                    row.innerHTML = `<div><strong>الزبون:</strong> ${order.fullName} | <strong>الهاتف:</strong> ${order.phone} | <strong>المنتج:</strong> ${order.productName} (${order.price} دج)</div>`;
                     container.appendChild(row);
                 });
-            } catch(e) {
-                container.innerHTML = '<p>لا توجد طلبات أو قيد الاعداد.</p>';
-            }
+            } catch(e) { container.innerHTML = '<p>لا توجد طلبات.</p>'; }
         }
 
-        // إضافة أفراد العمل (خاص بالأدمن الرئيسي)
         window.addNewStaff = async function() {
             const username = document.getElementById('new-staff-user').value.trim();
             const pass = document.getElementById('new-staff-pass').value.trim();
             const msg = document.getElementById('staff-msg');
-            msg.innerText = "";
-
-            if(!username || !pass) {
-                alert('أدخل اسم المستخدم وكلمة المرور!');
-                return;
-            }
-
+            if(!username || !pass) { alert('أدخل اسم المستخدم وكلمة المرور!'); return; }
             try {
                 await setDoc(doc(db, "staffUsers", username), { password: pass });
-                msg.innerText = `تمت إضافة حساب العضو (${username}) بنجاح!`;
+                msg.innerText = `تمت إضافة العضو (${username}) بنجاح!`;
                 document.getElementById('new-staff-user').value = '';
                 document.getElementById('new-staff-pass').value = '';
                 loadStaffList();
-            } catch(e) {
-                alert('حدث خطأ أثناء إضافة الحساب.');
-            }
+            } catch(e) { alert('خطأ في إضافة الحساب.'); }
         }
 
         async function loadStaffList() {
             const listDiv = document.getElementById('staff-list');
-            listDiv.innerHTML = 'جاري التحميل...';
             try {
                 const snap = await getDocs(collection(db, "staffUsers"));
                 listDiv.innerHTML = '';
-                if(snap.empty) {
-                    listDiv.innerHTML = '<p>لا توجد حسابات إضافية مسجلة.</p>';
-                    return;
-                }
                 snap.forEach(d => {
                     const row = document.createElement('div');
                     row.className = 'user-row';
-                    row.innerHTML = `<span>👤 اسم المستخدم: <b>${d.id}</b></span>`;
+                    row.innerHTML = `<span>👤 <b>${d.id}</b></span>`;
                     listDiv.appendChild(row);
                 });
-            } catch(e) {
-                listDiv.innerHTML = '';
-            }
+            } catch(e) { listDiv.innerHTML = ''; }
         }
     </script>
 </body>
