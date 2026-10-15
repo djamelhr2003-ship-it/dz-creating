@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لوحة التحكم - إدارة المنتجات، العروض المتقدمة، والأفراد</title>
+    <title>لوحة التحكم - إدارة سلة المهملات والطلبات</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
@@ -31,7 +31,7 @@
         .search-filter-box input, .search-filter-box select { flex: 1; min-width: 200px; padding: 8px; }
 
         .orders-grid-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-        .order-mini-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; gap: 12px; align-items: center; }
+        .order-mini-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; gap: 12px; align-items: center; position: relative; }
         .order-mini-card:hover { transform: translateY(-2px); border-color: #2563eb; background: #f1f5f9; }
         .order-mini-card.fake-warning { border-color: #ef4444; background: #fef2f2; }
         .order-mini-thumb { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; background: #eee; flex-shrink: 0; }
@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <!-- نافذة تعديل الموظف/الفرد -->
+    <!-- نافذة تعديل الموظف -->
     <div class="modal-overlay" id="editStaffModal">
         <div class="modal-card">
             <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">✏️ تعديل ملف الموظف</h3>
@@ -221,9 +221,21 @@
             </div>
         </div>
 
+        <!-- تبويب سلة المهملات مع أزرار الحذف الشامل والفردي والمحدد -->
         <div id="trash-tab" class="tab-content">
             <div class="container" style="border: 2px solid #64748b;">
                 <h2 style="color: #64748b;">🗑️ سلة المهملات (الطلبات المحذوفة)</h2>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; background: #f1f5f9; padding: 10px; border-radius: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                    <div>
+                        <label style="display:inline-flex; align-items:center; gap:5px; cursor:pointer; margin:0;">
+                            <input type="checkbox" id="select-all-trash" onclick="toggleSelectAllTrash(this)"> <b>تحديد الكل</b>
+                        </label>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="deleteSelectedTrash()" class="btn-danger" style="padding: 6px 12px; font-size: 13px;">حذف المحدد 🗑️</button>
+                        <button onclick="emptyTrash()" class="btn-danger" style="background:#dc2626; padding: 6px 12px; font-size: 13px;">حذف الكل نهائياً 🗑️🔥</button>
+                    </div>
+                </div>
                 <div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div>
             </div>
         </div>
@@ -303,7 +315,6 @@
             </div>
         </div>
 
-        <!-- إضافة منتج مع العروض الخاصة المتعددة بالزر (+) -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد للمتجر ➕</h2>
@@ -315,7 +326,6 @@
                 </div>
                 <div class="form-group"><label>الكمية في المخزون:</label><input type="number" id="prod-stock"></div>
                 <div class="form-group"><label>التصنيف:</label><input type="text" id="prod-category-new" placeholder="التصنيف"></div>
-                
                 <div class="form-group">
                     <label>روابط الصور:</label>
                     <div id="image-inputs-container">
@@ -325,20 +335,17 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- خانة العروض الخاصة المتعددة مع زر الزائد (+) -->
                 <div style="background: #fdf2f8; padding: 15px; border-radius: 8px; border: 1px dashed #f472b6; margin-bottom: 15px;">
-                    <label><b>🔥 العروض الخاصة (أضف أكثر من عرض باستخدام زر ＋):</b></label>
+                    <label><b>🔥 العروض الخاصة (اضغط ＋ للإضافة):</b></label>
                     <div id="promos-inputs-container" style="margin-top:10px;">
                         <div class="promo-input-row">
-                            <input type="text" class="promo-title-input" placeholder="عنوان العرض (مثلاً: عرض حبة + حبة هدية)">
+                            <input type="text" class="promo-title-input" placeholder="عنوان العرض...">
                             <input type="number" class="promo-old-price-input" placeholder="السعر القديم ❌" style="max-width:130px;">
                             <input type="number" class="promo-new-price-input" placeholder="السعر الجديد ✔️" style="max-width:130px;">
                             <button type="button" class="btn-add-promo" onclick="addPromoInput()">＋</button>
                         </div>
                     </div>
                 </div>
-
                 <button onclick="addProduct()">نشر المنتج 🚀</button>
             </div>
         </div>
@@ -347,7 +354,6 @@
             <div class="container"><h2>إدارة وتعديل المنتجات 🏷️</h2><div id="products-list">جاري التحميل...</div></div>
         </div>
 
-        <!-- إعدادات الأدمن وتغيير البيانات -->
         <div id="settings-tab" class="tab-content">
             <div class="container">
                 <h2>⚙️ إعدادات الحساب الرئيسي</h2>
@@ -404,7 +410,6 @@
             container.appendChild(row);
         }
 
-        // إضافة خانة عرض خاص جديدة بالضغط على زر (+)
         window.addPromoInput = function() {
             const container = document.getElementById('promos-inputs-container');
             const row = document.createElement('div');
@@ -449,6 +454,9 @@
 
             if(status.includes('مهملات')) {
                 actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'جديد ⏳')" class="btn-warning">استرجاع الطلب ♻️</button>`;
+                if(currentUser === 'admin') {
+                    actionsHtml += `<button onclick="permanentlyDeleteOrder('${o.id}')" class="btn-danger" style="background:#dc2626; margin-right:5px;">حذف نهائي 🗑️</button>`;
+                }
             } else {
                 if(status.includes('جديد')) {
                     actionsHtml = `
@@ -681,7 +689,6 @@
             let imageUrls = [];
             document.querySelectorAll('.image-url-input').forEach(i => { if(i.value.trim()) imageUrls.push(i.value.trim()); });
 
-            // جمع العروض الخاصة المتعددة
             let promos = [];
             document.querySelectorAll('.promo-input-row').forEach(row => {
                 let t = row.querySelector('.promo-title-input').value.trim();
@@ -793,6 +800,69 @@
                 showAlert('تم الحذف', 'تم نقل الطلب إلى سلة المهملات بنجاح!');
                 loadAllOrders();
             } catch(e) { showAlert('خطأ', 'فشل حذف الطلب.'); }
+        }
+
+        // حذف طلب نهائياً من قاعدة البيانات
+        window.permanentlyDeleteOrder = async function(id) {
+            if(confirm("هل أنت متأكد من حذف هذا الطلب نهائياً؟ لا يمكن استرجاعـه!")) {
+                try {
+                    await deleteDoc(doc(db, "orders", id));
+                    closeOrderModal();
+                    showAlert('تم الحذف النهائي', 'تم حذف الطلب من سلة المهملات نهائياً!');
+                    loadAllOrders();
+                } catch(e) { showAlert('خطأ', 'فشل الحذف النهائي.'); }
+            }
+        }
+
+        // تحديد الكل في سلة المهملات
+        window.toggleSelectAllTrash = function(masterCheckbox) {
+            document.querySelectorAll('.trash-checkbox').forEach(chk => {
+                chk.checked = masterCheckbox.checked;
+            });
+        }
+
+        // حذف الطلبات المحددة في سلة المهملات
+        window.deleteSelectedTrash = async function() {
+            let selectedCheckboxes = document.querySelectorAll('.trash-checkbox:checked');
+            if(selectedCheckboxes.length === 0) {
+                showAlert('تنبيه', 'الرجاء اختيار طلب واحد على الأقل للحذف!');
+                return;
+            }
+
+            if(confirm(`هل أنت متأكد من حذف (${selectedCheckboxes.length}) طلبات المحددة نهائياً؟`)) {
+                try {
+                    let promises = [];
+                    selectedCheckboxes.forEach(chk => {
+                        let id = chk.getAttribute('data-id');
+                        promises.push(deleteDoc(doc(db, "orders", id)));
+                    });
+                    await Promise.all(promises);
+                    showAlert('نجاح', 'تم حذف الطلبات المحددة نهائياً من سلة المهملات!');
+                    loadAllOrders();
+                } catch(e) {
+                    showAlert('خطأ', 'فشل حذف الطلبات المحددة.');
+                }
+            }
+        }
+
+        // تفريغ سلة المهملات بالكامل (حذف الكل)
+        window.emptyTrash = async function() {
+            let trashOrders = allFetchedOrders.filter(o => (o.status || '').includes('مهملات'));
+            if(trashOrders.length === 0) {
+                showAlert('تنبيه', 'سلة المهملات فارغة بالفعل!');
+                return;
+            }
+
+            if(confirm(`⚠️ هل أنت متأكد من تفريغ سلة المهملات بالكامل وحذف (${trashOrders.length}) طلب نهائياً؟`)) {
+                try {
+                    let promises = trashOrders.map(o => deleteDoc(doc(db, "orders", o.id)));
+                    await Promise.all(promises);
+                    showAlert('تم الحذف الشامل', 'تم تفريغ سلة المهملات بالكامل بنجاح!');
+                    loadAllOrders();
+                } catch(e) {
+                    showAlert('خطأ', 'فشل تفريغ سلة المهملات.');
+                }
+            }
         }
 
         async function loadAllOrders() {
@@ -925,6 +995,7 @@
 
                 let miniCardHtml = `
                     <div class="${cardClass}" onclick="openOrderModal('${o.id}')">
+                        ${isTrash ? `<input type="checkbox" class="trash-checkbox" data-id="${o.id}" onclick="event.stopPropagation()" style="width:18px; height:18px; margin-left:8px; cursor:pointer;">` : ''}
                         <img src="${pData.img}" class="order-mini-thumb">
                         <div>
                             <h4>👤 ${o.fullName} ${isFake ? '🚨(وهمي)' : ''}</h4>
