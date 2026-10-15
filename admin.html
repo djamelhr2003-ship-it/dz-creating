@@ -65,7 +65,7 @@
     <!-- نافذة إدخال كلمة المرور للأدمن -->
     <div class="modal-overlay" id="passwordModal" style="z-index: 6000;">
         <div class="modal-card" style="max-width: 380px; text-align: center;">
-            <h3 style="color: #c0392b; margin-top:0;" id="passwordModalTitle">🔒 تأكيد الحذف بكلمة المرور</h3>
+            <h3 style="color: #c0392b; margin-top:0;" id="passwordModalTitle">🔒 تأكيد العملية بكلمة المرور</h3>
             <p style="font-size: 13px; color: #555;">أدخل كلمة مرور الأدمن لتأكيد العملية:</p>
             <div class="form-group"><input type="password" id="admin-action-pass" autocomplete="new-password"></div>
             <button onclick="confirmAdminAction()" class="btn-danger" style="width: 100%; margin-bottom: 8px;">تأكيد 🗑️</button>
@@ -73,10 +73,10 @@
         </div>
     </div>
 
-    <!-- نافذة تعديل المنتج -->
+    <!-- نافذة تعديل المنتج والعروض -->
     <div class="modal-overlay" id="editProductModal" style="z-index: 5500;">
         <div class="modal-card">
-            <h3 style="margin-top:0; color:#2563eb;">✏️ تعديل المنتج والعروض</h3>
+            <h3 style="margin-top:0; color:#2563eb;">✏️ تعديل المنتج والعروض الذهبية</h3>
             <input type="hidden" id="edit-prod-id">
             <div class="form-group"><label>اسم المنتج:</label><input type="text" id="edit-prod-name"></div>
             <div class="form-group"><label>سعر الشراء:</label><input type="number" id="edit-prod-buy-price"></div>
@@ -105,10 +105,10 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الطلب -->
+    <!-- نافذة تفاصيل الطلب والأوقات -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
-            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب والأوقات</h3>
+            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب وسجل الأوقات</h3>
             <div id="orderDetailsContent" style="font-size: 14px; line-height: 1.8; color: #1e293b; margin-bottom: 20px;"></div>
             <div id="orderModalActions" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;"></div>
             <button onclick="closeOrderModal()" class="btn-secondary" style="margin-top: 15px; width: 100%; background: #64748b;">إغلاق النافذة ❌</button>
@@ -152,7 +152,7 @@
                 <button class="tab-btn" onclick="switchTab('trash-tab', event)" style="background:#64748b; color:white;">🗑️ المهملات</button>
                 <button class="tab-btn" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
                 <button class="tab-btn" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
-                <button class="tab-btn" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 الأفراد</button>
+                <button class="tab-btn" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 طاقم العمل</button>
                 <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج</button>
                 <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المخزون</button>
                 <button class="tab-btn" onclick="switchTab('settings-tab', event)" style="background: #e67e22; color: white;">⚙️ الإعدادات</button>
