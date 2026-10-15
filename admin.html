@@ -62,7 +62,7 @@
         </div>
     </div>
 
-    <!-- نافذة إدخال كلمة المرور للأدمن -->
+    <!-- نافذة كلمة المرور -->
     <div class="modal-overlay" id="passwordModal" style="z-index: 6000;">
         <div class="modal-card" style="max-width: 380px; text-align: center;">
             <h3 style="color: #c0392b; margin-top:0;" id="passwordModalTitle">🔒 تأكيد العملية بكلمة المرور</h3>
@@ -73,7 +73,7 @@
         </div>
     </div>
 
-    <!-- نافذة تعديل المنتج والعروض -->
+    <!-- نافذة تعديل المنتج -->
     <div class="modal-overlay" id="editProductModal" style="z-index: 5500;">
         <div class="modal-card">
             <h3 style="margin-top:0; color:#2563eb;">✏️ تعديل المنتج والعروض الذهبية</h3>
@@ -105,7 +105,7 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الطلب والأوقات -->
+    <!-- نافذة تفاصيل الطلب -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
             <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب وسجل الأوقات</h3>
@@ -286,7 +286,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             let user = sessionStorage.getItem('ecom_logged_user');
             if(user) {
-                let isAdmin = sessionStorage.getItem('ecom_is_admin') === 'true';
+                let isAdmin = sessionStorage.getItem('ecom_is_admin'] === 'true';
                 initDashboard(user, isAdmin);
             }
         });
