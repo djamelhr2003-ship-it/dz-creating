@@ -50,13 +50,11 @@
         .variant-pill { display: inline-block; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 3px; cursor: pointer; font-size: 13px; background: #f8fafc; }
         .variant-pill.selected { background: #2563eb; color: white; border-color: #2563eb; }
 
-        /* معرض الصور المصغرة وزوم الصور */
         .media-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
         .gallery-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 2px solid #cbd5e1; cursor: pointer; flex-shrink: 0; }
         .gallery-thumb.active { border-color: #2563eb; }
         .main-media-view { width: 100%; height: 240px; object-fit: contain; border-radius: 8px; background: #000; cursor: zoom-in; margin-bottom: 10px; }
 
-        /* نافذة زوم الصورة الكبيرة */
         .zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 5000; cursor: zoom-out; }
         .zoom-modal img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; }
     </style>
@@ -94,12 +92,10 @@
         <p style="text-align:center; grid-column: 1/-1;">جاري تحميل المنتجات...</p>
     </div>
 
-    <!-- نافذة زوم الصورة -->
     <div class="zoom-modal" id="zoomModal" onclick="this.style.display='none'">
         <img id="zoomModalImg" src="">
     </div>
 
-    <!-- نافذة تفاصيل المنتج -->
     <div class="modal-overlay" id="productDetailsModal">
         <div class="modal-card">
             <div id="modal-product-content"></div>
@@ -108,7 +104,6 @@
             <h4 style="color:#1e293b; margin-bottom:10px;">⭐ التعليقات والتقييمات:</h4>
             <div id="reviews-list-container" style="margin-bottom:15px;"></div>
 
-            <!-- نموذج التعليق يظهر فقط لمن أتم طلباً مسبقاً -->
             <div id="review-form-wrapper" style="display:none; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; margin-top:10px;">
                 <h4 style="margin:0 0 8px 0; font-size:13px; color:#1e293b;">أضف تقييمك ورسالتك حول هذا المنتج:</h4>
                 <div class="form-group" style="margin-bottom:8px;"><input type="text" id="review-user-name" placeholder="اسمك الكريم"></div>
@@ -130,7 +125,6 @@
         </div>
     </div>
 
-    <!-- نافذة السلة الكبيرة والتفاعلية -->
     <div class="modal-overlay" id="cartModal">
         <div class="modal-card" id="cart-modal-card-content">
             <h3 style="margin-top:0; color:#1e293b;">🛒 محتويات سلة الشراء</h3>
@@ -157,7 +151,7 @@
 
         let allProducts = [], cart = [], currentOpenedProduct = null, currentSelectedPrice = 0, currentQty = 1;
         let selectedColor = '', selectedSize = '';
-        let lastCreatedOrderId = null; // لحفظ معرف الطلب الأخير لإمكانية إلغائه
+        let lastCreatedOrderId = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             setupWhatsappSupport();
@@ -521,7 +515,7 @@
                 </div>
 
                 <button onclick="submitCartOrder()" style="background:#16a34a; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب نهائياً 🚀</button>
-                <button onclick="openCartModal()" style="margin-top:8px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">العودة للسلة 🔙</button>
+                <button onclick="document.getElementById('cartModal').style.display='none'" style="margin-top:8px; width:100%; background:#ef4444; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إلغاء الطلب / خروج ❌</button>
             `;
             calcCheckoutTotal();
         }
@@ -578,7 +572,6 @@
                 cart = [];
                 document.getElementById('cart-count').innerText = '0';
                 
-                // نافذة نجاح الطلب مع إمكانية إلغاؤه فوراً أو الخروج
                 let cardModalContent = document.getElementById('cart-modal-card-content');
                 cardModalContent.innerHTML = `
                     <div style="text-align:center; padding:15px;">
