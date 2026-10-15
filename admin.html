@@ -48,7 +48,7 @@
         .stat-card h4 { margin: 0 0 8px 0; font-size: 14px; color: #94a3b8; }
         .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
 
-        .staff-status-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .staff-status-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .offer-box-admin { background: #fef9c3; border: 1.5px solid #facc15; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
     </style>
 </head>
@@ -181,9 +181,10 @@
             </div>
         </div>
 
+        <!-- قسم طاقم العمل مع تفاصيل الأداء والطلبات والتواريخ -->
         <div id="staff-tab" class="tab-content">
             <div class="container" style="border: 2px solid #7c3aed;">
-                <h2 style="color: #7c3aed;">👥 إدارة الأفراد وطاقم العمل</h2>
+                <h2 style="color: #7c3aed;">👥 إدارة الأفراد وطاقم العمل وأداء كل شخص</h2>
                 <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #7c3aed; margin-bottom:20px;">
                     <h3 style="margin-top:0; color:#7c3aed;">➕ إضافة موظف جديد</h3>
                     <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="staff-username" autocomplete="off"></div>
@@ -247,6 +248,7 @@
 
         let ordersCache = {}, allFetchedOrders = [], productsMap = {}, productsFullCache = {};
         let pendingActionType = null, pendingActionId = null, pendingOriginalStatus = null;
+        let loggedInUser = '';
 
         window.togglePasswordVisibility = function() {
             let passInput = document.getElementById('login-pass');
@@ -286,12 +288,13 @@
         window.addEventListener('DOMContentLoaded', () => {
             let user = sessionStorage.getItem('ecom_logged_user');
             if(user) {
-                let isAdmin = sessionStorage.getItem('ecom_is_admin'] === 'true';
+                let isAdmin = sessionStorage.getItem('ecom_is_admin') === 'true';
                 initDashboard(user, isAdmin);
             }
         });
 
         async function initDashboard(user, isAdmin) {
+            loggedInUser = user;
             document.getElementById('login-box').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
             document.getElementById('welcome-role').innerText = `${user} (${isAdmin ? 'أدمن' : 'موظف'})`;
@@ -330,7 +333,7 @@
             let p = document.getElementById('staff-password').value.trim();
             if(!u || !p) { alert('أدخل البيانات!'); return; }
             let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            staffList[u] = { password: p };
+            staffList[u] = { password: p, createdAt: new Date().toLocaleString('ar-DZ') };
             localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
             showAlert('نجاح', `تم حفظ الموظف (${u}) بنجاح!`);
             document.getElementById('staff-username').value = '';
@@ -338,16 +341,45 @@
             loadStaffList();
         }
 
+        // دالة عرض بيانات كل شخص من طاقم العمل (الأوقات، التواريخ، والطلبات المنجزة)
         window.loadStaffList = function() {
             let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
             let container = document.getElementById('staff-list-container');
             let currentAdmin = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
-            let html = `<div class="staff-status-card"><div><b>👑 الأدمن:</b> ${currentAdmin}</div></div>`;
+
+            let adminOrdersCount = allFetchedOrders.filter(o => o.processedBy === currentAdmin).length;
+            let adminTotalSales = allFetchedOrders.filter(o => o.processedBy === currentAdmin && o.status?.includes('أرشيف')).reduce((s, o) => s + (o.finalTotal || 0), 0);
+
+            let html = `
+                <div class="staff-status-card" style="border:2px solid #2563eb;">
+                    <div style="width:100%;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <h3 style="margin:0; color:#2563eb;">👑 الأدمن الرئيسي: ${currentAdmin}</h3>
+                            <span style="font-size:12px; color:#64748b;">الحساب الرئيسي للنظام</span>
+                        </div>
+                        <p style="margin:4px 0; font-size:13px;">📊 <b>الطلبات المعالجة والمنجزة:</b> ${adminOrdersCount} طلب</p>
+                        <p style="margin:4px 0; font-size:13px;">💰 <b>إجمالي المبيعات المؤكدة (أرشيف):</b> ${adminTotalSales} دج</p>
+                    </div>
+                </div>
+            `;
+
             for(let u in staffList) {
+                let staffOrders = allFetchedOrders.filter(o => o.processedBy === u);
+                let completedOrders = staffOrders.filter(o => o.status?.includes('أرشيف')).length;
+                let staffSales = staffOrders.filter(o => o.status?.includes('أرشيف')).reduce((s, o) => s + (o.finalTotal || 0), 0);
+
                 html += `
                     <div class="staff-status-card">
-                        <div><b>👤 موظف:</b> ${u}</div>
-                        <button onclick="promptDeleteStaff('${u}')" class="btn-danger" style="padding:4px 10px; font-size:11px;">حذف 🗑️</button>
+                        <div style="width:100%;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <h3 style="margin:0; color:#7c3aed;">👤 موظف: ${u}</h3>
+                                <button onclick="promptDeleteStaff('${u}')" class="btn-danger" style="padding:4px 10px; font-size:11px;">حذف الموظف 🗑️</button>
+                            </div>
+                            <p style="margin:4px 0; font-size:12px; color:#555;">📅 <b>تاريخ الانضمام:</b> ${staffList[u].createdAt || 'غير متوفر'}</p>
+                            <p style="margin:4px 0; font-size:13px;">📦 <b>الطلبات التي تعامل معها:</b> ${staffOrders.length} طلب</p>
+                            <p style="margin:4px 0; font-size:13px;">✅ <b>الطلبات المنجزة (أرشيف):</b> ${completedOrders} طلب</p>
+                            <p style="margin:4px 0; font-size:13px;">💰 <b>إجمالي قيمة المبيعات:</b> ${staffSales} دج</p>
+                        </div>
                     </div>
                 `;
             }
@@ -542,6 +574,7 @@
                 renderOrdersFiltered(allFetchedOrders);
                 generateWilayaDetailedReport(allFetchedOrders);
                 updateAnalyticsData(allFetchedOrders);
+                loadStaffList();
             } catch(e) {}
         }
 
@@ -654,6 +687,7 @@
                 <hr style="border:0; border-top:1px solid #cbd5e1; margin:10px 0;">
                 <b>⏱️ سجل الأوقات والمراحل:</b><br>
                 - وقت إنشاء الطلب: ${o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString('ar-DZ') : 'غير متوفر'}<br>
+                - المعالجة بواسطة: <b>${o.processedBy || 'غير محدد'}</b><br>
                 - وقت المعالجة: ${o.timeProcessing || 'لم يبدأ بعد'}<br>
                 - وقت التوصيل: ${o.timeShipping || 'لم يبدأ بعد'}<br>
                 - وقت الأرشيف/التسليم النهائي: ${o.timeArchive || 'لم يتم التسليم بعد'}<br>
@@ -688,7 +722,7 @@
         
         window.updateOrderStatusWithTime = async function(id, newStatus, timeField, isProcessing = false) {
             let currentTime = new Date().toLocaleString('ar-DZ');
-            let updatePayload = { status: newStatus, [timeField]: currentTime };
+            let updatePayload = { status: newStatus, [timeField]: currentTime, processedBy: loggedInUser };
 
             if(isProcessing) {
                 let o = ordersCache[id];
