@@ -38,7 +38,6 @@
         .qty-container { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; background: #f1f5f9; padding: 5px; border-radius: 6px; }
         .qty-btn { background: #cbd5e1; border: none; width: 26px; height: 26px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 14px; }
 
-        /* التبويبات والصفحات الكاملة بدلاً من النوافذ العائمة */
         .page-view { display: none; background: white; padding: 20px; border-radius: 12px; max-width: 800px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
         .page-view.active { display: block; }
 
@@ -81,7 +80,6 @@
         <button class="drawer-close" onclick="toggleDrawer()">إغلاق ❌</button>
     </div>
 
-    <!-- الصفحة الرئيسية (المنتجات) -->
     <div id="home-page" class="page-view active" style="background:transparent; padding:0; box-shadow:none; max-width:100%;">
         <div class="categories-nav" id="categories-container">
             <button class="cat-btn active" onclick="filterCategory('الكل', event)">الكل</button>
@@ -97,9 +95,8 @@
         </div>
     </div>
 
-    <!-- صفحة تفاصيل المنتج المستقلة -->
     <div id="product-details-page" class="page-view">
-        <button onclick="switchPage('home-page')" style="background:#64748b; margin-bottom:15px; padding:6px 12px; font-size:12px;">🔙 العودة للمتجر</button>
+        <button onclick="switchPage('home-page')" style="background:#64748b; margin-bottom:15px; padding:6px 12px; font-size:12px; color:white; border:none; border-radius:6px; cursor:pointer;">🔙 العودة للمتجر</button>
         <div id="product-details-content"></div>
         
         <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
@@ -124,13 +121,11 @@
         <p id="review-locked-msg" style="font-size:12px; color:#c0392b; text-align:center; margin-top:10px;">⚠️ خانة التعليقات والتقييمات تفتح تلقائياً بعد إتمام أي عملية شراء ناجحة في المتجر.</p>
     </div>
 
-    <!-- صفحة السلة وإتمام الطلب المستقلة (بوابة COD الكاملة) -->
     <div id="cart-page" class="page-view">
-        <button onclick="switchPage('home-page')" style="background:#64748b; margin-bottom:15px; padding:6px 12px; font-size:12px;">🛍️ مواصلة التسوق</button>
+        <button onclick="switchPage('home-page')" style="background:#64748b; margin-bottom:15px; padding:6px 12px; font-size:12px; color:white; border:none; border-radius:6px; cursor:pointer;">🛍️ مواصلة التسوق</button>
         <div id="cart-page-content"></div>
     </div>
 
-    <!-- نافذة زوم الصور مع زر إغلاق دقيق -->
     <div class="zoom-modal" id="zoomModal">
         <button class="close-zoom-btn" onclick="closeZoomModal()">✕</button>
         <img id="zoomModalImg" src="">
@@ -144,14 +139,26 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let allProducts = [], cart = [], currentOpenedProduct = null, currentSelectedPrice = 0, currentQty = 1;
+        let allProducts = [], currentOpenedProduct = null, currentSelectedPrice = 0, currentQty = 1;
         let selectedColor = '', selectedSize = '';
-        let lastCreatedOrderId = null;
+        let lastCreatedOrderIds = JSON.parse(localStorage.getItem('dz_last_order_ids')) || [];
+
+        let cart = JSON.parse(localStorage.getItem('dz_store_cart')) || [];
 
         window.addEventListener('DOMContentLoaded', () => {
             setupWhatsappSupport();
             fetchStoreProducts();
             checkUserHasOrdered();
+            updateCartCountUI();
+
+            let lastPage = sessionStorage.getItem('dz_current_page') || 'home-page';
+            if(lastPage === 'cart-page' && cart.length > 0) {
+                openCartPage();
+            } else if(lastPage === 'product-details-page' && currentOpenedProduct) {
+                switchPage('product-details-page');
+            } else {
+                switchPage('home-page');
+            }
         });
 
         window.toggleDrawer = function() {
@@ -169,7 +176,18 @@
         window.switchPage = function(pageId) {
             document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
+            sessionStorage.setItem('dz_current_page', pageId);
             window.scrollTo(0, 0);
+        }
+
+        function saveCartToStorage() {
+            localStorage.setItem('dz_store_cart', JSON.stringify(cart));
+            updateCartCountUI();
+        }
+
+        function updateCartCountUI() {
+            let totalCount = cart.reduce((sum, i) => sum + i.quantity, 0);
+            document.getElementById('cart-count').innerText = totalCount;
         }
 
         function setupWhatsappSupport() {
@@ -251,7 +269,7 @@
 
                             <div class="btn-group">
                                 <button onclick='addToCartDirectFromHome(${JSON.stringify(p).replace(/'/g, "&apos;")}, ${p.frontQty || 1})' class="btn-cart" ${stockVal <= 0 ? 'disabled':''}>أضف للسلة 🛒</button>
-                                <button onclick='buyNowDirect(${JSON.stringify(p).replace(/'/g, "&apos;")}, ${p.frontQty || 1})' class="btn-buy" ${stockVal <= 0 ? 'disabled':''}>اطلب الآن ⚡</button>
+                                <button onclick='openProductDetailsPage(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-buy" ${stockVal <= 0 ? 'disabled':''}>اطلب الآن ⚡</button>
                             </div>
                         </div>
                     </div>
@@ -385,14 +403,8 @@
             } else {
                 cart.push({ id: product.id, productName: product.name, price: product.price, quantity: qty, color: '', size: '', imageUrl: product.imageUrls?.[0] || '' });
             }
-            document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
+            saveCartToStorage();
             renderProducts(allProducts);
-            openCartPage();
-        }
-
-        window.buyNowDirect = function(product, qty) {
-            cart = [{ id: product.id, productName: product.name, price: product.price, quantity: qty, color: '', size: '', imageUrl: product.imageUrls?.[0] || '' }];
-            document.getElementById('cart-count').innerText = qty;
             openCartPage();
         }
 
@@ -401,7 +413,7 @@
                 if(!selectedColor || !selectedSize) { alert('الرجاء اختيار اللون والمقاس أولاً!'); return; }
             }
             cart.push({ id: currentOpenedProduct.id, productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty, color: selectedColor, size: selectedSize, imageUrl: currentOpenedProduct.imageUrls?.[0] || '' });
-            document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
+            saveCartToStorage();
             renderProducts(allProducts);
             openCartPage();
         }
@@ -411,7 +423,7 @@
                 if(!selectedColor || !selectedSize) { alert('الرجاء اختيار اللون والمقاس أولاً!'); return; }
             }
             cart = [{ id: currentOpenedProduct.id, productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty, color: selectedColor, size: selectedSize, imageUrl: currentOpenedProduct.imageUrls?.[0] || '' }];
-            document.getElementById('cart-count').innerText = currentQty;
+            saveCartToStorage();
             openCartPage();
         }
 
@@ -460,7 +472,7 @@
 
         window.removeFromCart = function(index) {
             cart.splice(index, 1);
-            document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
+            saveCartToStorage();
             renderProducts(allProducts);
             if(cart.length === 0) {
                 switchPage('home-page');
@@ -469,7 +481,6 @@
             }
         }
 
-        // بوابة إتمام الطلب (COD) مع كل الولايات الـ 58 بالترقيم الكامل
         window.proceedToCheckoutForm = function() {
             let container = document.getElementById('cart-page-content');
             container.innerHTML = `
@@ -586,6 +597,7 @@
             let finalTotal = subtotal + deliveryFee;
 
             try {
+                lastCreatedOrderIds = [];
                 for(let item of cart) {
                     let docRef = await addDoc(collection(db, "orders"), {
                         productName: item.productName,
@@ -604,12 +616,13 @@
                         status: 'جديد ⏳',
                         createdAt: new Date()
                     });
-                    lastCreatedOrderId = docRef.id;
+                    lastCreatedOrderIds.push(docRef.id);
                 }
 
+                localStorage.setItem('dz_last_order_ids', JSON.stringify(lastCreatedOrderIds));
                 localStorage.setItem('dz_user_has_ordered', 'true');
                 cart = [];
-                document.getElementById('cart-count').innerText = '0';
+                saveCartToStorage();
                 renderProducts(allProducts);
                 
                 let container = document.getElementById('cart-page-content');
@@ -618,7 +631,7 @@
                         <h3 style="color:#16a34a; margin-top:0;">🎉 تم إرسال طلبك بنجاح!</h3>
                         <p style="font-size:13px; color:#555; line-height:1.5;">سنتصل بك قريباً لتأكيد طلبك. شكراً لتسوقك معنا.</p>
                         <div style="display:flex; gap:10px; margin-top:20px;">
-                            <button onclick="cancelMyLastOrder()" style="background:#ef4444; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إلغاء هذا الطلب ❌</button>
+                            <button onclick="cancelMyLastOrders()" style="background:#ef4444; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إلغاء هذا الطلب ❌</button>
                             <button onclick="switchPage('home-page')" style="background:#2563eb; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">موافق / العودة للمتجر ✅</button>
                         </div>
                     </div>
@@ -629,15 +642,22 @@
             }
         }
 
-        window.cancelMyLastOrder = async function() {
-            if(!lastCreatedOrderId) { alert('لا يوجد طلب نشط للإلغاء.'); return; }
-            if(confirm('هل أنت متأكد أنك تريد إلغاء طلبك؟')) {
+        window.cancelMyLastOrders = async function() {
+            if(!lastCreatedOrderIds || lastCreatedOrderIds.length === 0) { 
+                alert('لا يوجد طلب نشط للإلغاء.'); 
+                return; 
+            }
+            if(confirm('هل أنت متأكد أنك تريد إلغاء طلبك نهائياً؟')) {
                 try {
-                    await updateDoc(doc(db, "orders", lastCreatedOrderId), { status: 'ملغى ❌' });
-                    alert('تم إلغاء طلبك بنجاح.');
+                    for(let id of lastCreatedOrderIds) {
+                        await updateDoc(doc(db, "orders", id), { status: 'ملغى ❌' });
+                    }
+                    alert('تم إلغاء طلبك بنجاح ونقله إلى قائمة الطلبات الملغاة.');
+                    localStorage.removeItem('dz_last_order_ids');
+                    lastCreatedOrderIds = [];
                     switchPage('home-page');
                 } catch(e) {
-                    alert('حدث خطأ أثناء الإلغاء.');
+                    alert('حدث خطأ أثناء إلغاء الطلب.');
                 }
             }
         }
