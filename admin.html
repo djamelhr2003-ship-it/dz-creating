@@ -36,9 +36,9 @@
         .order-mini-card:hover { border-color: #2563eb; background: #f1f5f9; }
         .order-mini-thumb { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; background: #eee; flex-shrink: 0; }
         
-        .wilaya-table, .daily-report-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
-        .wilaya-table th, .wilaya-table td, .daily-report-table th, .daily-report-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-        .wilaya-table th, .daily-report-table th { background: #1e293b; color: white; }
+        .wilaya-table, .daily-report-table, .products-analytics-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
+        .wilaya-table th, .wilaya-table td, .daily-report-table th, .daily-report-table td, .products-analytics-table th, .products-analytics-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        .wilaya-table th, .daily-report-table th, .products-analytics-table th { background: #1e293b; color: white; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 3000; }
         .modal-card { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 550px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
@@ -144,6 +144,7 @@
         <div class="container" style="padding: 10px;">
             <div class="tabs-nav" id="main-tabs-nav">
                 <button class="tab-btn active" onclick="switchTab('orders-tab', event)">⏳ الجديدة</button>
+                <button class="tab-btn" onclick="switchTab('fake-orders-tab', event)" style="background:#dc2626; color:white;">⚠️ الوهمية</button>
                 <button class="tab-btn" onclick="switchTab('processing-tab', event)">🔄 المعالجة</button>
                 <button class="tab-btn" onclick="switchTab('shipping-tab', event)">🚚 التوصيل</button>
                 <button class="tab-btn" onclick="switchTab('archive-tab', event)">✅ الأرشيف</button>
@@ -161,6 +162,10 @@
         </div>
 
         <div id="orders-tab" class="tab-content active"><div class="container"><h2>الطلبات الجديدة ⏳</h2><div id="orders-list-new" class="orders-grid-compact">جاري التحميل...</div></div></div>
+        
+        <!-- قسم الطلبات الوهمية التلقائي -->
+        <div id="fake-orders-tab" class="tab-content"><div class="container" style="border:2px solid #dc2626;"><h2 style="color:#dc2626;">⚠️ الطلبات الوهمية والمكررة (خلال 48 ساعة)</h2><p style="font-size:13px; color:#64748b; text-align:center;">هذه الطلبات تم تحويلها أوتوماتيكياً لأن نفس الشخص طلب نفس المنتج لأكثر من مرة خلال 48 ساعة.</p><div id="orders-list-fake" class="orders-grid-compact">جاري التحميل...</div></div></div>
+
         <div id="processing-tab" class="tab-content"><div class="container"><h2>قيد المعالجة 🔄</h2><div id="orders-list-processing" class="orders-grid-compact">جاري التحميل...</div></div></div>
         <div id="shipping-tab" class="tab-content"><div class="container"><h2>جاري التوصيل 🚚</h2><div id="orders-list-shipping" class="orders-grid-compact">جاري التحميل...</div></div></div>
         <div id="archive-tab" class="tab-content"><div class="container"><h2>الأرشيف ✅</h2><div id="orders-list-archive" class="orders-grid-compact">جاري التحميل...</div></div></div>
@@ -170,31 +175,23 @@
 
         <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات</h2><div id="wilaya-report-content">جاري التجهيز...</div></div></div>
         
-        <!-- قسم إدارة وتعليقات وحذف العملاء -->
         <div id="reviews-mgmt-tab" class="tab-content">
             <div class="container" style="border: 2px solid #0284c7;">
-                <h2 style="color: #0284c7;">💬 إدارة تعليقات وتقييمات العملاء (إخفاء / إظهار / حذف)</h2>
-                <p style="font-size:13px; color:#64748b; text-align:center; margin-bottom:20px;">يمكنك هنا التحكم في إظهار، إخفاء، أو حذف أي تعليق نهائياً.</p>
+                <h2 style="color: #0284c7;">💬 إدارة تعليقات وتقييمات العملاء</h2>
                 <div id="admin-reviews-list-container">جاري التحميل...</div>
             </div>
         </div>
 
+        <!-- قسم التحليلات المطورة (الأكثر طلباً، الزوار، التحليل اليومي والأسبوعي والشهري) -->
         <div id="analytics-tab" class="tab-content">
             <div class="container">
-                <h2>💰 التحليلات المالية والأرباح حسب التواريخ</h2>
+                <h2>💰 التحليلات المالية، الزوار، وتحليل المنتجات</h2>
                 
-                <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:20px; display:flex; gap:15px; flex-wrap:wrap; align-items:flex-end;">
-                    <div style="flex:1; min-width:200px;">
-                        <label>من تاريخ:</label>
-                        <input type="date" id="filter-date-from" onchange="updateAnalyticsData(allFetchedOrders)">
-                    </div>
-                    <div style="flex:1; min-width:200px;">
-                        <label>إلى تاريخ:</label>
-                        <input type="date" id="filter-date-to" onchange="updateAnalyticsData(allFetchedOrders)">
-                    </div>
-                    <div>
-                        <button onclick="resetDateFilter()" style="background:#64748b; padding:10px 15px;">إلغاء الفلترة 🔄</button>
-                    </div>
+                <div class="stats-grid" style="margin-top:20px;">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"><h4>👥 زوار اليوم</h4><span id="stat-visitors-day">0</span></div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #059669, #047857);"><h4>📅 زوار الأسبوع</h4><span id="stat-visitors-week">0</span></div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);"><h4>📊 زوار الشهر</h4><span id="stat-visitors-month">0</span></div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #d97706, #b45309);"><h4>🔥 أكثر منتج مشاهدة</h4><span id="stat-top-viewed" style="font-size:16px;">-</span></div>
                 </div>
 
                 <div class="stats-grid">
@@ -204,8 +201,11 @@
                     <div class="stat-card" style="background: linear-gradient(135deg, #dc2626, #991b1b);"><h4>خسائر الروتور</h4><span id="stat-total-router-loss">0 دج</span></div>
                 </div>
 
+                <h3 style="margin-top:30px; color:#1e293b; text-align:right;">🏆 تحليل المنتجات الأكثر طلباً ومبيعاً:</h3>
+                <div id="top-products-analytics-container">جاري التحليل...</div>
+
                 <h3 style="margin-top:30px; color:#1e293b; text-align:right;">📅 التحليل اليومي لكل يوم على حدة:</h3>
-                <div id="daily-analytics-container">جاري توليد التقرير اليومي...</div>
+                <div id="daily-analytics-container">جاري التجهيز...</div>
             </div>
         </div>
 
@@ -348,304 +348,26 @@
             location.reload();
         }
 
-        // تحميل وعرض جميع التعليقات مع أزرار الإخفاء، الإظهار، والحذف للأدمن
-        window.loadAllReviewsForAdmin = function() {
-            let container = document.getElementById('admin-reviews-list-container');
-            let html = '';
-            let totalReviewsCount = 0;
+        // فحص وتحويل الطلبات الوهمية أوتوماتيكياً (نفس الشخص طلب نفس المنتج خلال 48 ساعة)
+        async function processFakeOrdersDetection(orders) {
+            let clientProductTimes = {}; // key: phone_productName, value: firstOrderTimeMs
 
-            for(let key in localStorage) {
-                if(key.startsWith('dz_reviews_')) {
-                    let prodId = key.replace('dz_reviews_', '');
-                    let reviews = JSON.parse(localStorage.getItem(key)) || [];
-                    let prodName = productsFullCache[prodId]?.name || `منتج (ID: ${prodId})`;
+            for(let o of orders) {
+                if(o.status?.includes('مهملات') || o.status?.includes('ملغى') || o.status?.includes('وهمي')) continue;
+                
+                let key = `${o.phone}_${o.productName}`;
+                let orderTime = o.createdAt?.toDate ? o.createdAt.toDate().getTime() : new Date().getTime();
 
-                    reviews.forEach((rev, index) => {
-                        totalReviewsCount++;
-                        let isHidden = rev.hidden === true;
-                        let stars = '⭐'.repeat(Number(rev.rating));
-
-                        html += `
-                            <div style="background:#f8fafc; border:1px solid ${isHidden ? '#fca5a5':'#cbd5e1'}; padding:12px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                                <div>
-                                    <span style="font-size:11px; background:#e2e8f0; padding:2px 6px; border-radius:4px;">📦 ${prodName}</span>
-                                    <h4 style="margin:5px 0 2px 0; color:#1e293b;">👤 ${rev.name} <span style="font-size:12px; font-weight:normal; color:#64748b;">(${rev.date})</span></h4>
-                                    <div style="font-size:13px; color:#f59e0b; margin-bottom:3px;">${stars}</div>
-                                    <p style="margin:0; font-size:13px; color:#333;">${rev.comment}</p>
-                                    ${isHidden ? '<span style="color:red; font-size:11px; font-weight:bold;">[مخفي عن الزبون 🙈]</span>' : '<span style="color:green; font-size:11px; font-weight:bold;">[ظاهر للزبون 👀]</span>'}
-                                </div>
-                                <div style="display:flex; gap:6px;">
-                                    <button onclick="toggleReviewVisibility('${prodId}', ${index})" style="background:${isHidden ? '#16a34a':'#dc2626'}; padding:6px 12px; font-size:12px;">
-                                        ${isHidden ? 'إظهار للزبون 👀' : 'إخفاء عن الزبون 🙈'}
-                                    </button>
-                                    <button onclick="adminDeleteReview('${prodId}', ${index})" style="background:#991b1b; padding:6px 12px; font-size:12px;">
-                                        حذف التعليق 🗑️
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
+                if(clientProductTimes[key]) {
+                    let diffHours = (orderTime - clientProductTimes[key]) / (1000 * 60 * 60);
+                    if(diffHours <= 48) {
+                        // تحويل الطلب تلقائياً إلى قسم الطلبات الوهمية
+                        await updateDoc(doc(db, "orders", o.id), { status: 'وهمي ⚠️' });
+                    }
+                } else {
+                    clientProductTimes[key] = orderTime;
                 }
             }
-
-            if(totalReviewsCount === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#64748b;">لا توجد تعليقات أو تقييمات مضافة حتى الآن.</p>';
-            } else {
-                container.innerHTML = html;
-            }
-        }
-
-        window.toggleReviewVisibility = function(prodId, reviewIndex) {
-            let reviewsKey = `dz_reviews_${prodId}`;
-            let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
-            if(reviews[reviewIndex]) {
-                reviews[reviewIndex].hidden = !reviews[reviewIndex].hidden;
-                localStorage.setItem(reviewsKey, JSON.stringify(reviews));
-                loadAllReviewsForAdmin();
-            }
-        }
-
-        window.adminDeleteReview = function(prodId, reviewIndex) {
-            if(confirm('هل أنت متأكد من حذف هذا التعليق نهائياً؟')) {
-                let reviewsKey = `dz_reviews_${prodId}`;
-                let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
-                reviews.splice(reviewIndex, 1);
-                localStorage.setItem(reviewsKey, JSON.stringify(reviews));
-                loadAllReviewsForAdmin();
-                showAlert('نجاح', 'تم حذف التعليق نهائياً!');
-            }
-        }
-
-        window.updateAdminCredentials = function() {
-            let u = document.getElementById('setting-admin-user').value.trim();
-            let p = document.getElementById('setting-admin-pass').value.trim();
-            if(!u || !p) { alert('أدخل الحقول كاملة!'); return; }
-            localStorage.setItem('dz_custom_admin_user', u);
-            localStorage.setItem('dz_custom_admin_pass', p);
-            showAlert('نجاح', 'تم تحديث بيانات الأدمن بنجاح 💾!');
-        }
-
-        window.saveStaffMember = function() {
-            let u = document.getElementById('staff-username').value.trim();
-            let p = document.getElementById('staff-password').value.trim();
-            if(!u || !p) { alert('أدخل البيانات!'); return; }
-            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            staffList[u] = { password: p, createdAt: new Date().toLocaleDateString('ar-DZ') };
-            localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
-            showAlert('نجاح', `تم حفظ الموظف (${u}) بنجاح!`);
-            document.getElementById('staff-username').value = '';
-            document.getElementById('staff-password').value = '';
-            loadStaffList();
-        }
-
-        window.loadStaffList = function() {
-            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            let container = document.getElementById('staff-list-container');
-            let currentAdmin = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
-
-            let adminOrdersCount = allFetchedOrders.filter(o => o.processedBy === currentAdmin).length;
-            let adminTotalSales = allFetchedOrders.filter(o => o.processedBy === currentAdmin && o.status?.includes('أرشيف')).reduce((s, o) => s + (o.finalTotal || 0), 0);
-
-            let html = `
-                <div class="staff-status-card" style="border:2px solid #2563eb;">
-                    <div style="width:100%;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                            <h3 style="margin:0; color:#2563eb;">👑 الأدمن الرئيسي: ${currentAdmin}</h3>
-                            <span style="font-size:12px; color:#64748b;">الحساب الرئيسي للنظام</span>
-                        </div>
-                        <p style="margin:4px 0; font-size:13px;">📊 <b>الطلبات المعالجة والمنجزة:</b> ${adminOrdersCount} طلب</p>
-                        <p style="margin:4px 0; font-size:13px;">💰 <b>إجمالي المبيعات المؤكدة (أرشيف):</b> ${adminTotalSales} دج</p>
-                    </div>
-                </div>
-            `;
-
-            for(let u in staffList) {
-                let staffOrders = allFetchedOrders.filter(o => o.processedBy === u);
-                let completedOrders = staffOrders.filter(o => o.status?.includes('أرشيف')).length;
-                let staffSales = staffOrders.filter(o => o.status?.includes('أرشيف')).reduce((s, o) => s + (o.finalTotal || 0), 0);
-
-                html += `
-                    <div class="staff-status-card">
-                        <div style="width:100%;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                                <h3 style="margin:0; color:#7c3aed;">👤 موظف: ${u}</h3>
-                                <button onclick="promptDeleteStaff('${u}')" class="btn-danger" style="padding:4px 10px; font-size:11px;">حذف الموظف 🗑️</button>
-                            </div>
-                            <p style="margin:4px 0; font-size:12px; color:#555;">📅 <b>تاريخ الانضمام:</b> ${staffList[u].createdAt || 'غير متوفر'}</p>
-                            <p style="margin:4px 0; font-size:13px;">📦 <b>الطلبات التي تعامل معها:</b> ${staffOrders.length} طلب</p>
-                            <p style="margin:4px 0; font-size:13px;">✅ <b>الطلبات المنجزة (أرشيف):</b> ${completedOrders} طلب</p>
-                            <p style="margin:4px 0; font-size:13px;">💰 <b>إجمالي قيمة المبيعات:</b> ${staffSales} دج</p>
-                        </div>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        }
-
-        window.promptDeleteStaff = function(username) {
-            pendingActionType = 'delete_staff';
-            pendingActionId = username;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModalTitle').innerText = '🔒 تأكيد الحذف بكلمة المرور';
-            document.getElementById('passwordModal').style.display = 'flex';
-        }
-
-        window.addOfferField = function(title = '', oldPrice = '', newPrice = '') {
-            let container = document.getElementById('offers-container');
-            let div = document.createElement('div');
-            div.className = 'offer-box-admin';
-            div.innerHTML = `
-                <div class="form-group"><label>وصف العرض:</label><input type="text" class="offer-title" value="${title}" placeholder="مثال: اشتري 2 واحصل على 1 هدية"></div>
-                <div class="form-group"><label>السعر القديم:</label><input type="number" class="offer-old-price" value="${oldPrice}"></div>
-                <div class="form-group"><label>السعر الجديد للعرض:</label><input type="number" class="offer-new-price" value="${newPrice}"></div>
-                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف هذا العرض ❌</button>
-            `;
-            container.appendChild(div);
-        }
-
-        window.addEditOfferField = function(title = '', oldPrice = '', newPrice = '') {
-            let container = document.getElementById('edit-offers-container');
-            let div = document.createElement('div');
-            div.className = 'offer-box-admin';
-            div.innerHTML = `
-                <div class="form-group"><label>وصف العرض:</label><input type="text" class="edit-offer-title" value="${title}"></div>
-                <div class="form-group"><label>السعر القديم:</label><input type="number" class="edit-offer-old-price" value="${oldPrice}"></div>
-                <div class="form-group"><label>السعر الجديد للعرض:</label><input type="number" class="edit-offer-new-price" value="${newPrice}"></div>
-                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف هذا العرض ❌</button>
-            `;
-            container.appendChild(div);
-        }
-
-        async function loadProductsMap() {
-            try {
-                const snap = await getDocs(collection(db, "products"));
-                productsMap = {};
-                productsFullCache = {};
-                snap.forEach(d => {
-                    const p = d.data();
-                    productsFullCache[d.id] = p;
-                    productsMap[p.name] = { id: d.id, img: p.imageUrls?.[0] || 'https://via.placeholder.com/50', buyPrice: p.buyPrice || 0, stock: p.stock !== undefined ? p.stock : 10, margin: p.profitMargin || (p.price - p.buyPrice || 0) };
-                });
-            } catch(e) {}
-        }
-
-        window.addProduct = async function() {
-            let name = document.getElementById('prod-name').value.trim();
-            let buyPrice = Number(document.getElementById('prod-buy-price').value) || 0;
-            let price = Number(document.getElementById('prod-price').value) || 0;
-            let stock = Number(document.getElementById('prod-stock').value) || 10;
-            let category = document.getElementById('prod-category').value;
-            let videoUrl = document.getElementById('prod-video').value.trim();
-            let description = document.getElementById('prod-desc').value.trim();
-            let imgsRaw = document.getElementById('prod-imgs').value.trim();
-            let imageUrls = imgsRaw ? imgsRaw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : [];
-            
-            let enableOffers = document.getElementById('enable-offers').checked;
-            let offers = [];
-            if(enableOffers) {
-                document.querySelectorAll('#offers-container .offer-box-admin').forEach(box => {
-                    let title = box.querySelector('.offer-title').value.trim();
-                    let oldPrice = Number(box.querySelector('.offer-old-price').value) || 0;
-                    let newPrice = Number(box.querySelector('.offer-new-price').value) || 0;
-                    if(title && newPrice) offers.push({ title, oldPrice, newPrice });
-                });
-            }
-
-            if(!name || !price) { showAlert('تنبيه', 'أدخل اسم المنتج وسعر البيع!'); return; }
-
-            await addDoc(collection(db, "products"), {
-                name, buyPrice, price, stock, profitMargin: price - buyPrice, category, description,
-                imageUrls, videoUrl, enableOffers, offers, createdAt: new Date()
-            });
-            showAlert('نجاح', 'تم نشر المنتج مع العروض بنجاح!');
-            document.getElementById('prod-name').value = '';
-            document.getElementById('prod-buy-price').value = '';
-            document.getElementById('prod-price').value = '';
-            document.getElementById('offers-container').innerHTML = '';
-            document.getElementById('enable-offers').checked = false;
-            loadProducts();
-            loadProductsMap();
-        }
-
-        async function loadProducts() {
-            const list = document.getElementById('products-list');
-            const snap = await getDocs(collection(db, "products"));
-            list.innerHTML = '';
-            snap.forEach(d => {
-                const p = d.data();
-                if(p.status === 'مهملات') return;
-                let stockVal = p.stock !== undefined ? p.stock : 10;
-                list.innerHTML += `
-                    <div style="background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                        <span><b>${p.name}</b> [📁 ${p.category || 'عام'}] - السعر: ${p.price} دج | 📦 المخزون: <b style="color:${stockVal <= 5 ? 'red':'green'}">${stockVal}</b></span>
-                        <div style="display:flex; gap:6px;">
-                            <button onclick="openEditProductModal('${d.id}')" class="btn-warning" style="padding:4px 10px; font-size:12px;">تعديل ✏️</button>
-                            <button onclick="promptDeleteProduct('${d.id}')" class="btn-danger" style="padding:4px 10px; font-size:12px;">حذف 🗑️</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        window.openEditProductModal = function(id) {
-            let p = productsFullCache[id];
-            if(!p) return;
-            document.getElementById('edit-prod-id').value = id;
-            document.getElementById('edit-prod-name').value = p.name || '';
-            document.getElementById('edit-prod-buy-price').value = p.buyPrice || 0;
-            document.getElementById('edit-prod-price').value = p.price || 0;
-            document.getElementById('edit-prod-stock').value = p.stock !== undefined ? p.stock : 10;
-            document.getElementById('edit-prod-category').value = p.category || 'الكل';
-            document.getElementById('edit-prod-imgs').value = (p.imageUrls || []).join(', ');
-            
-            let enableOffers = p.enableOffers || false;
-            document.getElementById('edit-enable-offers').checked = enableOffers;
-            let container = document.getElementById('edit-offers-container');
-            container.innerHTML = '';
-            if(enableOffers && p.offers) {
-                p.offers.forEach(o => addEditOfferField(o.title, o.oldPrice, o.newPrice));
-            }
-
-            document.getElementById('editProductModal').style.display = 'flex';
-        }
-
-        window.saveProductEdits = async function() {
-            let id = document.getElementById('edit-prod-id').value;
-            let name = document.getElementById('edit-prod-name').value.trim();
-            let buyPrice = Number(document.getElementById('edit-prod-buy-price').value) || 0;
-            let price = Number(document.getElementById('edit-prod-price').value) || 0;
-            let stock = Number(document.getElementById('edit-prod-stock').value) || 0;
-            let category = document.getElementById('edit-prod-category').value;
-            let imgsRaw = document.getElementById('edit-prod-imgs').value.trim();
-            let imageUrls = imgsRaw ? imgsRaw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : [];
-
-            let enableOffers = document.getElementById('edit-enable-offers').checked;
-            let offers = [];
-            if(enableOffers) {
-                document.querySelectorAll('#edit-offers-container .offer-box-admin').forEach(box => {
-                    let title = box.querySelector('.edit-offer-title').value.trim();
-                    let oldPrice = Number(box.querySelector('.edit-offer-old-price').value) || 0;
-                    let newPrice = Number(box.querySelector('.edit-offer-new-price').value) || 0;
-                    if(title && newPrice) offers.push({ title, oldPrice, newPrice });
-                });
-            }
-
-            await updateDoc(doc(db, "products", id), {
-                name, buyPrice, price, stock, profitMargin: price - buyPrice, category, imageUrls, enableOffers, offers
-            });
-
-            document.getElementById('editProductModal').style.display = 'none';
-            showAlert('نجاح', 'تم تحديث تفاصيل المنتج والعروض بنجاح 💾!');
-            loadProducts();
-            loadProductsMap();
-        }
-
-        window.promptDeleteProduct = function(id) {
-            pendingActionType = 'delete_product';
-            pendingActionId = id;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModalTitle').innerText = '🔒 تأكيد الحذف بكلمة المرور';
-            document.getElementById('passwordModal').style.display = 'flex';
         }
 
         async function loadAllOrders() {
@@ -667,6 +389,18 @@
                     ordersCache[o.id] = o;
                     allFetchedOrders.push(o);
                 }
+
+                await processFakeOrdersDetection(allFetchedOrders);
+                
+                // إعادة الجلب بعد التحديث الآلي للوهمي
+                const snapReload = await getDocs(collection(db, "orders"));
+                allFetchedOrders = [];
+                snapReload.forEach(d => {
+                    const o = { id: d.id, ...d.data() };
+                    ordersCache[o.id] = o;
+                    allFetchedOrders.push(o);
+                });
+
                 renderOrdersFiltered(allFetchedOrders);
                 generateWilayaDetailedReport(allFetchedOrders);
                 updateAnalyticsData(allFetchedOrders);
@@ -676,6 +410,7 @@
 
         function renderOrdersFiltered(orders) {
             let newDiv = document.getElementById('orders-list-new');
+            let fakeDiv = document.getElementById('orders-list-fake');
             let procDiv = document.getElementById('orders-list-processing');
             let shipDiv = document.getElementById('orders-list-shipping');
             let archDiv = document.getElementById('orders-list-archive');
@@ -683,7 +418,7 @@
             let cancelDiv = document.getElementById('orders-list-cancelled');
             let trashDiv = document.getElementById('orders-list-trash');
 
-            if(newDiv) newDiv.innerHTML = procDiv.innerHTML = shipDiv.innerHTML = archDiv.innerHTML = retDiv.innerHTML = cancelDiv.innerHTML = trashDiv.innerHTML = '';
+            if(newDiv) newDiv.innerHTML = fakeDiv.innerHTML = procDiv.innerHTML = shipDiv.innerHTML = archDiv.innerHTML = retDiv.innerHTML = cancelDiv.innerHTML = trashDiv.innerHTML = '';
 
             orders.forEach(o => {
                 const status = o.status || 'جديد ⏳';
@@ -707,6 +442,7 @@
                 `;
                 if(isTrash) trashDiv.innerHTML += cardHtml;
                 else if(status.includes('جديد')) newDiv.innerHTML += cardHtml;
+                else if(status.includes('وهمي')) fakeDiv.innerHTML += cardHtml;
                 else if(status.includes('المعالجة')) procDiv.innerHTML += cardHtml;
                 else if(status.includes('التوصيل')) shipDiv.innerHTML += cardHtml;
                 else if(status.includes('أرشيف')) archDiv.innerHTML += cardHtml;
@@ -866,27 +602,74 @@
             if(reportEl) reportEl.innerHTML = html;
         }
 
-        window.resetDateFilter = function() {
-            document.getElementById('filter-date-from').value = '';
-            document.getElementById('filter-date-to').value = '';
-            updateAnalyticsData(allFetchedOrders);
+        window.loadAllReviewsForAdmin = function() {
+            let container = document.getElementById('admin-reviews-list-container');
+            let html = '';
+            let totalReviewsCount = 0;
+
+            for(let key in localStorage) {
+                if(key.startsWith('dz_reviews_')) {
+                    let prodId = key.replace('dz_reviews_', '');
+                    let reviews = JSON.parse(localStorage.getItem(key)) || [];
+                    let prodName = productsFullCache[prodId]?.name || `منتج (ID: ${prodId})`;
+
+                    reviews.forEach((rev, index) => {
+                        totalReviewsCount++;
+                        let isHidden = rev.hidden === true;
+                        let stars = '⭐'.repeat(Number(rev.rating));
+
+                        html += `
+                            <div style="background:#f8fafc; border:1px solid ${isHidden ? '#fca5a5':'#cbd5e1'}; padding:12px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                                <div>
+                                    <span style="font-size:11px; background:#e2e8f0; padding:2px 6px; border-radius:4px;">📦 ${prodName}</span>
+                                    <h4 style="margin:5px 0 2px 0; color:#1e293b;">👤 ${rev.name} <span style="font-size:12px; font-weight:normal; color:#64748b;">(${rev.date})</span></h4>
+                                    <div style="font-size:13px; color:#f59e0b; margin-bottom:3px;">${stars}</div>
+                                    <p style="margin:0; font-size:13px; color:#333;">${rev.comment}</p>
+                                    ${isHidden ? '<span style="color:red; font-size:11px; font-weight:bold;">[مخفي عن الزبون 🙈]</span>' : '<span style="color:green; font-size:11px; font-weight:bold;">[ظاهر للزبون 👀]</span>'}
+                                </div>
+                                <div style="display:flex; gap:6px;">
+                                    <button onclick="toggleReviewVisibility('${prodId}', ${index})" style="background:${isHidden ? '#16a34a':'#dc2626'}; padding:6px 12px; font-size:12px;">
+                                        ${isHidden ? 'إظهار للزبون 👀' : 'إخفاء عن الزبون 🙈'}
+                                    </button>
+                                    <button onclick="adminDeleteReview('${prodId}', ${index})" style="background:#991b1b; padding:6px 12px; font-size:12px;">
+                                        حذف 🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+            container.innerHTML = totalReviewsCount === 0 ? '<p style="text-align:center; color:#64748b;">لا توجد تعليقات.</p>' : html;
         }
 
-        window.updateAnalyticsData = function(orders) {
-            let dateFrom = document.getElementById('filter-date-from')?.value;
-            let dateTo = document.getElementById('filter-date-to')?.value;
+        window.toggleReviewVisibility = function(prodId, reviewIndex) {
+            let reviewsKey = `dz_reviews_${prodId}`;
+            let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+            if(reviews[reviewIndex]) {
+                reviews[reviewIndex].hidden = !reviews[reviewIndex].hidden;
+                localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+                loadAllReviewsForAdmin();
+            }
+        }
 
+        window.adminDeleteReview = function(prodId, reviewIndex) {
+            if(confirm('هل أنت متأكد من حذف هذا التعليق نهائياً؟')) {
+                let reviewsKey = `dz_reviews_${prodId}`;
+                let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+                reviews.splice(reviewIndex, 1);
+                localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+                loadAllReviewsForAdmin();
+            }
+        }
+
+        // حساب وتحديث التحليلات الشاملة (الزوار، الأرباح، المنتجات الأكثر طلباً ومبيعاً)
+        window.updateAnalyticsData = function(orders) {
             let totalProfit = 0, totalBuy = 0, totalSell = 0, routerLoss = 0;
-            let dailyMap = {};
+            let productSalesCount = {}; // لترتيب الأكثر طلباً ومبيعاً
 
             orders.forEach(o => {
-                if(o.status && (o.status.includes('مهملات') || o.status.includes('ملغى'))) return;
-
-                let orderDateObj = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
-                let orderDateStr = orderDateObj.toISOString().split('T')[0];
-
-                if(dateFrom && orderDateStr < dateFrom) return;
-                if(dateTo && orderDateStr > dateTo) return;
+                if(o.status && (o.status.includes('مهملات') || o.status.includes('ملغى') || o.status.includes('وهمي'))) return;
 
                 let sellPrice = (o.finalTotal || 0);
                 totalSell += sellPrice;
@@ -895,57 +678,65 @@
                 let buyPriceTotal = (pData.buyPrice * (o.quantity || 1));
                 totalBuy += buyPriceTotal;
 
-                let profit = 0;
                 if(o.status && o.status.includes('أرشيف')) {
-                    profit = (pData.margin * (o.quantity || 1));
-                    totalProfit += profit;
+                    totalProfit += (pData.margin * (o.quantity || 1));
                 }
-
-                let routerFee = 0;
                 if(o.status && o.status.includes('روتور')) {
-                    routerFee = 600;
                     routerLoss += 600;
                 }
 
-                if(!dailyMap[orderDateStr]) {
-                    dailyMap[orderDateStr] = { ordersCount: 0, sell: 0, profit: 0, routerLoss: 0 };
+                // تجميع حساب المنتجات الأكثر طلباً ومبيعاً
+                if(o.productName) {
+                    if(!productSalesCount[o.productName]) productSalesCount[o.productName] = { count: 0, totalRevenue: 0 };
+                    productSalesCount[o.productName].count += (o.quantity || 1);
+                    productSalesCount[o.productName].totalRevenue += sellPrice;
                 }
-                dailyMap[orderDateStr].ordersCount++;
-                dailyMap[orderDateStr].sell += sellPrice;
-                dailyMap[orderDateStr].profit += profit;
-                dailyMap[orderDateStr].routerLoss += routerFee;
             });
 
-            if(document.getElementById('stat-total-profit')) {
-                document.getElementById('stat-total-profit').innerText = totalProfit + ' دج';
-                document.getElementById('stat-total-buy-price').innerText = totalBuy + ' دج';
-                document.getElementById('stat-total-sell-price').innerText = totalSell + ' دج';
-                document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
-            }
+            // تحديث البطاقات المالية
+            document.getElementById('stat-total-profit').innerText = totalProfit + ' دج';
+            document.getElementById('stat-total-buy-price').innerText = totalBuy + ' دج';
+            document.getElementById('stat-total-sell-price').innerText = totalSell + ' دج';
+            document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
 
-            let dailyContainer = document.getElementById('daily-analytics-container');
-            if(dailyContainer) {
-                let sortedDays = Object.keys(dailyMap).sort().reverse();
-                if(sortedDays.length === 0) {
-                    dailyContainer.innerHTML = '<p style="font-size:13px; color:#64748b;">لا توجد بيانات مطابقة في هذا النطاق الزمني.</p>';
-                    return;
-                }
-                let tableHtml = `<table class="daily-report-table"><thead><tr><th>📅 اليوم / التاريخ</th><th>📦 عدد الطلبات</th><th>💰 إجمالي المبيعات</th><th>📈 الأرباح المؤكدة</th><th>⚠️ خسائر الروتور</th></tr></thead><tbody>`;
-                sortedDays.forEach(day => {
-                    let d = dailyMap[day];
-                    tableHtml += `
-                        <tr>
-                            <td><b>${day}</b></td>
-                            <td>${d.ordersCount} طلب</td>
-                            <td>${d.sell} دج</td>
-                            <td style="color:green; font-weight:bold;">${d.profit} دج</td>
-                            <td style="color:red;">${d.routerLoss} دج</td>
-                        </tr>
-                    `;
+            // حساب وإظهار تحليل الزوار (يومي، أسبوعي، شهري، وأكثر منتج مشاهدة)
+            let visitorsData = JSON.parse(localStorage.getItem('dz_store_visitors')) || { days: {}, weeks: {}, months: {} };
+            let todayStr = new Date().toISOString().split('T')[0];
+            let weekStr = getWeekKey(new Date());
+            let monthStr = todayStr.substring(0, 7);
+
+            document.getElementById('stat-visitors-day').innerText = visitorsData.days[todayStr] || 0;
+            document.getElementById('stat-visitors-week').innerText = visitorsData.weeks[weekStr] || 0;
+            document.getElementById('stat-visitors-month').innerText = visitorsData.months[monthStr] || 0;
+
+            let viewsMap = JSON.parse(localStorage.getItem('dz_product_views')) || {};
+            let topViewedProd = Object.keys(viewsMap).reduce((a, b) => viewsMap[a] > viewsMap[b] ? a : b, 'لا توجد مشاهدات');
+            document.getElementById('stat-top-viewed').innerText = topViewedProd;
+
+            // توليد جدول المنتجات الأكثر طلباً ومبيعاً
+            let topProdContainer = document.getElementById('top-products-analytics-container');
+            let sortedProducts = Object.keys(productSalesCount).sort((a,b) => productSalesCount[b].count - productSalesCount[a].count);
+            
+            if(sortedProducts.length === 0) {
+                topProdContainer.innerHTML = '<p style="font-size:13px; color:#64748b;">لا توجد طلبات مسجلة بعد.</p>';
+            } else {
+                let pTableHtml = `<table class="products-analytics-table"><thead><tr><th>📦 اسم المنتج</th><th>🔥 عدد الوحدات المباعة</th><th>💰 إجمالي المبيعات المحققة</th></tr></thead><tbody>`;
+                sortedProducts.forEach(pName => {
+                    let item = productSalesCount[pName];
+                    pTableHtml += `<tr><td><b>${pName}</b></td><td>${item.count} وحدة</td><td style="color:green; font-weight:bold;">${item.totalRevenue} دج</td></tr>`;
                 });
-                tableHtml += `</tbody></table>`;
-                dailyContainer.innerHTML = tableHtml;
+                pTableHtml += `</tbody></table>`;
+                topProdContainer.innerHTML = pTableHtml;
             }
+        }
+
+        function getWeekKey(d) {
+            let date = new Date(d.getTime());
+            date.setHours(0, 0, 0, 0);
+            date.setDate(date.getDate() + 4 - (date.getDay() || 7));
+            let yearStart = new Date(date.getFullYear(), 0, 1);
+            let weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+            return `${date.getFullYear()}-W${weekNo}`;
         }
     </script>
 </body>
