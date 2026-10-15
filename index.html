@@ -81,7 +81,7 @@
         <p style="text-align:center; grid-column: 1/-1;">جاري تحميل المنتجات...</p>
     </div>
 
-    <!-- نافذة تفاصيل المنتج (التبويب الجديد عند النقر على السلعة) -->
+    <!-- نافذة تفاصيل المنتج والتعليقات -->
     <div class="modal-overlay" id="productDetailsModal">
         <div class="modal-card">
             <div id="modal-product-content"></div>
@@ -91,25 +91,8 @@
             <div class="products-grid" id="related-products-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
 
             <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
-            <h4 style="color:#1e293b; margin-bottom:10px;">⭐ تقييمات والتعليقات:</h4>
+            <h4 style="color:#1e293b; margin-bottom:10px;">⭐ التقييمات والتعليقات السابقة:</h4>
             <div id="reviews-list-container" style="margin-bottom:15px;"></div>
-            
-            <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1;">
-                <h4 style="margin-top:0; font-size:14px;">أضف تقييمك ورأيك:</h4>
-                <div class="form-group"><input type="text" id="reviewer-name" placeholder="اسمك الكريم"></div>
-                <div class="form-group">
-                    <label>التقييم بالنجوم:</label>
-                    <select id="reviewer-rating">
-                        <option value="5">⭐⭐⭐⭐⭐ (ممتاز)</option>
-                        <option value="4">⭐⭐⭐⭐ (جيد جداً)</option>
-                        <option value="3">⭐⭐⭐ (متوسط)</option>
-                        <option value="2">⭐⭐ (ضعيف)</option>
-                        <option value="1">⭐ (سيء)</option>
-                    </select>
-                </div>
-                <div class="form-group"><textarea id="reviewer-comment" placeholder="اكتب تعليقك هنا..." style="height:60px;"></textarea></div>
-                <button onclick="submitReview()" style="background:#0284c7; color:white; padding:8px 12px; width:100%; border:none; border-radius:6px; font-weight:bold;">إرسال التعليق والتقييم ✍️</button>
-            </div>
 
             <button onclick="document.getElementById('productDetailsModal').style.display='none'" style="margin-top:15px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إغلاق التبويب ❌</button>
         </div>
@@ -117,7 +100,7 @@
 
     <!-- نافذة سلة الشراء وإتمام الطلب (COD مع ولايات الجزائر الـ 58) -->
     <div class="modal-overlay" id="cartModal">
-        <div class="modal-card">
+        <div class="modal-card" id="cart-modal-card-content">
             <h3 style="margin-top:0; color:#1e293b;">🛒 سلة الشراء وإتمام الطلب (الدفع عند الاستلام)</h3>
             <div id="cart-items-list" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
 
@@ -272,7 +255,6 @@
             });
         }
 
-        // فتح تبويب/نافذة جديدة لتفاصيل المنتج مع صنف المنتجات الأخرى والتعليقات
         window.openProductDetails = function(product) {
             currentOpenedProduct = product;
             currentSelectedPrice = product.price;
@@ -333,7 +315,6 @@
 
             document.getElementById('modal-product-content').innerHTML = contentHtml;
 
-            // عرض المنتجات الأخرى من نفس الصنف
             let relatedGrid = document.getElementById('related-products-grid');
             let related = allProducts.filter(p => p.category === product.category && p.id !== product.id);
             if(related.length === 0) {
@@ -370,66 +351,23 @@
         }
 
         window.addToCartDirect = function(product) {
-            cart.push({ productName: product.name, price: product.price, quantity: 1 });
+            cart.push({ id: product.id, productName: product.name, price: product.price, quantity: 1 });
             document.getElementById('cart-count').innerText = cart.length;
             alert(`تمت إضافة (${product.name}) إلى السلة بنجاح! 🛒`);
         }
 
         window.addCurrentToCart = function() {
-            cart.push({ productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty });
+            cart.push({ id: currentOpenedProduct.id, productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty });
             document.getElementById('cart-count').innerText = cart.length;
             document.getElementById('productDetailsModal').style.display = 'none';
             alert('تمت إضافة المنتج بجميع خصائصه إلى السلة بنجاح! 🛒');
         }
 
         window.buyCurrentNow = function() {
-            cart = [{ productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty }];
+            cart = [{ id: currentOpenedProduct.id, productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty }];
             document.getElementById('cart-count').innerText = 1;
             document.getElementById('productDetailsModal').style.display = 'none';
             openCartModal();
-        }
-
-        // نظام التعليقات وتقييم النجوم المخزن محلياً
-        window.submitReview = function() {
-            let name = document.getElementById('reviewer-name').value.trim();
-            let rating = document.getElementById('reviewer-rating').value;
-            let comment = document.getElementById('reviewer-comment').value.trim();
-
-            if(!name || !comment) { alert('أدخل الاسم والتعليق من فضلك!'); return; }
-
-            let reviewsKey = `dz_reviews_${currentOpenedProduct.id}`;
-            let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
-            reviews.push({ name, rating, comment, date: new Date().toLocaleDateString('ar-DZ') });
-            localStorage.setItem(reviewsKey, JSON.stringify(reviews));
-
-            document.getElementById('reviewer-name').value = '';
-            document.getElementById('reviewer-comment').value = '';
-            renderReviews(currentOpenedProduct.id);
-            alert('شكراً لك! تم إضافة تقييمك بنجاح ⭐');
-        }
-
-        function renderReviews(productId) {
-            let container = document.getElementById('reviews-list-container');
-            let reviews = JSON.parse(localStorage.getItem(`dz_reviews_${productId}`)) || [];
-            if(reviews.length === 0) {
-                container.innerHTML = '<p style="font-size:12px; color:#64748b;">لا توجد تعليقات بعد. كن أول من يقيّم!</p>';
-                return;
-            }
-            let html = '';
-            reviews.forEach(r => {
-                let stars = '⭐'.repeat(Number(r.rating));
-                html += `
-                    <div class="review-box">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
-                            <b>👤 ${r.name}</b>
-                            <span style="font-size:11px; color:#64748b;">${r.date}</span>
-                        </div>
-                        <div class="rating-stars" style="font-size:13px;">${stars}</div>
-                        <p style="margin:0; color:#333;">${r.comment}</p>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
         }
 
         window.openCartModal = function() {
@@ -437,6 +375,102 @@
                 alert('سلة الشراء فارغة حالياً!');
                 return;
             }
+            renderCartModalForm();
+        }
+
+        function renderCartModalForm() {
+            let cardHtml = `
+                <h3 style="margin-top:0; color:#1e293b;">🛒 سلة الشراء وإتمام الطلب (الدفع عند الاستلام)</h3>
+                <div id="cart-items-list" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
+
+                <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="order-fullname" placeholder="أدخل اسمك الكامل"></div>
+                <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone" placeholder="07xxxxxxxx"></div>
+                <div class="form-group">
+                    <label>الولاية (جميع ولايات الجزائر 58):</label>
+                    <select id="order-wilaya" onchange="calculateCartTotal()">
+                        <option value="Adrar">01 - أدرار</option>
+                        <option value="Chlef" selected>02 - الشلف</option>
+                        <option value="Laghouat">03 - الأغواط</option>
+                        <option value="Oum El Bouaghi">04 - أم البواقي</option>
+                        <option value="Batna">05 - باتنة</option>
+                        <option value="Béjaïa">06 - بجاية</option>
+                        <option value="Biskra">07 - بسكرة</option>
+                        <option value="Béchar">08 - بشار</option>
+                        <option value="Blida">09 - البليدة</option>
+                        <option value="Bouira">10 - البويرة</option>
+                        <option value="Tamanrasset">11 - تمنراست</option>
+                        <option value="Tébessa">12 - تبسة</option>
+                        <option value="Tlemcen">13 - تلمسان</option>
+                        <option value="Tiaret">14 - تيارت</option>
+                        <option value="Tizi Ouzou">15 - تيزي وزو</option>
+                        <option value="Algiers">16 - الجزائر العاصمة</option>
+                        <option value="Djelfa">17 - الجلفة</option>
+                        <option value="Jijel">18 - جيجل</option>
+                        <option value="Sétif">19 - سطيف</option>
+                        <option value="Saïda">20 - سعيدة</option>
+                        <option value="Skikda">21 - سكيكدة</option>
+                        <option value="Sidi Bel Abbès">22 - سيدي بلعباس</option>
+                        <option value="Annaba">23 - عنابة</option>
+                        <option value="Guelma">24 - قالمة</option>
+                        <option value="Constantine">25 - قسنطينة</option>
+                        <option value="Médéa">26 - المدية</option>
+                        <option value="Mostaganem">27 - مستغانم</option>
+                        <option value="M'Sila">28 - المسيلة</option>
+                        <option value="Mascara">29 - معسكر</option>
+                        <option value="Ouargla">30 - ورقلة</option>
+                        <option value="Oran">31 - وهران</option>
+                        <option value="El Bayadh">32 - البيض</option>
+                        <option value="Illizi">33 - إليزي</option>
+                        <option value="Bordj Bou Arréridj">34 - برج بوعريريج</option>
+                        <option value="Boumerdès">35 - بومرداس</option>
+                        <option value="El Tarf">36 - الطارف</option>
+                        <option value="Tindouf">37 - تندوف</option>
+                        <option value="Tissemsilt">38 - تيسمسيلت</option>
+                        <option value="El Oued">39 - الوادي</option>
+                        <option value="Khenchela">40 - خنشلة</option>
+                        <option value="Souk Ahras">41 - سوق أهراس</option>
+                        <option value="Tipaza">42 - تيبازة</option>
+                        <option value="Mila">43 - ميلة</option>
+                        <option value="Aïn Defla">44 - عين الدفلى</option>
+                        <option value="Naâma">45 - النعامة</option>
+                        <option value="Aïn Témouchent">46 - عين تموشنت</option>
+                        <option value="Ghardaïa">47 - غرداية</option>
+                        <option value="Relizane">48 - غليزان</option>
+                        <option value="Timimoun">49 - تيميمون</option>
+                        <option value="Bordj Badji Mokhtar">50 - برج باجي مختار</option>
+                        <option value="Ouled Djellal">51 - أولاد جلال</option>
+                        <option value="Béni Abbès">52 - بني عباس</option>
+                        <option value="In Salah">53 - إن صالح</option>
+                        <option value="In Guezzam">54 - إن قزام</option>
+                        <option value="Touggourt">55 - تقرت</option>
+                        <option value="Djanet">56 - جانت</option>
+                        <option value="El M'Ghair">57 - المغير</option>
+                        <option value="El Meniaa">58 - المنيعة</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>البلدية / العنوان بالتفصيل:</label><input type="text" id="order-commune" placeholder="اسم البلدية والحي"></div>
+                <div class="form-group">
+                    <label>نوع التوصيل:</label>
+                    <select id="order-delivery-type" onchange="calculateCartTotal()">
+                        <option value="توصيل للمنزل 🏠">توصيل للمنزل 🏠</option>
+                        <option value="توصيل للمكتب 🏢">توصيل للمكتب (ستوب ديسك) 🏢</option>
+                    </select>
+                </div>
+
+                <div style="background:#f1f5f9; padding:10px; border-radius:6px; margin-bottom:15px; font-size:14px;">
+                    <span>💰 المجموع الكلي النهائي (COD):</span> <b id="cart-final-total" style="color:#e11d48; font-size:18px;">0 دج</b>
+                </div>
+
+                <button onclick="submitCartOrder()" style="background:#16a34a; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب نهائياً 🚀</button>
+                <button onclick="document.getElementById('cartModal').style.display='none'" style="margin-top:8px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إلغاء ❌</button>
+            `;
+            document.getElementById('cart-modal-card-content').innerHTML = cardHtml;
+            
+            let savedName = localStorage.getItem('dz_user_name');
+            let savedPhone = localStorage.getItem('dz_user_phone');
+            if(savedName) document.getElementById('order-fullname').value = savedName;
+            if(savedPhone) document.getElementById('order-phone').value = savedPhone;
+
             renderCartItems();
             calculateCartTotal();
             document.getElementById('cartModal').style.display = 'flex';
@@ -444,6 +478,7 @@
 
         function renderCartItems() {
             let container = document.getElementById('cart-items-list');
+            if(!container) return;
             let html = '';
             cart.forEach((item, index) => {
                 html += `
@@ -469,10 +504,11 @@
 
         window.calculateCartTotal = function() {
             let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            let deliveryType = document.getElementById('order-delivery-type').value;
+            let deliveryType = document.getElementById('order-delivery-type')?.value || '';
             let deliveryFee = deliveryType.includes('منزل') ? 600 : 400;
             let total = subtotal + deliveryFee;
-            document.getElementById('cart-final-total').innerText = total + ' دج';
+            let totalEl = document.getElementById('cart-final-total');
+            if(totalEl) totalEl.innerText = total + ' دج';
         }
 
         window.submitCartOrder = async function() {
@@ -494,6 +530,9 @@
             let deliveryFee = deliveryType.includes('منزل') ? 600 : 400;
             let finalTotal = subtotal + deliveryFee;
 
+            // حفظ المنتجات التي طلبها الزبون لنتمكن من عرض نافذة تقييمها بعد إتمام الطلب
+            let orderedItemsForReview = [...cart];
+
             try {
                 for(let item of cart) {
                     await addDoc(collection(db, "orders"), {
@@ -510,13 +549,94 @@
                         createdAt: new Date()
                     });
                 }
-                alert('🎉 تم إرسال طلبك بنجاح عبر نظام COD! سنتصل بك قريباً للتأكيد.');
+
                 cart = [];
                 document.getElementById('cart-count').innerText = '0';
-                document.getElementById('cartModal').style.display = 'none';
+
+                // تحويل نافذة السلة فوراً إلى "رسالة النجاح وتقييم المنتجات المطلوبة"
+                showOrderSuccessAndReviewModal(fullName, orderedItemsForReview);
+
             } catch(e) {
                 alert('فشل إرسال الطلب، حاول مرة أخرى.');
             }
+        }
+
+        // نافذة النجاح وإظهار خيار التعليق والتقييم بعد إتمام الطلب مباشرة
+        function showOrderSuccessAndReviewModal(clientName, orderedItems) {
+            let cardModalContent = document.getElementById('cart-modal-card-content');
+            
+            let reviewsHtml = '';
+            orderedItems.forEach((item, idx) => {
+                reviewsHtml += `
+                    <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:12px; border-radius:8px; margin-bottom:12px;">
+                        <p style="margin:0 0 8px 0; font-weight:bold; color:#1e293b;">📦 ${item.productName}</p>
+                        <div class="form-group">
+                            <label style="font-size:12px;">التقييم بالنجوم ⭐:</label>
+                            <select id="success-rating-${idx}">
+                                <option value="5">⭐⭐⭐⭐⭐ (ممتاز)</option>
+                                <option value="4">⭐⭐⭐⭐ (جيد جداً)</option>
+                                <option value="3">⭐⭐⭐ (متوسط)</option>
+                                <option value="2">⭐⭐ (ضعيف)</option>
+                                <option value="1">⭐ (سيء)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <textarea id="success-comment-${idx}" placeholder="اكتب تعليقك حول هذا المنتج..." style="height:50px; font-size:13px;"></textarea>
+                        </div>
+                    </div>
+                `;
+            });
+
+            cardModalContent.innerHTML = `
+                <div style="text-align:center;">
+                    <h2 style="color:#16a34a; margin-top:0;">🎉 تم إرسال طلبك بنجاح يا ${clientName}!</h2>
+                    <p style="color:#475569; font-size:14px; line-height:1.5;">سنتصل بك قريباً عبر الهاتف لتأكيد الطلب. نود معرفة رأيك وتقييمك للمنتجات التي طلبتها:</p>
+                </div>
+                ${reviewsHtml}
+                <button onclick="submitPostOrderReviews(${JSON.stringify(orderedItems).replace(/'/g, "&apos;")}, '${clientName}')" style="background:#2563eb; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إرسال التقييمات وإنهاء الطلب 🚀</button>
+            `;
+        }
+
+        window.submitPostOrderReviews = function(orderedItems, clientName) {
+            orderedItems.forEach((item, idx) => {
+                let rating = document.getElementById(`success-rating-${idx}`).value;
+                let comment = document.getElementById(`success-comment-${idx}`).value.trim();
+
+                if(comment && item.id) {
+                    let reviewsKey = `dz_reviews_${item.id}`;
+                    let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+                    reviews.push({ name: clientName, rating, comment, date: new Date().toLocaleDateString('ar-DZ') });
+                    localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+                }
+            });
+
+            alert('شكراً لك على تقييمك وثقتك بنا! ❤️');
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        function renderReviews(productId) {
+            let container = document.getElementById('reviews-list-container');
+            if(!container) return;
+            let reviews = JSON.parse(localStorage.getItem(`dz_reviews_${productId}`)) || [];
+            if(reviews.length === 0) {
+                container.innerHTML = '<p style="font-size:12px; color:#64748b;">لا توجد تعليقات بعد لهذا المنتج. ستظهر هنا تقييمات العملاء بعد الطلب!</p>';
+                return;
+            }
+            let html = '';
+            reviews.forEach(r => {
+                let stars = '⭐'.repeat(Number(r.rating));
+                html += `
+                    <div class="review-box">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                            <b>👤 ${r.name}</b>
+                            <span style="font-size:11px; color:#64748b;">${r.date}</span>
+                        </div>
+                        <div class="rating-stars" style="font-size:13px;">${stars}</div>
+                        <p style="margin:0; color:#333;">${r.comment}</p>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
         }
     </script>
 </body>
