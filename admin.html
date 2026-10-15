@@ -152,6 +152,7 @@
                 <button class="tab-btn" onclick="switchTab('trash-tab', event)" style="background:#64748b; color:white;">🗑️ المهملات</button>
                 <button class="tab-btn" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
                 <button class="tab-btn" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
+                <button class="tab-btn" onclick="switchTab('reviews-mgmt-tab', event)" style="background: #0284c7; color: white;">💬 التعليقات</button>
                 <button class="tab-btn" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 طاقم العمل</button>
                 <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج</button>
                 <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المخزون</button>
@@ -169,12 +170,19 @@
 
         <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات</h2><div id="wilaya-report-content">جاري التجهيز...</div></div></div>
         
-        <!-- قسم التحليلات المطور مع اختيار التواريخ وتحليل الأداء اليومي المستقل -->
+        <!-- قسم إدارة وتعليقات وحذف العملاء -->
+        <div id="reviews-mgmt-tab" class="tab-content">
+            <div class="container" style="border: 2px solid #0284c7;">
+                <h2 style="color: #0284c7;">💬 إدارة تعليقات وتقييمات العملاء (إخفاء / إظهار / حذف)</h2>
+                <p style="font-size:13px; color:#64748b; text-align:center; margin-bottom:20px;">يمكنك هنا التحكم في إظهار، إخفاء، أو حذف أي تعليق نهائياً.</p>
+                <div id="admin-reviews-list-container">جاري التحميل...</div>
+            </div>
+        </div>
+
         <div id="analytics-tab" class="tab-content">
             <div class="container">
                 <h2>💰 التحليلات المالية والأرباح حسب التواريخ</h2>
                 
-                <!-- نافذة اختيار التواريخ -->
                 <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:20px; display:flex; gap:15px; flex-wrap:wrap; align-items:flex-end;">
                     <div style="flex:1; min-width:200px;">
                         <label>من تاريخ:</label>
@@ -324,6 +332,7 @@
             await loadAllOrders();
             loadProducts();
             loadStaffList();
+            loadAllReviewsForAdmin();
         }
 
         window.switchTab = function(tabId, event) {
@@ -331,11 +340,80 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             if(event && event.currentTarget) event.currentTarget.classList.add('active');
+            if(tabId === 'reviews-mgmt-tab') loadAllReviewsForAdmin();
         }
 
         window.logout = function() {
             sessionStorage.clear();
             location.reload();
+        }
+
+        // تحميل وعرض جميع التعليقات مع أزرار الإخفاء، الإظهار، والحذف للأدمن
+        window.loadAllReviewsForAdmin = function() {
+            let container = document.getElementById('admin-reviews-list-container');
+            let html = '';
+            let totalReviewsCount = 0;
+
+            for(let key in localStorage) {
+                if(key.startsWith('dz_reviews_')) {
+                    let prodId = key.replace('dz_reviews_', '');
+                    let reviews = JSON.parse(localStorage.getItem(key)) || [];
+                    let prodName = productsFullCache[prodId]?.name || `منتج (ID: ${prodId})`;
+
+                    reviews.forEach((rev, index) => {
+                        totalReviewsCount++;
+                        let isHidden = rev.hidden === true;
+                        let stars = '⭐'.repeat(Number(rev.rating));
+
+                        html += `
+                            <div style="background:#f8fafc; border:1px solid ${isHidden ? '#fca5a5':'#cbd5e1'}; padding:12px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                                <div>
+                                    <span style="font-size:11px; background:#e2e8f0; padding:2px 6px; border-radius:4px;">📦 ${prodName}</span>
+                                    <h4 style="margin:5px 0 2px 0; color:#1e293b;">👤 ${rev.name} <span style="font-size:12px; font-weight:normal; color:#64748b;">(${rev.date})</span></h4>
+                                    <div style="font-size:13px; color:#f59e0b; margin-bottom:3px;">${stars}</div>
+                                    <p style="margin:0; font-size:13px; color:#333;">${rev.comment}</p>
+                                    ${isHidden ? '<span style="color:red; font-size:11px; font-weight:bold;">[مخفي عن الزبون 🙈]</span>' : '<span style="color:green; font-size:11px; font-weight:bold;">[ظاهر للزبون 👀]</span>'}
+                                </div>
+                                <div style="display:flex; gap:6px;">
+                                    <button onclick="toggleReviewVisibility('${prodId}', ${index})" style="background:${isHidden ? '#16a34a':'#dc2626'}; padding:6px 12px; font-size:12px;">
+                                        ${isHidden ? 'إظهار للزبون 👀' : 'إخفاء عن الزبون 🙈'}
+                                    </button>
+                                    <button onclick="adminDeleteReview('${prodId}', ${index})" style="background:#991b1b; padding:6px 12px; font-size:12px;">
+                                        حذف التعليق 🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+
+            if(totalReviewsCount === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#64748b;">لا توجد تعليقات أو تقييمات مضافة حتى الآن.</p>';
+            } else {
+                container.innerHTML = html;
+            }
+        }
+
+        window.toggleReviewVisibility = function(prodId, reviewIndex) {
+            let reviewsKey = `dz_reviews_${prodId}`;
+            let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+            if(reviews[reviewIndex]) {
+                reviews[reviewIndex].hidden = !reviews[reviewIndex].hidden;
+                localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+                loadAllReviewsForAdmin();
+            }
+        }
+
+        window.adminDeleteReview = function(prodId, reviewIndex) {
+            if(confirm('هل أنت متأكد من حذف هذا التعليق نهائياً؟')) {
+                let reviewsKey = `dz_reviews_${prodId}`;
+                let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+                reviews.splice(reviewIndex, 1);
+                localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+                loadAllReviewsForAdmin();
+                showAlert('نجاح', 'تم حذف التعليق نهائياً!');
+            }
         }
 
         window.updateAdminCredentials = function() {
@@ -794,7 +872,6 @@
             updateAnalyticsData(allFetchedOrders);
         }
 
-        // حساب التحليلات مع تصفية التواريخ وإظهار التقرير اليومي المنفصل لكل يوم
         window.updateAnalyticsData = function(orders) {
             let dateFrom = document.getElementById('filter-date-from')?.value;
             let dateTo = document.getElementById('filter-date-to')?.value;
@@ -806,9 +883,8 @@
                 if(o.status && (o.status.includes('مهملات') || o.status.includes('ملغى'))) return;
 
                 let orderDateObj = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
-                let orderDateStr = orderDateObj.toISOString().split('T')[0]; // YYYY-MM-DD
+                let orderDateStr = orderDateObj.toISOString().split('T')[0];
 
-                // فلترة التواريخ إن وجدت
                 if(dateFrom && orderDateStr < dateFrom) return;
                 if(dateTo && orderDateStr > dateTo) return;
 
@@ -831,7 +907,6 @@
                     routerLoss += 600;
                 }
 
-                // التجميع اليومي المستقل لكل يوم
                 if(!dailyMap[orderDateStr]) {
                     dailyMap[orderDateStr] = { ordersCount: 0, sell: 0, profit: 0, routerLoss: 0 };
                 }
@@ -848,7 +923,6 @@
                 document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
             }
 
-            // توليد جدول التحليل اليومي لكل يوم على حدة
             let dailyContainer = document.getElementById('daily-analytics-container');
             if(dailyContainer) {
                 let sortedDays = Object.keys(dailyMap).sort().reverse();
