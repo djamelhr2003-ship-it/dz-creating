@@ -49,7 +49,7 @@
         .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
 
         .staff-status-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        .offer-box-admin, .variant-box-admin { background: #fef9c3; border: 1.5px solid #facc15; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .variant-box-admin { background: #fef9c3; border: 1.5px solid #facc15; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -92,10 +92,20 @@
                     <option value="أكسسوارات">أكسسوارات 🕶️</option>
                 </select>
             </div>
-            <div class="form-group"><label>روابط الصور:</label><textarea id="edit-prod-imgs" style="height:40px;"></textarea></div>
+            
+            <div class="form-group">
+                <label>روابط الصور:</label>
+                <div id="edit-images-inputs-container"></div>
+                <button type="button" onclick="addEditImageInput()" class="btn-secondary" style="background:#2563eb; margin-top:5px; font-size:12px;">➕ إضافة صورة أخرى</button>
+            </div>
+
+            <div class="form-group">
+                <label>رابط الفيديو (دقة 1080):</label>
+                <input type="text" id="edit-prod-video" placeholder="أدخل رابط فيديو دقة 1080">
+            </div>
             
             <div id="edit-variants-section" style="display:none; margin-top:15px; border-top:1px solid #cbd5e1; padding-top:10px;">
-                <h4 style="color:#b45309; margin:5px 0;">🎨 المقاسات والألوان والمخزون الخاص بها:</h4>
+                <h4 style="color:#b45309; margin:5px 0;">🎨 المقاسات والألوان ومخزونها:</h4>
                 <div id="edit-variants-container"></div>
                 <button type="button" onclick="addEditVariantField()" class="btn-secondary" style="background:#d97706; margin-bottom:15px; font-size:12px;">➕ إضافة لون ومقاس آخر</button>
             </div>
@@ -105,10 +115,10 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الطلب مع الأزرار المخصصة بحسب الحالة -->
+    <!-- نافذة تفاصيل الطلب مع ملاحظات الزبون -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
-            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب والصورة والملحقات</h3>
+            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب والصورة وملاحظات الزبون</h3>
             <div id="orderDetailsContent" style="font-size: 14px; line-height: 1.8; color: #1e293b; margin-bottom: 20px;"></div>
             <div id="orderModalActions" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;"></div>
             <button onclick="closeOrderModal()" class="btn-secondary" style="margin-top: 15px; width: 100%; background: #64748b;">إغلاق النافذة ❌</button>
@@ -238,7 +248,7 @@
 
         <div id="add-product-tab" class="tab-content">
             <div class="container">
-                <h2>إضافة منتج مع المقاسات والألوان والمخزون ➕</h2>
+                <h2>إضافة منتج مع صور متعددة وفيديو بدقة 1080 ➕</h2>
                 <div class="form-group"><label>اسم المنتج:</label><input type="text" id="prod-name"></div>
                 <div class="form-group"><label>سعر الشراء:</label><input type="number" id="prod-buy-price"></div>
                 <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="prod-price"></div>
@@ -254,12 +264,26 @@
                         <option value="أكسسوارات">أكسسوارات 🕶️</option>
                     </select>
                 </div>
-                <div class="form-group"><label>روابط الصور:</label><textarea id="prod-imgs" style="height:40px;"></textarea></div>
-                <div class="form-group"><label>رابط الفيديو:</label><input type="text" id="prod-video"></div>
+                
+                <div class="form-group">
+                    <label>روابط الصور (أضف أكثر من صورة بضغط زر +):</label>
+                    <div id="images-inputs-container">
+                        <div style="display:flex; gap:5px; margin-bottom:5px;">
+                            <input type="text" class="prod-img-input" placeholder="رابط الصورة 1">
+                        </div>
+                    </div>
+                    <button type="button" onclick="addImageInput()" class="btn-secondary" style="background:#2563eb; margin-top:5px; font-size:12px;">➕ إضافة رابط صورة أخرى</button>
+                </div>
+
+                <div class="form-group">
+                    <label>رابط الفيديو (دقة 1080):</label>
+                    <input type="text" id="prod-video" placeholder="أدخل رابط فيديو دقة 1080">
+                </div>
+
                 <div class="form-group"><label>الوصف:</label><textarea id="prod-desc"></textarea></div>
                 
                 <div id="add-variants-section" style="display:none; margin:15px 0; border:1px solid #cbd5e1; padding:15px; border-radius:8px; background:#f8fafc;">
-                    <h4 style="color:#b45309; margin-top:0;">🎨 تخصيص ألوان ومقاسات الملابس مع مخزون كل لون/مقاس:</h4>
+                    <h4 style="color:#b45309; margin-top:0;">🎨 تخصيص ألوان ومقاسات الملابس مع مخزونها:</h4>
                     <div id="variants-container"></div>
                     <button type="button" onclick="addVariantField()" class="btn-secondary" style="background:#d97706; margin-top:5px; font-size:12px;">➕ إضافة لون ومقاس آخر</button>
                 </div>
@@ -273,7 +297,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDdJY7mI1DON...", authDomain: "creater-ecom.firebaseapp.com", projectId: "creater-ecom", storageBucket: "creater-ecom.appspot.com", messagingSenderId: "893449950593", appId: "1:893449950593:web:..." };
         const app = initializeApp(firebaseConfig);
@@ -294,6 +318,22 @@
             document.getElementById('centerModal').style.display = 'flex';
         }
         window.closeCenterModal = function() { document.getElementById('centerModal').style.display = 'none'; }
+
+        window.addImageInput = function(val = '') {
+            let container = document.getElementById('images-inputs-container');
+            let div = document.createElement('div');
+            div.style.cssText = 'display:flex; gap:5px; margin-bottom:5px;';
+            div.innerHTML = `<input type="text" class="prod-img-input" value="${val}" placeholder="رابط صورة إضافية"><button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف ❌</button>`;
+            container.appendChild(div);
+        }
+
+        window.addEditImageInput = function(val = '') {
+            let container = document.getElementById('edit-images-inputs-container');
+            let div = document.createElement('div');
+            div.style.cssText = 'display:flex; gap:5px; margin-bottom:5px;';
+            div.innerHTML = `<input type="text" class="edit-prod-img-input" value="${val}" placeholder="رابط صورة إضافية"><button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف ❌</button>`;
+            container.appendChild(div);
+        }
 
         window.toggleAddVariantsSection = function() {
             let cat = document.getElementById('prod-category').value;
@@ -513,13 +553,13 @@
             loadAllOrders();
         }
 
-        // تفاصيل الطلب مع الأزرار المخصصة بحسب الطلب بدقة
         window.openOrderModal = function(id) {
             const o = ordersCache[id];
             if(!o) return;
 
             let imgHtml = o.imageUrl ? `<div style="text-align:center; margin-bottom:10px;"><img src="${o.imageUrl}" style="width:100px; height:100px; object-fit:cover; border-radius:8px;"></div>` : '';
             let variantDetails = (o.color || o.size) ? `<br><b>🎨 اللون والمقاس:</b> اللون: ${o.color || '-'} | المقاس: ${o.size || '-'}` : '';
+            let notesHtml = o.customerNotes ? `<br><b>💬 ملاحظة الزبون:</b> <span style="color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:4px;">${o.customerNotes}</span>` : '<br><b>💬 ملاحظة الزبون:</b> لا توجد ملاحظات';
 
             document.getElementById('orderDetailsContent').innerHTML = `
                 ${imgHtml}
@@ -529,6 +569,7 @@
                 <b>📦 الطلب:</b> ${o.productName}${variantDetails}<br>
                 <b>🔢 الكمية:</b> ${o.quantity || 1}<br>
                 <b>🚚 نوع التوصيل:</b> ${o.deliveryType}<br>
+                ${notesHtml}<br>
                 <b>💰 المجموع الكلي:</b> <span style="color:red; font-weight:bold;">${o.finalTotal} دج</span><br>
                 <b>📌 الحالة الحالية:</b> <b>${o.status}</b>
             `;
@@ -539,30 +580,23 @@
             if(!staffPermissions.process) {
                 actionsHtml = '<p style="color:red;">ليس لديك صلاحية تعديل حالة الطلبات.</p>';
             } else {
-                // 1. في الطلب الجديد: زر معالجة (يذهب للمعالجة)، زر وهمي (يذهب للوهمية)، زر ملغى (يذهب للوهمية كما طلبت أو ملغى)
                 if(currentStatus.includes('جديد')) {
                     actionsHtml = `
                         <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', true)" style="background:#2563eb;">نقل للمعالجة 🔄</button>
                         <button onclick="updateOrderStatus('${o.id}', 'وهمي ⚠️', 'timeFake')" style="background:#dc2626;">وهمي ⚠️</button>
                         <button onclick="updateOrderStatus('${o.id}', 'وهمي ⚠️', 'timeFake')" class="btn-danger">ملغى (للوهمية) ❌</button>
                     `;
-                }
-                // 2. في المعالجة: زر التوصيل (يذهب للتوصيل)
-                else if(currentStatus.includes('المعالجة')) {
+                } else if(currentStatus.includes('المعالجة')) {
                     actionsHtml = `
                         <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
                     `;
-                }
-                // 3. في التوصيل: زر التأكيد (يذهب للأرشيف)، زر روتور (يذهب للروتور)، زر ملغى (يذهب لملغى)
-                else if(currentStatus.includes('التوصيل')) {
+                } else if(currentStatus.includes('التوصيل')) {
                     actionsHtml = `
                         <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم (أرشيف) ✅</button>
                         <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
                         <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">ملغى ❌</button>
                     `;
-                }
-                // 4. في باقي الأقسام والأرشيف: تظهر جميع الخيارات بمرونة كاملة
-                else {
+                } else {
                     actionsHtml = `
                         <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', false)" style="background:#2563eb;">نقل للمعالجة 🔄</button>
                         <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
@@ -675,9 +709,13 @@
             let stock = Number(document.getElementById('prod-stock').value) || 10;
             let category = document.getElementById('prod-category').value;
             let description = document.getElementById('prod-desc').value.trim();
-            let imgsRaw = document.getElementById('prod-imgs').value.trim();
-            let imageUrls = imgsRaw ? imgsRaw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : [];
+            let videoUrl = document.getElementById('prod-video').value.trim();
             
+            let imageUrls = [];
+            document.querySelectorAll('.prod-img-input').forEach(input => {
+                if(input.value.trim()) imageUrls.push(input.value.trim());
+            });
+
             let variants = [];
             if(category === 'الملابس') {
                 document.querySelectorAll('#variants-container .variant-box-admin').forEach(box => {
@@ -691,7 +729,7 @@
             if(!name || !price) { showAlert('تنبيه', 'أدخل اسم المنتج وسعر البيع!'); return; }
 
             await addDoc(collection(db, "products"), {
-                name, buyPrice, price, stock, category, description, imageUrls, variants, createdAt: new Date()
+                name, buyPrice, price, stock, category, description, imageUrls, videoUrl, variants, createdAt: new Date()
             });
             showAlert('نجاح', 'تم نشر المنتج بنجاح!');
             loadProducts();
@@ -741,7 +779,15 @@
             document.getElementById('edit-prod-price').value = p.price || 0;
             document.getElementById('edit-prod-stock').value = p.stock !== undefined ? p.stock : 10;
             document.getElementById('edit-prod-category').value = p.category || 'الكل';
-            document.getElementById('edit-prod-imgs').value = (p.imageUrls || []).join(', ');
+            document.getElementById('edit-prod-video').value = p.videoUrl || '';
+
+            let imgContainer = document.getElementById('edit-images-inputs-container');
+            imgContainer.innerHTML = '';
+            if(p.imageUrls && p.imageUrls.length > 0) {
+                p.imageUrls.forEach(url => addEditImageInput(url));
+            } else {
+                addEditImageInput('');
+            }
             
             toggleEditVariantsSection();
             let container = document.getElementById('edit-variants-container');
@@ -760,8 +806,12 @@
             let price = Number(document.getElementById('edit-prod-price').value) || 0;
             let stock = Number(document.getElementById('edit-prod-stock').value) || 0;
             let category = document.getElementById('edit-prod-category').value;
-            let imgsRaw = document.getElementById('edit-prod-imgs').value.trim();
-            let imageUrls = imgsRaw ? imgsRaw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : [];
+            let videoUrl = document.getElementById('edit-prod-video').value.trim();
+            
+            let imageUrls = [];
+            document.querySelectorAll('.edit-prod-img-input').forEach(input => {
+                if(input.value.trim()) imageUrls.push(input.value.trim());
+            });
 
             let variants = [];
             if(category === 'الملابس') {
@@ -773,7 +823,7 @@
                 });
             }
 
-            await updateDoc(doc(db, "products", id), { name, buyPrice, price, stock, category, imageUrls, variants });
+            await updateDoc(doc(db, "products", id), { name, buyPrice, price, stock, category, imageUrls, videoUrl, variants });
             document.getElementById('editProductModal').style.display = 'none';
             showAlert('نجاح', 'تم تحديث المنتج بنجاح 💾!');
             loadProducts();
