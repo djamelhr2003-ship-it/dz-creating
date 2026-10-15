@@ -162,10 +162,7 @@
         </div>
 
         <div id="orders-tab" class="tab-content active"><div class="container"><h2>الطلبات الجديدة ⏳</h2><div id="orders-list-new" class="orders-grid-compact">جاري التحميل...</div></div></div>
-        
-        <!-- قسم الطلبات الوهمية التلقائي -->
-        <div id="fake-orders-tab" class="tab-content"><div class="container" style="border:2px solid #dc2626;"><h2 style="color:#dc2626;">⚠️ الطلبات الوهمية والمكررة (خلال 48 ساعة)</h2><p style="font-size:13px; color:#64748b; text-align:center;">هذه الطلبات تم تحويلها أوتوماتيكياً لأن نفس الشخص طلب نفس المنتج لأكثر من مرة خلال 48 ساعة.</p><div id="orders-list-fake" class="orders-grid-compact">جاري التحميل...</div></div></div>
-
+        <div id="fake-orders-tab" class="tab-content"><div class="container" style="border:2px solid #dc2626;"><h2 style="color:#dc2626;">⚠️ الطلبات الوهمية والمكررة (خلال 48 ساعة)</h2><p style="font-size:13px; color:#64748b; text-align:center;">هذه الطلبات تحولت أوتوماتيكياً لأن نفس الشخص طلب نفس المنتج مكرراً خلال 48 ساعة.</p><div id="orders-list-fake" class="orders-grid-compact">جاري التحميل...</div></div></div>
         <div id="processing-tab" class="tab-content"><div class="container"><h2>قيد المعالجة 🔄</h2><div id="orders-list-processing" class="orders-grid-compact">جاري التحميل...</div></div></div>
         <div id="shipping-tab" class="tab-content"><div class="container"><h2>جاري التوصيل 🚚</h2><div id="orders-list-shipping" class="orders-grid-compact">جاري التحميل...</div></div></div>
         <div id="archive-tab" class="tab-content"><div class="container"><h2>الأرشيف ✅</h2><div id="orders-list-archive" class="orders-grid-compact">جاري التحميل...</div></div></div>
@@ -182,10 +179,9 @@
             </div>
         </div>
 
-        <!-- قسم التحليلات المطورة (الأكثر طلباً، الزوار، التحليل اليومي والأسبوعي والشهري) -->
         <div id="analytics-tab" class="tab-content">
             <div class="container">
-                <h2>💰 التحليلات المالية، الزوار، وتحليل المنتجات</h2>
+                <h2>💰 التحليلات المالية (تتصفر تلقائياً كل يوم)، الزوار، والمنتجات الأكثر طلباً</h2>
                 
                 <div class="stats-grid" style="margin-top:20px;">
                     <div class="stat-card" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"><h4>👥 زوار اليوم</h4><span id="stat-visitors-day">0</span></div>
@@ -195,10 +191,10 @@
                 </div>
 
                 <div class="stats-grid">
-                    <div class="stat-card" style="background: linear-gradient(135deg, #059669, #047857);"><h4>إجمالي الربح</h4><span id="stat-total-profit">0 دج</span></div>
-                    <div class="stat-card"><h4>إجمالي الشراء</h4><span id="stat-total-buy-price">0 دج</span></div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"><h4>إجمالي البيع</h4><span id="stat-total-sell-price">0 دج</span></div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #dc2626, #991b1b);"><h4>خسائر الروتور</h4><span id="stat-total-router-loss">0 دج</span></div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #059669, #047857);"><h4>إجمالي الربح (اليوم)</h4><span id="stat-total-profit">0 دج</span></div>
+                    <div class="stat-card"><h4>إجمالي الشراء (اليوم)</h4><span id="stat-total-buy-price">0 دج</span></div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"><h4>إجمالي البيع (اليوم)</h4><span id="stat-total-sell-price">0 دج</span></div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #dc2626, #991b1b);"><h4>خسائر الروتور (اليوم)</h4><span id="stat-total-router-loss">0 دج</span></div>
                 </div>
 
                 <h3 style="margin-top:30px; color:#1e293b; text-align:right;">🏆 تحليل المنتجات الأكثر طلباً ومبيعاً:</h3>
@@ -348,20 +344,16 @@
             location.reload();
         }
 
-        // فحص وتحويل الطلبات الوهمية أوتوماتيكياً (نفس الشخص طلب نفس المنتج خلال 48 ساعة)
         async function processFakeOrdersDetection(orders) {
-            let clientProductTimes = {}; // key: phone_productName, value: firstOrderTimeMs
-
+            let clientProductTimes = {};
             for(let o of orders) {
                 if(o.status?.includes('مهملات') || o.status?.includes('ملغى') || o.status?.includes('وهمي')) continue;
-                
                 let key = `${o.phone}_${o.productName}`;
                 let orderTime = o.createdAt?.toDate ? o.createdAt.toDate().getTime() : new Date().getTime();
 
                 if(clientProductTimes[key]) {
                     let diffHours = (orderTime - clientProductTimes[key]) / (1000 * 60 * 60);
                     if(diffHours <= 48) {
-                        // تحويل الطلب تلقائياً إلى قسم الطلبات الوهمية
                         await updateDoc(doc(db, "orders", o.id), { status: 'وهمي ⚠️' });
                     }
                 } else {
@@ -392,7 +384,6 @@
 
                 await processFakeOrdersDetection(allFetchedOrders);
                 
-                // إعادة الجلب بعد التحديث الآلي للوهمي
                 const snapReload = await getDocs(collection(db, "orders"));
                 allFetchedOrders = [];
                 snapReload.forEach(d => {
@@ -486,7 +477,7 @@
                 loadAllOrders();
             } else if(pendingActionType === 'permanent_delete_order') {
                 await deleteDoc(doc(db, "orders", pendingActionId));
-                showAlert('نجاح', 'تم حذف الطلب نهائياً ولن يظهر مرة أخرى!');
+                showAlert('نجاح', 'تم حذف الطلب نهائياً!');
                 loadAllOrders();
             } else if(pendingActionType === 'delete_staff') {
                 let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
@@ -568,9 +559,6 @@
                             let newStock = currentStock - orderedQty;
                             if(newStock < 0) newStock = 0;
                             await updateDoc(doc(db, "products", pRef.id), { stock: newStock });
-                            if(newStock <= 5) {
-                                alert(`⚠️ تحذير: انخفض مخزون المنتج (${o.productName}) ليصبح المتبقي ${newStock} قطع فقط!`);
-                            }
                         }
                     }
                 }
@@ -663,29 +651,52 @@
             }
         }
 
-        // حساب وتحديث التحليلات الشاملة (الزوار، الأرباح، المنتجات الأكثر طلباً ومبيعاً)
+        // تحديث التحليلات المالية (مع تصفير أرباح البطاقات العلوية تلقائياً كل يوم جديد)
         window.updateAnalyticsData = function(orders) {
             let totalProfit = 0, totalBuy = 0, totalSell = 0, routerLoss = 0;
-            let productSalesCount = {}; // لترتيب الأكثر طلباً ومبيعاً
+            let productSalesCount = {};
+            let dailyMap = {};
+            let todayDateStr = new Date().toISOString().split('T')[0];
 
             orders.forEach(o => {
                 if(o.status && (o.status.includes('مهملات') || o.status.includes('ملغى') || o.status.includes('وهمي'))) return;
 
-                let sellPrice = (o.finalTotal || 0);
-                totalSell += sellPrice;
+                let orderDateObj = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
+                let orderDateStr = orderDateObj.toISOString().split('T')[0];
 
+                let sellPrice = (o.finalTotal || 0);
                 let pData = productsMap[o.productName] || { buyPrice: 0, margin: 0 };
                 let buyPriceTotal = (pData.buyPrice * (o.quantity || 1));
-                totalBuy += buyPriceTotal;
-
+                
+                let profit = 0;
                 if(o.status && o.status.includes('أرشيف')) {
-                    totalProfit += (pData.margin * (o.quantity || 1));
-                }
-                if(o.status && o.status.includes('روتور')) {
-                    routerLoss += 600;
+                    profit = (pData.margin * (o.quantity || 1));
                 }
 
-                // تجميع حساب المنتجات الأكثر طلباً ومبيعاً
+                let routerFee = 0;
+                if(o.status && o.status.includes('روتور')) {
+                    routerFee = 600;
+                }
+
+                if(!dailyMap[orderDateStr]) {
+                    dailyMap[orderDateStr] = { ordersCount: 0, sell: 0, profit: 0, routerLoss: 0 };
+                }
+                dailyMap[orderDateStr].ordersCount++;
+                dailyMap[orderDateStr].sell += sellPrice;
+                dailyMap[orderDateStr].profit += profit;
+                dailyMap[orderDateStr].routerLoss += routerFee;
+
+                if(orderDateStr === todayDateStr) {
+                    totalSell += sellPrice;
+                    totalBuy += buyPriceTotal;
+                    if(o.status && o.status.includes('أرشيف')) {
+                        totalProfit += profit;
+                    }
+                    if(o.status && o.status.includes('روتور')) {
+                        routerLoss += routerFee;
+                    }
+                }
+
                 if(o.productName) {
                     if(!productSalesCount[o.productName]) productSalesCount[o.productName] = { count: 0, totalRevenue: 0 };
                     productSalesCount[o.productName].count += (o.quantity || 1);
@@ -693,19 +704,16 @@
                 }
             });
 
-            // تحديث البطاقات المالية
             document.getElementById('stat-total-profit').innerText = totalProfit + ' دج';
             document.getElementById('stat-total-buy-price').innerText = totalBuy + ' دج';
             document.getElementById('stat-total-sell-price').innerText = totalSell + ' دج';
             document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
 
-            // حساب وإظهار تحليل الزوار (يومي، أسبوعي، شهري، وأكثر منتج مشاهدة)
             let visitorsData = JSON.parse(localStorage.getItem('dz_store_visitors')) || { days: {}, weeks: {}, months: {} };
-            let todayStr = new Date().toISOString().split('T')[0];
             let weekStr = getWeekKey(new Date());
-            let monthStr = todayStr.substring(0, 7);
+            let monthStr = todayDateStr.substring(0, 7);
 
-            document.getElementById('stat-visitors-day').innerText = visitorsData.days[todayStr] || 0;
+            document.getElementById('stat-visitors-day').innerText = visitorsData.days[todayDateStr] || 0;
             document.getElementById('stat-visitors-week').innerText = visitorsData.weeks[weekStr] || 0;
             document.getElementById('stat-visitors-month').innerText = visitorsData.months[monthStr] || 0;
 
@@ -713,7 +721,6 @@
             let topViewedProd = Object.keys(viewsMap).reduce((a, b) => viewsMap[a] > viewsMap[b] ? a : b, 'لا توجد مشاهدات');
             document.getElementById('stat-top-viewed').innerText = topViewedProd;
 
-            // توليد جدول المنتجات الأكثر طلباً ومبيعاً
             let topProdContainer = document.getElementById('top-products-analytics-container');
             let sortedProducts = Object.keys(productSalesCount).sort((a,b) => productSalesCount[b].count - productSalesCount[a].count);
             
@@ -728,6 +735,28 @@
                 pTableHtml += `</tbody></table>`;
                 topProdContainer.innerHTML = pTableHtml;
             }
+
+            let dailyContainer = document.getElementById('daily-analytics-container');
+            let sortedDays = Object.keys(dailyMap).sort().reverse();
+            if(sortedDays.length === 0) {
+                dailyContainer.innerHTML = '<p style="font-size:13px; color:#64748b;">لا توجد بيانات تحليل يومي بعد.</p>';
+                return;
+            }
+            let tableHtml = `<table class="daily-report-table"><thead><tr><th>📅 اليوم / التاريخ</th><th>📦 عدد الطلبات</th><th>💰 إجمالي المبيعات</th><th>📈 الأرباح المؤكدة</th><th>⚠️ خسائر الروتور</th></tr></thead><tbody>`;
+            sortedDays.forEach(day => {
+                let d = dailyMap[day];
+                tableHtml += `
+                    <tr>
+                        <td><b>${day}</b></td>
+                        <td>${d.ordersCount} طلب</td>
+                        <td>${d.sell} دج</td>
+                        <td style="color:green; font-weight:bold;">${d.profit} دج</td>
+                        <td style="color:red;">${d.routerLoss} دج</td>
+                    </tr>
+                `;
+            });
+            tableHtml += `</tbody></table>`;
+            dailyContainer.innerHTML = tableHtml;
         }
 
         function getWeekKey(d) {
@@ -737,6 +766,238 @@
             let yearStart = new Date(date.getFullYear(), 0, 1);
             let weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
             return `${date.getFullYear()}-W${weekNo}`;
+        }
+
+        window.saveStaffMember = function() {
+            let u = document.getElementById('staff-username').value.trim();
+            let p = document.getElementById('staff-password').value.trim();
+            if(!u || !p) { alert('أدخل البيانات!'); return; }
+            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
+            staffList[u] = { password: p, createdAt: new Date().toLocaleDateString('ar-DZ') };
+            localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
+            showAlert('نجاح', `تم حفظ الموظف (${u}) بنجاح!`);
+            document.getElementById('staff-username').value = '';
+            document.getElementById('staff-password').value = '';
+            loadStaffList();
+        }
+
+        window.loadStaffList = function() {
+            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
+            let container = document.getElementById('staff-list-container');
+            let currentAdmin = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
+
+            let adminOrdersCount = allFetchedOrders.filter(o => o.processedBy === currentAdmin).length;
+            let adminTotalSales = allFetchedOrders.filter(o => o.processedBy === currentAdmin && o.status?.includes('أرشيف')).reduce((s, o) => s + (o.finalTotal || 0), 0);
+
+            let html = `
+                <div class="staff-status-card" style="border:2px solid #2563eb;">
+                    <div style="width:100%;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <h3 style="margin:0; color:#2563eb;">👑 الأدمن الرئيسي: ${currentAdmin}</h3>
+                            <span style="font-size:12px; color:#64748b;">الحساب الرئيسي للنظام</span>
+                        </div>
+                        <p style="margin:4px 0; font-size:13px;">📊 <b>الطلبات المعالجة:</b> ${adminOrdersCount} طلب</p>
+                        <p style="margin:4px 0; font-size:13px;">💰 <b>إجمالي المبيعات المؤكدة:</b> ${adminTotalSales} دج</p>
+                    </div>
+                </div>
+            `;
+
+            for(let u in staffList) {
+                let staffOrders = allFetchedOrders.filter(o => o.processedBy === u);
+                let completedOrders = staffOrders.filter(o => o.status?.includes('أرشيف')).length;
+                let staffSales = staffOrders.filter(o => o.status?.includes('أرشيف')).reduce((s, o) => s + (o.finalTotal || 0), 0);
+
+                html += `
+                    <div class="staff-status-card">
+                        <div style="width:100%;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <h3 style="margin:0; color:#7c3aed;">👤 موظف: ${u}</h3>
+                                <button onclick="promptDeleteStaff('${u}')" class="btn-danger" style="padding:4px 10px; font-size:11px;">حذف الموظف 🗑️</button>
+                            </div>
+                            <p style="margin:4px 0; font-size:12px; color:#555;">📅 <b>تاريخ الانضمام:</b> ${staffList[u].createdAt || 'غير متوفر'}</p>
+                            <p style="margin:4px 0; font-size:13px;">📦 <b>الطلبات التي تعامل معها:</b> ${staffOrders.length} طلب</p>
+                            <p style="margin:4px 0; font-size:13px;">✅ <b>الطلبات المنجزة:</b> ${completedOrders} طلب</p>
+                            <p style="margin:4px 0; font-size:13px;">💰 <b>إجمالي قيمة المبيعات:</b> ${staffSales} دج</p>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        window.promptDeleteStaff = function(username) {
+            pendingActionType = 'delete_staff';
+            pendingActionId = username;
+            document.getElementById('admin-action-pass').value = '';
+            document.getElementById('passwordModalTitle').innerText = '🔒 تأكيد الحذف بكلمة المرور';
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        window.addOfferField = function(title = '', oldPrice = '', newPrice = '') {
+            let container = document.getElementById('offers-container');
+            let div = document.createElement('div');
+            div.className = 'offer-box-admin';
+            div.innerHTML = `
+                <div class="form-group"><label>وصف العرض:</label><input type="text" class="offer-title" value="${title}" placeholder="مثال: اشتري 2 واحصل على 1 هدية"></div>
+                <div class="form-group"><label>السعر القديم:</label><input type="number" class="offer-old-price" value="${oldPrice}"></div>
+                <div class="form-group"><label>السعر الجديد للعرض:</label><input type="number" class="offer-new-price" value="${newPrice}"></div>
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف هذا العرض ❌</button>
+            `;
+            container.appendChild(div);
+        }
+
+        window.addEditOfferField = function(title = '', oldPrice = '', newPrice = '') {
+            let container = document.getElementById('edit-offers-container');
+            let div = document.createElement('div');
+            div.className = 'offer-box-admin';
+            div.innerHTML = `
+                <div class="form-group"><label>وصف العرض:</label><input type="text" class="edit-offer-title" value="${title}"></div>
+                <div class="form-group"><label>السعر القديم:</label><input type="number" class="edit-offer-old-price" value="${oldPrice}"></div>
+                <div class="form-group"><label>السعر الجديد للعرض:</label><input type="number" class="edit-offer-new-price" value="${newPrice}"></div>
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف هذا العرض ❌</button>
+            `;
+            container.appendChild(div);
+        }
+
+        async function loadProductsMap() {
+            try {
+                const snap = await getDocs(collection(db, "products"));
+                productsMap = {};
+                productsFullCache = {};
+                snap.forEach(d => {
+                    const p = d.data();
+                    productsFullCache[d.id] = p;
+                    productsMap[p.name] = { id: d.id, img: p.imageUrls?.[0] || 'https://via.placeholder.com/50', buyPrice: p.buyPrice || 0, stock: p.stock !== undefined ? p.stock : 10, margin: p.profitMargin || (p.price - p.buyPrice || 0) };
+                });
+            } catch(e) {}
+        }
+
+        window.addProduct = async function() {
+            let name = document.getElementById('prod-name').value.trim();
+            let buyPrice = Number(document.getElementById('prod-buy-price').value) || 0;
+            let price = Number(document.getElementById('prod-price').value) || 0;
+            let stock = Number(document.getElementById('prod-stock').value) || 10;
+            let category = document.getElementById('prod-category').value;
+            let videoUrl = document.getElementById('prod-video').value.trim();
+            let description = document.getElementById('prod-desc').value.trim();
+            let imgsRaw = document.getElementById('prod-imgs').value.trim();
+            let imageUrls = imgsRaw ? imgsRaw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : [];
+            
+            let enableOffers = document.getElementById('enable-offers').checked;
+            let offers = [];
+            if(enableOffers) {
+                document.querySelectorAll('#offers-container .offer-box-admin').forEach(box => {
+                    let title = box.querySelector('.offer-title').value.trim();
+                    let oldPrice = Number(box.querySelector('.offer-old-price').value) || 0;
+                    let newPrice = Number(box.querySelector('.offer-new-price').value) || 0;
+                    if(title && newPrice) offers.push({ title, oldPrice, newPrice });
+                });
+            }
+
+            if(!name || !price) { showAlert('تنبيه', 'أدخل اسم المنتج وسعر البيع!'); return; }
+
+            await addDoc(collection(db, "products"), {
+                name, buyPrice, price, stock, profitMargin: price - buyPrice, category, description,
+                imageUrls, videoUrl, enableOffers, offers, createdAt: new Date()
+            });
+            showAlert('نجاح', 'تم نشر المنتج مع العروض بنجاح!');
+            document.getElementById('prod-name').value = '';
+            document.getElementById('prod-buy-price').value = '';
+            document.getElementById('prod-price').value = '';
+            document.getElementById('offers-container').innerHTML = '';
+            document.getElementById('enable-offers').checked = false;
+            loadProducts();
+            loadProductsMap();
+        }
+
+        async function loadProducts() {
+            const list = document.getElementById('products-list');
+            const snap = await getDocs(collection(db, "products"));
+            list.innerHTML = '';
+            snap.forEach(d => {
+                const p = d.data();
+                if(p.status === 'مهملات') return;
+                let stockVal = p.stock !== undefined ? p.stock : 10;
+                list.innerHTML += `
+                    <div style="background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span><b>${p.name}</b> [📁 ${p.category || 'عام'}] - السعر: ${p.price} دج | 📦 المخزون: <b style="color:${stockVal <= 5 ? 'red':'green'}">${stockVal}</b></span>
+                        <div style="display:flex; gap:6px;">
+                            <button onclick="openEditProductModal('${d.id}')" class="btn-warning" style="padding:4px 10px; font-size:12px;">تعديل ✏️</button>
+                            <button onclick="promptDeleteProduct('${d.id}')" class="btn-danger" style="padding:4px 10px; font-size:12px;">حذف 🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.openEditProductModal = function(id) {
+            let p = productsFullCache[id];
+            if(!p) return;
+            document.getElementById('edit-prod-id').value = id;
+            document.getElementById('edit-prod-name').value = p.name || '';
+            document.getElementById('edit-prod-buy-price').value = p.buyPrice || 0;
+            document.getElementById('edit-prod-price').value = p.price || 0;
+            document.getElementById('edit-prod-stock').value = p.stock !== undefined ? p.stock : 10;
+            document.getElementById('edit-prod-category').value = p.category || 'الكل';
+            document.getElementById('edit-prod-imgs').value = (p.imageUrls || []).join(', ');
+            
+            let enableOffers = p.enableOffers || false;
+            document.getElementById('edit-enable-offers').checked = enableOffers;
+            let container = document.getElementById('edit-offers-container');
+            container.innerHTML = '';
+            if(enableOffers && p.offers) {
+                p.offers.forEach(o => addEditOfferField(o.title, o.oldPrice, o.newPrice));
+            }
+
+            document.getElementById('editProductModal').style.display = 'flex';
+        }
+
+        window.saveProductEdits = async function() {
+            let id = document.getElementById('edit-prod-id').value;
+            let name = document.getElementById('edit-prod-name').value.trim();
+            let buyPrice = Number(document.getElementById('edit-prod-buy-price').value) || 0;
+            let price = Number(document.getElementById('edit-prod-price').value) || 0;
+            let stock = Number(document.getElementById('edit-prod-stock').value) || 0;
+            let category = document.getElementById('edit-prod-category').value;
+            let imgsRaw = document.getElementById('edit-prod-imgs').value.trim();
+            let imageUrls = imgsRaw ? imgsRaw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : [];
+
+            let enableOffers = document.getElementById('edit-enable-offers').checked;
+            let offers = [];
+            if(enableOffers) {
+                document.querySelectorAll('#edit-offers-container .offer-box-admin').forEach(box => {
+                    let title = box.querySelector('.edit-offer-title').value.trim();
+                    let oldPrice = Number(box.querySelector('.edit-offer-old-price').value) || 0;
+                    let newPrice = Number(box.querySelector('.edit-offer-new-price').value) || 0;
+                    if(title && newPrice) offers.push({ title, oldPrice, newPrice });
+                });
+            }
+
+            await updateDoc(doc(db, "products", id), {
+                name, buyPrice, price, stock, profitMargin: price - buyPrice, category, imageUrls, enableOffers, offers
+            });
+
+            document.getElementById('editProductModal').style.display = 'none';
+            showAlert('نجاح', 'تم تحديث تفاصيل المنتج والعروض بنجاح 💾!');
+            loadProducts();
+            loadProductsMap();
+        }
+
+        window.promptDeleteProduct = function(id) {
+            pendingActionType = 'delete_product';
+            pendingActionId = id;
+            document.getElementById('admin-action-pass').value = '';
+            document.getElementById('passwordModalTitle').innerText = '🔒 تأكيد الحذف بكلمة المرور';
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        window.updateAdminCredentials = function() {
+            let u = document.getElementById('setting-admin-user').value.trim();
+            let p = document.getElementById('setting-admin-pass').value.trim();
+            if(!u || !p) { alert('أدخل الحقول كاملة!'); return; }
+            localStorage.setItem('dz_custom_admin_user', u);
+            localStorage.setItem('dz_custom_admin_pass', p);
+            showAlert('نجاح', 'تم تحديث بيانات الأدمن بنجاح 💾!');
         }
     </script>
 </body>
