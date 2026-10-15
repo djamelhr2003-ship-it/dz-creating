@@ -3,42 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - متجري العالمي</title>
+    <title>تسجيل الدخول - لوحة التحكم</title>
     <style>
-        body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        h2 { text-align: center; color: #131921; }
+        body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .container { max-width: 400px; width: 100%; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); box-sizing: border-box; }
+        h2 { text-align: center; color: #131921; margin-top: 0; }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { background: #ffd814; border: 1px solid #fcd200; color: #0f1111; width: 100%; padding: 12px; border-radius: 6px; font-size: 15px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #f7ca00; }
-        .btn-store { background: #232f3e; color: white; text-decoration: none; display: block; text-align: center; padding: 10px; border-radius: 6px; margin-top: 10px; font-weight: bold; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #333; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; outline: none; }
+        input:focus { border-color: #ffd814; box-shadow: 0 0 0 2px rgba(254,189,105,0.3); }
+        
+        /* تصميم حاوية خانة كلمة المرور مع زر العين */
+        .password-container { position: relative; width: 100%; }
+        .password-container input { padding-left: 40px; }
+        .toggle-password { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px; color: #666; padding: 0; }
+
+        button.btn-login { background: #ffd814; border: 1px solid #fcd200; color: #0f1111; width: 100%; padding: 12px; border-radius: 6px; font-size: 15px; cursor: pointer; font-weight: bold; margin-top: 5px; transition: 0.2s; }
+        button.btn-login:hover { background: #f7ca00; }
+        .btn-store { background: #232f3e; color: white; text-decoration: none; display: block; text-align: center; padding: 10px; border-radius: 6px; margin-top: 10px; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="container" id="login-box">
         <h2>تسجيل دخول لوحة التحكم 🔐</h2>
-        <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="login-username" placeholder="admin"></div>
-        <div class="form-group"><label>كلمة المرور:</label><input type="password" id="login-pass" placeholder="dzstore2026"></div>
-        <button onclick="checkAdminLogin()">دخول للنظام 🚀</button>
+        
+        <div class="form-group">
+            <label>اسم المستخدم الجديد:</label>
+            <input type="text" id="login-username" placeholder="أدخل اسم المستخدم...">
+        </div>
+        
+        <div class="form-group">
+            <label>كلمة المرور الجديدة:</label>
+            <div class="password-container">
+                <input type="password" id="login-pass" placeholder="أدخل كلمة المرور...">
+                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">👁️</button>
+            </div>
+        </div>
+
+        <button class="btn-login" onclick="checkAdminLogin()">دخول للنظام 🚀</button>
         <a href="index.html" class="btn-store">🛍️ العودة إلى المتجر الرئيسي</a>
-        <div id="login-error" style="color:red; margin-top:10px; text-align:center;"></div>
+        <div id="login-error" style="color:red; margin-top:10px; text-align:center; font-size:13px;"></div>
     </div>
 
     <script>
+        // دالة إظهار وإخفاء كلمة المرور عبر أيقونة العين
+        window.togglePasswordVisibility = function() {
+            let passInput = document.getElementById('login-pass');
+            let toggleBtn = document.querySelector('.toggle-password');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                toggleBtn.innerText = '🙈'; // تغيير شكل الأيقونة عند الإظهار
+            } else {
+                passInput.type = 'password';
+                toggleBtn.innerText = '👁️';
+            }
+        }
+
         window.checkAdminLogin = function() {
-            let adminUser = localStorage.getItem('dz_admin_user') || 'admin';
-            let adminPass = localStorage.getItem('dz_admin_pass') || 'dzstore2026';
+            // يمكنك هنا تعيين اسم المستخدم وكلمة المرور الجديدة التي تريدها
+            let defaultUser = "admin";
+            let defaultPass = "123456";
 
             let u = document.getElementById('login-username').value.trim();
             let p = document.getElementById('login-pass').value.trim();
 
-            if (u === adminUser && p === adminPass) {
+            if (u === defaultUser && p === defaultPass) {
                 localStorage.setItem('ecom_logged_user', 'admin');
-                alert('تم تسجيل الدخول بنجاح! (ملاحظة: يمكنك توجيه هذا الزر لفتح تبويبات التحكم الخاصة بك مباشرة)');
-                // يمكنك توجيه الصفحة أو فتح واجهة التحكم الخاصة بك هنا
+                alert('تم تسجيل الدخول بنجاح! 🎉');
+                // يمكنك توجيه الصفحة لوحة التحكم الخاصة بك هنا لاحقاً
             } else {
                 document.getElementById('login-error').innerText = 'اسم المستخدم أو كلمة المرور غير صحيحة!';
             }
