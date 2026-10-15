@@ -7,7 +7,7 @@
     <style>
         body { font-family: Tahoma, sans-serif; background: #f8fafc; margin: 0; padding: 15px; color: #333; }
         .header { background: #232f3e; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .header h1 { margin: 0; font-size: 18px; }
+        .header h1 { margin: 0; font-size: 18px; cursor: pointer; }
         .nav-links { display: flex; gap: 10px; align-items: center; }
         .admin-link, .cart-btn { background: #374151; color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; }
         .cart-btn { background: #d97706; }
@@ -17,16 +17,21 @@
         .cat-btn.active { background: #2563eb; color: white; }
 
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
-        .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; transition: 0.2s; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
         .product-img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; background: #eee; }
         .product-title { font-size: 15px; font-weight: bold; margin: 8px 0 4px 0; color: #1e293b; }
-        .product-price { color: #e11d48; font-weight: bold; font-size: 16px; margin-bottom: 10px; }
+        .product-price { color: #e11d48; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
         
-        .btn-buy { background: #2563eb; color: white; border: none; width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        .btn-buy:hover { background: #1d4ed8; }
+        .btn-group { display: flex; gap: 6px; margin-top: 8px; }
+        .btn-cart { background: #f59e0b; color: white; border: none; flex: 1; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .btn-buy { background: #2563eb; color: white; border: none; flex: 1; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
+        
+        .qty-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0; background: #f1f5f9; padding: 6px; border-radius: 6px; }
+        .qty-btn { background: #cbd5e1; border: none; width: 30px; height: 30px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 16px; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-card { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-card { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; }
@@ -43,36 +48,25 @@
             justify-content: space-between;
             cursor: pointer;
         }
-        .crossed-old-price {
-            position: relative;
-            color: #64748b;
-            font-weight: bold;
-            font-size: 13px;
-            margin-left: 8px;
-        }
-        .crossed-old-price::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: #ef4444;
-            transform: translateY(-50%);
-        }
+        .crossed-old-price { position: relative; color: #64748b; font-weight: bold; font-size: 13px; margin-left: 8px; }
+        .crossed-old-price::after { content: ""; position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background-color: #ef4444; transform: translateY(-50%); }
         .new-offer-price { color: #16a34a; font-weight: bold; font-size: 15px; }
+
+        .rating-stars { color: #f59e0b; font-size: 18px; margin-bottom: 5px; }
+        .review-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <h1>🛍️ متجري العالمي (COD)</h1>
+        <h1 onclick="location.reload()">🛍️ متجري العالمي (COD)</h1>
         <div class="nav-links">
             <button class="cart-btn" onclick="openCartModal()">🛒 سلة الشراء (<span id="cart-count">0</span>)</button>
             <a href="admin.html" class="admin-link">⚙️ لوحة التحكم</a>
         </div>
     </div>
 
+    <!-- التصنيفات -->
     <div class="categories-nav" id="categories-container">
         <button class="cat-btn active" onclick="filterCategory('الكل', event)">الكل</button>
         <button class="cat-btn" onclick="filterCategory('ساعات اليد', event)">ساعات اليد ⌚</button>
@@ -82,46 +76,117 @@
         <button class="cat-btn" onclick="filterCategory('أكسسوارات', event)">أكسسوارات 🕶️</button>
     </div>
 
+    <!-- شبكة المنتجات -->
     <div class="products-grid" id="store-products-grid">
         <p style="text-align:center; grid-column: 1/-1;">جاري تحميل المنتجات...</p>
     </div>
 
-    <!-- نافذة تفاصيل المنتج والعروض -->
-    <div class="modal-overlay" id="productModal">
+    <!-- نافذة تفاصيل المنتج (التبويب الجديد عند النقر على السلعة) -->
+    <div class="modal-overlay" id="productDetailsModal">
         <div class="modal-card">
-            <h3 id="modal-prod-name" style="margin-top:0; color:#1e293b;"></h3>
-            <div id="modal-prod-price" style="color:#e11d48; font-weight:bold; font-size:18px; margin-bottom:10px;"></div>
-            <div id="product-offers-container" style="margin-bottom: 12px;"></div>
-            <div class="form-group">
-                <label>الكمية:</label>
-                <input type="number" id="modal-quantity" value="1" min="1">
+            <div id="modal-product-content"></div>
+            
+            <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
+            <h4 style="color:#1e293b; margin-bottom:10px;">📦 منتجات أخرى من نفس الصنف:</h4>
+            <div class="products-grid" id="related-products-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
+
+            <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
+            <h4 style="color:#1e293b; margin-bottom:10px;">⭐ تقييمات والتعليقات:</h4>
+            <div id="reviews-list-container" style="margin-bottom:15px;"></div>
+            
+            <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #cbd5e1;">
+                <h4 style="margin-top:0; font-size:14px;">أضف تقييمك ورأيك:</h4>
+                <div class="form-group"><input type="text" id="reviewer-name" placeholder="اسمك الكريم"></div>
+                <div class="form-group">
+                    <label>التقييم بالنجوم:</label>
+                    <select id="reviewer-rating">
+                        <option value="5">⭐⭐⭐⭐⭐ (ممتاز)</option>
+                        <option value="4">⭐⭐⭐⭐ (جيد جداً)</option>
+                        <option value="3">⭐⭐⭐ (متوسط)</option>
+                        <option value="2">⭐⭐ (ضعيف)</option>
+                        <option value="1">⭐ (سيء)</option>
+                    </select>
+                </div>
+                <div class="form-group"><textarea id="reviewer-comment" placeholder="اكتب تعليقك هنا..." style="height:60px;"></textarea></div>
+                <button onclick="submitReview()" style="background:#0284c7; color:white; padding:8px 12px; width:100%; border:none; border-radius:6px; font-weight:bold;">إرسال التعليق والتقييم ✍️</button>
             </div>
-            <button onclick="addToCartFromModal()" style="background:#2563eb; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إضافة إلى سلة الشراء 🛒</button>
-            <button onclick="document.getElementById('productModal').style.display='none'" style="margin-top:8px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إلغاء ❌</button>
+
+            <button onclick="document.getElementById('productDetailsModal').style.display='none'" style="margin-top:15px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إغلاق التبويب ❌</button>
         </div>
     </div>
 
-    <!-- نافذة السلة والطلب -->
+    <!-- نافذة سلة الشراء وإتمام الطلب (COD مع ولايات الجزائر الـ 58) -->
     <div class="modal-overlay" id="cartModal">
         <div class="modal-card">
-            <h3 style="margin-top:0; color:#1e293b;">🛒 سلة الشراء وإتمام الطلب (COD)</h3>
+            <h3 style="margin-top:0; color:#1e293b;">🛒 سلة الشراء وإتمام الطلب (الدفع عند الاستلام)</h3>
             <div id="cart-items-list" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
 
             <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="order-fullname" placeholder="أدخل اسمك الكامل"></div>
             <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone" placeholder="07xxxxxxxx"></div>
             <div class="form-group">
-                <label>الولاية:</label>
+                <label>الولاية (جميع ولايات الجزائر 58):</label>
                 <select id="order-wilaya" onchange="calculateCartTotal()">
-                    <option value="الشلف">02 - الشلف</option>
-                    <option value="الجزائر">16 - الجزائر العاصمة</option>
-                    <option value="وهران">31 - وهران</option>
-                    <option value="قسنطينة">25 - قسنطينة</option>
-                    <option value="بليدة">09 - البليدة</option>
-                    <option value="تيزي وزو">15 - تيزي وزو</option>
-                    <option value="أخرى">ولاية أخرى</option>
+                    <option value="Adrar">01 - أدرار</option>
+                    <option value="Chlef" selected>02 - الشلف</option>
+                    <option value="Laghouat">03 - الأغواط</option>
+                    <option value="Oum El Bouaghi">04 - أم البواقي</option>
+                    <option value="Batna">05 - باتنة</option>
+                    <option value="Béjaïa">06 - بجاية</option>
+                    <option value="Biskra">07 - بسكرة</option>
+                    <option value="Béchar">08 - بشار</option>
+                    <option value="Blida">09 - البليدة</option>
+                    <option value="Bouira">10 - البويرة</option>
+                    <option value="Tamanrasset">11 - تمنراست</option>
+                    <option value="Tébessa">12 - تبسة</option>
+                    <option value="Tlemcen">13 - تلمسان</option>
+                    <option value="Tiaret">14 - تيارت</option>
+                    <option value="Tizi Ouzou">15 - تيزي وزو</option>
+                    <option value="Algiers">16 - الجزائر العاصمة</option>
+                    <option value="Djelfa">17 - الجلفة</option>
+                    <option value="Jijel">18 - جيجل</option>
+                    <option value="Sétif">19 - سطيف</option>
+                    <option value="Saïda">20 - سعيدة</option>
+                    <option value="Skikda">21 - سكيكدة</option>
+                    <option value="Sidi Bel Abbès">22 - سيدي بلعباس</option>
+                    <option value="Annaba">23 - عنابة</option>
+                    <option value="Guelma">24 - قالمة</option>
+                    <option value="Constantine">25 - قسنطينة</option>
+                    <option value="Médéa">26 - المدية</option>
+                    <option value="Mostaganem">27 - مستغانم</option>
+                    <option value="M'Sila">28 - المسيلة</option>
+                    <option value="Mascara">29 - معسكر</option>
+                    <option value="Ouargla">30 - ورقلة</option>
+                    <option value="Oran">31 - وهران</option>
+                    <option value="El Bayadh">32 - البيض</option>
+                    <option value="Illizi">33 - إليزي</option>
+                    <option value="Bordj Bou Arréridj">34 - برج بوعريريج</option>
+                    <option value="Boumerdès">35 - بومرداس</option>
+                    <option value="El Tarf">36 - الطارف</option>
+                    <option value="Tindouf">37 - تندوف</option>
+                    <option value="Tissemsilt">38 - تيسمسيلت</option>
+                    <option value="El Oued">39 - الوادي</option>
+                    <option value="Khenchela">40 - خنشلة</option>
+                    <option value="Souk Ahras">41 - سوق أهراس</option>
+                    <option value="Tipaza">42 - تيبازة</option>
+                    <option value="Mila">43 - ميلة</option>
+                    <option value="Aïn Defla">44 - عين الدفلى</option>
+                    <option value="Naâma">45 - النعامة</option>
+                    <option value="Aïn Témouchent">46 - عين تموشنت</option>
+                    <option value="Ghardaïa">47 - غرداية</option>
+                    <option value="Relizane">48 - غليزان</option>
+                    <option value="Timimoun">49 - تيميمون</option>
+                    <option value="Bordj Badji Mokhtar">50 - برج باجي مختار</option>
+                    <option value="Ouled Djellal">51 - أولاد جلال</option>
+                    <option value="Béni Abbès">52 - بني عباس</option>
+                    <option value="In Salah">53 - إن صالح</option>
+                    <option value="In Guezzam">54 - إن قزام</option>
+                    <option value="Touggourt">55 - تقرت</option>
+                    <option value="Djanet">56 - جانت</option>
+                    <option value="El M'Ghair">57 - المغير</option>
+                    <option value="El Meniaa">58 - المنيعة</option>
                 </select>
             </div>
-            <div class="form-group"><label>البلدية / العنوان:</label><input type="text" id="order-commune" placeholder="اسم البلدية أو العنوان بالتفصيل"></div>
+            <div class="form-group"><label>البلدية / العنوان بالتفصيل:</label><input type="text" id="order-commune" placeholder="اسم البلدية والحي"></div>
             <div class="form-group">
                 <label>نوع التوصيل:</label>
                 <select id="order-delivery-type" onchange="calculateCartTotal()">
@@ -135,7 +200,7 @@
             </div>
 
             <button onclick="submitCartOrder()" style="background:#16a34a; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب نهائياً 🚀</button>
-            <button onclick="document.getElementById('cartModal').style.display='none'" style="margin-top:8px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إغلاق ❌</button>
+            <button onclick="document.getElementById('cartModal').style.display='none'" style="margin-top:8px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إلغاء ❌</button>
         </div>
     </div>
 
@@ -147,13 +212,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let allProducts = [], cart = [], currentSelectedProduct = null, currentSelectedPrice = 0;
+        let allProducts = [], cart = [], currentOpenedProduct = null, currentSelectedPrice = 0, currentQty = 1;
 
         window.addEventListener('DOMContentLoaded', () => {
             let savedName = localStorage.getItem('dz_user_name');
             let savedPhone = localStorage.getItem('dz_user_phone');
             if(savedName) document.getElementById('order-fullname').value = savedName;
             if(savedPhone) document.getElementById('order-phone').value = savedPhone;
+            fetchStoreProducts();
         });
 
         async function fetchStoreProducts() {
@@ -189,46 +255,49 @@
                 let stockVal = p.stock !== undefined ? p.stock : 10;
                 grid.innerHTML += `
                     <div class="product-card">
-                        <div>
+                        <div onclick='openProductDetails(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
                             <img src="${img}" class="product-img">
                             <h3 class="product-title">${p.name}</h3>
                             <p class="product-price">${p.price} دج</p>
                         </div>
                         <div>
-                            <p style="font-size:12px; color:${stockVal > 0 ? 'green':'red'}; margin-bottom:8px;">${stockVal > 0 ? '📦 متوفر في المخزون' : '❌ نفذت الكمية'}</p>
-                            <button onclick='openProductModal(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-buy" ${stockVal <= 0 ? 'disabled style="background:#cbd5e1;cursor:not-allowed;"':''}>شراء / سلة 🛒</button>
+                            <p style="font-size:11px; color:${stockVal > 0 ? 'green':'red'}; margin-bottom:6px;">${stockVal > 0 ? '📦 متوفر' : '❌ نفذت الكمية'}</p>
+                            <div class="btn-group">
+                                <button onclick='addToCartDirect(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-cart" ${stockVal <= 0 ? 'disabled':''}>أضف للسلة 🛒</button>
+                                <button onclick='openProductDetails(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-buy" ${stockVal <= 0 ? 'disabled':''}>اطلب الآن ⚡</button>
+                            </div>
                         </div>
                     </div>
                 `;
             });
         }
 
-        window.openProductModal = function(product) {
-            currentSelectedProduct = product;
+        // فتح تبويب/نافذة جديدة لتفاصيل المنتج مع صنف المنتجات الأخرى والتعليقات
+        window.openProductDetails = function(product) {
+            currentOpenedProduct = product;
             currentSelectedPrice = product.price;
+            currentQty = 1;
 
-            document.getElementById('modal-prod-name').innerText = product.name;
-            document.getElementById('modal-prod-price').innerText = product.price + ' دج';
-            document.getElementById('modal-quantity').value = 1;
-
-            let offersContainer = document.getElementById('product-offers-container');
+            let img = product.imageUrls?.[0] || 'https://via.placeholder.com/200';
+            
+            let offersHtml = '';
             if(product.enableOffers && product.offers && product.offers.length > 0) {
-                let html = '<h4 style="margin:5px 0; color:#b45309; font-size:13px;">🔥 اختر أحد العروض الذهبية المتاحة:</h4>';
-                html += `
+                offersHtml += '<h4 style="margin:10px 0 5px 0; color:#b45309; font-size:13px;">🔥 اختر أحد العروض الذهبية:</h4>';
+                offersHtml += `
                     <label class="gold-offer-box">
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <input type="radio" name="selectedOffer" value="base" checked onchange="currentSelectedPrice=${product.price}">
-                            <span style="font-size:13px;"><b>السعر العادي الأساسي</b></span>
+                            <input type="radio" name="modalOffer" value="base" checked onchange="currentSelectedPrice=${product.price}; updateModalTotal()">
+                            <span><b>السعر العادي الأساسي</b></span>
                         </div>
                         <span class="new-offer-price">${product.price} دج</span>
                     </label>
                 `;
                 product.offers.forEach((offer, i) => {
-                    html += `
+                    offersHtml += `
                         <label class="gold-offer-box">
                             <div style="display:flex; align-items:center; gap:8px;">
-                                <input type="radio" name="selectedOffer" value="${i}" onchange="currentSelectedPrice=${offer.newPrice}">
-                                <span style="font-size:13px;"><b>${offer.title}</b> ✔️</span>
+                                <input type="radio" name="modalOffer" value="${i}" onchange="currentSelectedPrice=${offer.newPrice}; updateModalTotal()">
+                                <span><b>${offer.title}</b> ✔️</span>
                             </div>
                             <div>
                                 <span class="crossed-old-price">${offer.oldPrice} دج</span>
@@ -237,24 +306,130 @@
                         </label>
                     `;
                 });
-                offersContainer.innerHTML = html;
-            } else {
-                offersContainer.innerHTML = '';
             }
 
-            document.getElementById('productModal').style.display = 'flex';
+            let contentHtml = `
+                <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                    <img src="${img}" style="width:180px; height:180px; object-fit:cover; border-radius:8px; background:#eee;">
+                    <div style="flex:1;">
+                        <h2 style="margin:0 0 5px 0; color:#1e293b;">${product.name}</h2>
+                        <p style="color:#e11d48; font-weight:bold; font-size:20px; margin:0 0 10px 0;" id="modal-display-price">${product.price} دج</p>
+                        <p style="font-size:13px; color:#555; line-height:1.5;">${product.description || 'لا يوجد وصف متاح.'}</p>
+                    </div>
+                </div>
+                ${offersHtml}
+                <div class="qty-container">
+                    <span>الكمية:</span>
+                    <button class="qty-btn" onclick="changeQty(-1)">-</button>
+                    <b id="modal-qty-val" style="font-size:16px;">1</b>
+                    <button class="qty-btn" onclick="changeQty(1)">+</button>
+                </div>
+                <div style="margin-bottom:10px; font-size:15px;">المجموع الجزئي: <b id="modal-total-price" style="color:#e11d48;">${product.price} دج</b></div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="addCurrentToCart()" style="background:#f59e0b; color:white; flex:1; padding:12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">أضف للسلة 🛒</button>
+                    <button onclick="buyCurrentNow()" style="background:#16a34a; color:white; flex:1; padding:12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">اطلب الآن 🚀</button>
+                </div>
+            `;
+
+            document.getElementById('modal-product-content').innerHTML = contentHtml;
+
+            // عرض المنتجات الأخرى من نفس الصنف
+            let relatedGrid = document.getElementById('related-products-grid');
+            let related = allProducts.filter(p => p.category === product.category && p.id !== product.id);
+            if(related.length === 0) {
+                relatedGrid.innerHTML = '<p style="font-size:12px; color:#777;">لا توجد منتجات أخرى في هذا الصنف.</p>';
+            } else {
+                relatedGrid.innerHTML = '';
+                related.forEach(rp => {
+                    let rImg = rp.imageUrls?.[0] || 'https://via.placeholder.com/150';
+                    relatedGrid.innerHTML += `
+                        <div class="product-card" onclick='openProductDetails(${JSON.stringify(rp).replace(/'/g, "&apos;")})'>
+                            <img src="${rImg}" style="width:100%; height:100px; object-fit:cover; border-radius:6px;">
+                            <h5 style="margin:5px 0 2px 0; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${rp.name}</h5>
+                            <span style="color:#e11d48; font-size:12px; font-weight:bold;">${rp.price} دج</span>
+                        </div>
+                    `;
+                });
+            }
+
+            renderReviews(product.id);
+            document.getElementById('productDetailsModal').style.display = 'flex';
         }
 
-        window.addToCartFromModal = function() {
-            let qty = Number(document.getElementById('modal-quantity').value) || 1;
-            cart.push({
-                productName: currentSelectedProduct.name,
-                price: currentSelectedPrice,
-                quantity: qty
-            });
+        window.changeQty = function(delta) {
+            currentQty += delta;
+            if(currentQty < 1) currentQty = 1;
+            document.getElementById('modal-qty-val').innerText = currentQty;
+            updateModalTotal();
+        }
+
+        window.updateModalTotal = function() {
+            let total = currentSelectedPrice * currentQty;
+            document.getElementById('modal-display-price').innerText = currentSelectedPrice + ' دج';
+            document.getElementById('modal-total-price').innerText = total + ' دج';
+        }
+
+        window.addToCartDirect = function(product) {
+            cart.push({ productName: product.name, price: product.price, quantity: 1 });
             document.getElementById('cart-count').innerText = cart.length;
-            document.getElementById('productModal').style.display = 'none';
-            alert('تمت إضافة المنتج إلى السلة بنجاح! 🛒');
+            alert(`تمت إضافة (${product.name}) إلى السلة بنجاح! 🛒`);
+        }
+
+        window.addCurrentToCart = function() {
+            cart.push({ productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty });
+            document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('productDetailsModal').style.display = 'none';
+            alert('تمت إضافة المنتج بجميع خصائصه إلى السلة بنجاح! 🛒');
+        }
+
+        window.buyCurrentNow = function() {
+            cart = [{ productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty }];
+            document.getElementById('cart-count').innerText = 1;
+            document.getElementById('productDetailsModal').style.display = 'none';
+            openCartModal();
+        }
+
+        // نظام التعليقات وتقييم النجوم المخزن محلياً
+        window.submitReview = function() {
+            let name = document.getElementById('reviewer-name').value.trim();
+            let rating = document.getElementById('reviewer-rating').value;
+            let comment = document.getElementById('reviewer-comment').value.trim();
+
+            if(!name || !comment) { alert('أدخل الاسم والتعليق من فضلك!'); return; }
+
+            let reviewsKey = `dz_reviews_${currentOpenedProduct.id}`;
+            let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+            reviews.push({ name, rating, comment, date: new Date().toLocaleDateString('ar-DZ') });
+            localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+
+            document.getElementById('reviewer-name').value = '';
+            document.getElementById('reviewer-comment').value = '';
+            renderReviews(currentOpenedProduct.id);
+            alert('شكراً لك! تم إضافة تقييمك بنجاح ⭐');
+        }
+
+        function renderReviews(productId) {
+            let container = document.getElementById('reviews-list-container');
+            let reviews = JSON.parse(localStorage.getItem(`dz_reviews_${productId}`)) || [];
+            if(reviews.length === 0) {
+                container.innerHTML = '<p style="font-size:12px; color:#64748b;">لا توجد تعليقات بعد. كن أول من يقيّم!</p>';
+                return;
+            }
+            let html = '';
+            reviews.forEach(r => {
+                let stars = '⭐'.repeat(Number(r.rating));
+                html += `
+                    <div class="review-box">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+                            <b>👤 ${r.name}</b>
+                            <span style="font-size:11px; color:#64748b;">${r.date}</span>
+                        </div>
+                        <div class="rating-stars" style="font-size:13px;">${stars}</div>
+                        <p style="margin:0; color:#333;">${r.comment}</p>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
         }
 
         window.openCartModal = function() {
@@ -308,7 +483,7 @@
             let deliveryType = document.getElementById('order-delivery-type').value;
 
             if(!fullName || !phone || !commune) {
-                alert('الرجاء تعبئة الاسم، رقم الهاتف، والعنوان!');
+                alert('الرجاء تعبئة الاسم، رقم الهاتف، والعنوان بالتفصيل!');
                 return;
             }
 
@@ -343,8 +518,6 @@
                 alert('فشل إرسال الطلب، حاول مرة أخرى.');
             }
         }
-
-        fetchStoreProducts();
     </script>
 </body>
 </html>
