@@ -6,12 +6,12 @@
     <title>لوحة تحكم الأدمن - المتجر العالمي</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f1f5f9; margin: 0; padding: 15px; color: #333; }
-        .header { background: #1e293b; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header { background: #1e293b; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .header h1 { margin: 0; font-size: 18px; }
         .btn-logout { background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        .tab-btn { background: #cbd5e1; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; color: #334155; white-space: nowrap; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { background: #cbd5e1; border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; color: #334155; white-space: nowrap; font-size: 13px; }
         .tab-btn.active { background: #2563eb; color: white; }
 
         .panel { display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -30,6 +30,8 @@
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; }
         .modal-card { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        
+        .archive-filter-box { background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     </style>
 </head>
 <body>
@@ -39,9 +41,12 @@
         <button class="btn-logout" onclick="logoutAdmin()">تسجيل الخروج 🚪</button>
     </div>
 
+    <!-- شريط الأزرار والتبويبات العلوي المتناسق -->
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('products-tab', event)">إدارة المنتجات 📦</button>
         <button class="tab-btn" onclick="switchTab('orders-tab', event)">إدارة الطلبات 🛒</button>
+        <button class="tab-btn" onclick="switchTab('completed-archive-tab', event)">أرشيف المكتملة ✅</button>
+        <button class="tab-btn" onclick="switchTab('cancelled-archive-tab', event)">أرشيف الملغاة ❌</button>
         <button class="tab-btn" onclick="switchTab('settings-tab', event)">الإعدادات والاتصال ⚙️</button>
     </div>
 
@@ -60,11 +65,10 @@
                 <option value="أكسسوارات">أكسسوارات 🕶️</option>
             </select>
         </div>
-        <div class="form-group"><label>روابط الصور (مفصولة بفاصلة أو رابط واحد لكل سطر):</label><textarea id="p-images" placeholder="https://... , https://..." style="height:60px;"></textarea></div>
-        <div class="form-group"><label>رابط الفيديو (اختياري):</label><input type="url" id="p-video" placeholder="https://... (رابط فيديو المنتج)"></div>
+        <div class="form-group"><label>روابط الصور (مفصولة بفاصلة أو سطر لكل رابط):</label><textarea id="p-images" placeholder="https://..." style="height:60px;"></textarea></div>
+        <div class="form-group"><label>رابط الفيديو (اختياري):</label><input type="url" id="p-video" placeholder="https://..."></div>
         <div class="form-group"><label>وصف المنتج:</label><textarea id="p-desc" placeholder="اكتب تفاصيل ومواصفات المنتج..." style="height:70px;"></textarea></div>
         
-        <!-- خيارات إضافية للملابس (الألوان والمقاسات) -->
         <div id="clothing-variants-box" style="background:#f8fafc; padding:12px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:12px;">
             <label style="color:#2563eb;">👕 خيارات الملابس (الألوان والمقاسات):</label>
             <div class="form-group" style="margin-top:8px;"><label>الألوان (مفصولة بفاصلة):</label><input type="text" id="p-colors" placeholder="أبيض, أسود, أحمر"></div>
@@ -92,9 +96,9 @@
         </div>
     </div>
 
-    <!-- لوحة إدارة الطلبات -->
+    <!-- لوحة إدارة الطلبات الحالية -->
     <div id="orders-tab" class="panel">
-        <h3 style="margin-top:0;">📋 متابعة طلبات الزبائن (COD)</h3>
+        <h3 style="margin-top:0;">📋 متابعة طلبات الزبائن الواردة (COD)</h3>
         <div style="overflow-x:auto;">
             <table class="orders-table">
                 <thead>
@@ -115,11 +119,67 @@
         </div>
     </div>
 
+    <!-- أرشيف الطلبات المكتملة -->
+    <div id="completed-archive-tab" class="panel">
+        <h3 style="margin-top:0;">✅ أرشيف الطلبات المكتملة (مؤكدة / مسلمة)</h3>
+        <div class="archive-filter-box">
+            <label style="margin:0;">اختر التاريخ:</label>
+            <input type="date" id="completed-date-filter" style="width:auto; flex:1;" onchange="filterCompletedArchive()">
+            <button onclick="resetCompletedFilter()" style="background:#64748b; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">عرض الكل 🔄</button>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ والوقت</th>
+                        <th>الزبون</th>
+                        <th>الهاتف</th>
+                        <th>الولاية</th>
+                        <th>المنتج والخيارات</th>
+                        <th>المجموع</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-completed-archive-list">
+                    <tr><td colspan="7">اختر تاريخاً أو اضغط عرض الكل...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- أرشيف الطلبات الملغاة -->
+    <div id="cancelled-archive-tab" class="panel">
+        <h3 style="margin-top:0;">❌ أرشيف الطلبات الملغاة</h3>
+        <div class="archive-filter-box">
+            <label style="margin:0;">اختر التاريخ:</label>
+            <input type="date" id="cancelled-date-filter" style="width:auto; flex:1;" onchange="filterCancelledArchive()">
+            <button onclick="resetCancelledFilter()" style="background:#64748b; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">عرض الكل 🔄</button>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ والوقت</th>
+                        <th>الزبون</th>
+                        <th>الهاتف</th>
+                        <th>الولاية</th>
+                        <th>المنتج والخيارات</th>
+                        <th>المجموع</th>
+                        <th>الحالة</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-cancelled-archive-list">
+                    <tr><td colspan="7">اختر تاريخاً أو اضغط عرض الكل...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- لوحة الإعدادات -->
     <div id="settings-tab" class="panel">
         <h3 style="margin-top:0;">⚙️ إعدادات المتجر العامة</h3>
         <div class="form-group">
-            <label>رقم واتساب الدعم (بدون علامة + أو مسافات، مثال: 213700000000):</label>
+            <label>رقم واتساب الدعم (مثال: 213700000000):</label>
             <input type="text" id="settings-whatsapp" placeholder="213700000000">
         </div>
         <button class="btn-primary" onclick="saveSettings()">حفظ الإعدادات 💾</button>
@@ -132,17 +192,25 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDdJY7mI1DON...", authDomain: "creater-ecom.firebaseapp.com", projectId: "creater-ecom", storageBucket: "creater-ecom.appspot.com", messagingSenderId: "893449950593", appId: "1:893449950593:web:..." };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        let allOrdersData = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             fetchAdminProducts();
             fetchAdminOrders();
             let savedWa = localStorage.getItem('dz_whatsapp_support');
             if(savedWa) document.getElementById('settings-whatsapp').value = savedWa;
+
+            let todayStr = new Date().toISOString().split('T')[0];
+            let compDateEl = document.getElementById('completed-date-filter');
+            let cancDateEl = document.getElementById('cancelled-date-filter');
+            if(compDateEl) compDateEl.value = todayStr;
+            if(cancDateEl) cancDateEl.value = todayStr;
         });
 
         window.switchTab = function(tabId, event) {
@@ -150,6 +218,9 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
+            if(tabId === 'completed-archive-tab' || tabId === 'cancelled-archive-tab') {
+                renderArchives();
+            }
         }
 
         window.logoutAdmin = function() {
@@ -199,16 +270,8 @@
 
             try {
                 await addDoc(collection(db, "products"), {
-                    name,
-                    price,
-                    category,
-                    imageUrls,
-                    videoUrl,
-                    description,
-                    variants,
-                    stock: 10,
-                    status: 'نشط',
-                    createdAt: new Date()
+                    name, price, category, imageUrls, videoUrl, description, variants,
+                    stock: 10, status: 'نشط', createdAt: new Date()
                 });
                 alert('تم نشر المنتج بنجاح في المتجر! 🎉');
                 document.getElementById('p-name').value = '';
@@ -263,27 +326,37 @@
         async function fetchAdminOrders() {
             try {
                 const snap = await getDocs(collection(db, "orders"));
-                let html = '';
+                allOrdersData = [];
+                let activeHtml = '';
+                
                 snap.forEach(d => {
                     let order = { id: d.id, ...d.data() };
-                    let variantInfo = (order.color || order.size) ? ` [اللون: ${order.color || '-'} | المقاس: ${order.size || '-'}]` : '';
-                    let statusColor = order.status?.includes('جديد') ? '#f59e0b' : (order.status?.includes('معالجة') ? '#2563eb' : (order.status?.includes('ملغى') ? '#ef4444' : '#16a34a'));
+                    allOrdersData.push(order);
 
-                    html += `
+                    let status = order.status || 'جديد ⏳';
+                    if(status.includes('مؤكد') || status.includes('مسلم') || status.includes('ملغى')) {
+                        return;
+                    }
+
+                    let variantInfo = (order.color || order.size) ? ` [اللون: ${order.color || '-'} | المقاس: ${order.size || '-'}]` : '';
+                    let statusColor = status.includes('جديد') ? '#f59e0b' : '#2563eb';
+
+                    activeHtml += `
                         <tr>
                             <td><b>${order.fullName}</b></td>
                             <td>${order.phone}</td>
                             <td>${order.wilaya} (${order.commune})</td>
                             <td>${order.productName} × ${order.quantity} ${variantInfo}</td>
                             <td><b style="color:#e11d48;">${order.finalTotal} دج</b></td>
-                            <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold;">${order.status || 'جديد ⏳'}</span></td>
+                            <td><span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold;">${status}</span></td>
                             <td>
                                 <button onclick='openOrderDetailsModal(${JSON.stringify(order).replace(/'/g, "&apos;")})' style="background:#2563eb; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:12px;">التفاصيل 👁️</button>
                             </td>
                         </tr>
                     `;
                 });
-                document.getElementById('admin-orders-list').innerHTML = html || '<tr><td colspan="7">لا توجد طلبات واردة حالياً.</td></tr>';
+                document.getElementById('admin-orders-list').innerHTML = activeHtml || '<tr><td colspan="7">لا توجد طلبات جديدة أو قيد المعالجة حالياً.</td></tr>';
+                renderArchives();
             } catch(e) {}
         }
 
@@ -309,10 +382,9 @@
                     
                     <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
                         <button onclick="updateOrderStatus('${order.id}', 'قيد المعالجة 🔄')" style="background:#2563eb; color:white; flex:1; padding:10px; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">نقل للمعالجة 🔄</button>
-                        <button onclick="updateOrderStatus('${order.id}', 'مؤكد ✅')" style="background:#16a34a; color:white; flex:1; padding:10px; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">تأكيد الطلب ✅</button>
+                        <button onclick="updateOrderStatus('${order.id}', 'مؤكد ✅')" style="background:#16a34a; color:white; flex:1; padding:10px; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">تأكيد وأرشفة ✅</button>
                     </div>
-                    <!-- زر الإلغاء الفعلي والنشط -->
-                    <button onclick="updateOrderStatus('${order.id}', 'ملغى ❌')" style="background:#ef4444; color:white; width:100%; padding:10px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; margin-bottom:10px;">إلغاء الطلب ❌</button>
+                    <button onclick="updateOrderStatus('${order.id}', 'ملغى ❌')" style="background:#ef4444; color:white; width:100%; padding:10px; border:none; border-radius:6px; cursor:pointer; font-weight:bold; margin-bottom:10px;">إلغاء الطلب وأرشفته ❌</button>
                     
                     <button onclick="document.getElementById('orderModal').style.display='none'" style="background:#64748b; color:white; width:100%; padding:10px; border:none; border-radius:6px; cursor:pointer;">إغلاق النافذة ❌</button>
                 </div>
@@ -324,13 +396,69 @@
         window.updateOrderStatus = async function(orderId, newStatus) {
             try {
                 await updateDoc(doc(db, "orders", orderId), { status: newStatus });
-                alert(`تم تحديث حالة الطلب بنجاح إلى: ${newStatus}`);
+                alert(`تم تحديث وحفظ حالة الطلب بنجاح إلى: ${newStatus}`);
                 document.getElementById('orderModal').style.display = 'none';
                 fetchAdminOrders();
             } catch(e) {
                 alert('فشل تحديث حالة الطلب.');
             }
         }
+
+        window.renderArchives = function() {
+            let completedDateFilter = document.getElementById('completed-date-filter').value;
+            let cancelledDateFilter = document.getElementById('cancelled-date-filter').value;
+
+            let completedHtml = '';
+            let cancelledHtml = '';
+
+            allOrdersData.forEach(order => {
+                let status = order.status || '';
+                let isCompleted = status.includes('مؤكد') || status.includes('مسلم');
+                let isCancelled = status.includes('ملغى');
+
+                if (!isCompleted && !isCancelled) return;
+
+                let orderDateStr = '';
+                if (order.createdAt && order.createdAt.seconds) {
+                    orderDateStr = new Date(order.createdAt.seconds * 1000).toISOString().split('T')[0];
+                } else {
+                    orderDateStr = new Date().toISOString().split('T')[0];
+                }
+
+                let orderTimeFormatted = order.createdAt?.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleString('ar-DZ') : 'اليوم';
+                let variantInfo = (order.color || order.size) ? ` [اللون: ${order.color || '-'} | المقاس: ${order.size || '-'}]` : '';
+
+                let rowHtml = `
+                    <tr>
+                        <td>${orderTimeFormatted}</td>
+                        <td><b>${order.fullName}</b></td>
+                        <td>${order.phone}</td>
+                        <td>${order.wilaya}</td>
+                        <td>${order.productName} × ${order.quantity} ${variantInfo}</td>
+                        <td><b style="color:#e11d48;">${order.finalTotal} دج</b></td>
+                        <td><span style="background:${isCompleted ? '#16a34a' : '#ef4444'}; color:white; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold;">${status}</span></td>
+                    </tr>
+                `;
+
+                if (isCompleted) {
+                    if (!completedDateFilter || orderDateStr === completedDateFilter) {
+                        completedHtml += rowHtml;
+                    }
+                } else if (isCancelled) {
+                    if (!cancelledDateFilter || orderDateStr === cancelledDateFilter) {
+                        cancelledHtml += rowHtml;
+                    }
+                }
+            });
+
+            document.getElementById('admin-completed-archive-list').innerHTML = completedHtml || '<tr><td colspan="7">لا توجد طلبات مكتملة في هذا التاريخ. (تبدأ فارغة يومياً حتى يتم تأكيد وتسجيل الطلبات)</td></tr>';
+            document.getElementById('admin-cancelled-archive-list').innerHTML = cancelledHtml || '<tr><td colspan="7">لا توجد طلبات ملغاة في هذا التاريخ.</td></tr>';
+        }
+
+        window.filterCompletedArchive = function() { renderArchives(); }
+        window.resetCompletedFilter = function() { document.getElementById('completed-date-filter').value = ''; renderArchives(); }
+        window.filterCancelledArchive = function() { renderArchives(); }
+        window.resetCancelledFilter = function() { document.getElementById('cancelled-date-filter').value = ''; renderArchives(); }
     </script>
 </body>
 </html>
