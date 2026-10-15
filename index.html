@@ -55,8 +55,10 @@
         .gallery-thumb.active { border-color: #2563eb; }
         .main-media-view { width: 100%; height: 240px; object-fit: contain; border-radius: 8px; background: #000; cursor: zoom-in; margin-bottom: 10px; }
 
-        .zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 5000; cursor: zoom-out; }
+        /* نافذة زوم الصورة مع زر إغلاق (X) صغير وواضح */
+        .zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 5000; }
         .zoom-modal img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; }
+        .close-zoom-btn { position: absolute; top: 20px; right: 20px; background: #ef4444; color: white; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 5100; }
     </style>
 </head>
 <body>
@@ -92,7 +94,9 @@
         <p style="text-align:center; grid-column: 1/-1;">جاري تحميل المنتجات...</p>
     </div>
 
-    <div class="zoom-modal" id="zoomModal" onclick="this.style.display='none'">
+    <!-- نافذة زوم الصورة مع زر إغلاق X دقيق -->
+    <div class="zoom-modal" id="zoomModal">
+        <button class="close-zoom-btn" onclick="closeZoomModal()">✕</button>
         <img id="zoomModalImg" src="">
     </div>
 
@@ -125,7 +129,6 @@
         </div>
     </div>
 
-    <!-- نافذة السلة الكبيرة أو خيار ما بعد الإضافة -->
     <div class="modal-overlay" id="cartModal">
         <div class="modal-card" id="cart-modal-card-content">
             <h3 style="margin-top:0; color:#1e293b;">🛒 محتويات سلة الشراء</h3>
@@ -222,8 +225,6 @@
             products.forEach(p => {
                 let img = p.imageUrls?.[0] || 'https://via.placeholder.com/200';
                 let stockVal = p.stock !== undefined ? p.stock : 10;
-                
-                // حساب عدد القطع الموجودة في السلة لهذا المنتج لعرضه في الواجهة الأولى
                 let existingCartItem = cart.find(item => item.id === p.id);
                 let cartQtyText = existingCartItem ? ` (في السلة: ${existingCartItem.quantity})` : '';
 
@@ -332,6 +333,10 @@
             document.getElementById('zoomModal').style.display = 'flex';
         }
 
+        window.closeZoomModal = function() {
+            document.getElementById('zoomModal').style.display = 'none';
+        }
+
         window.selectColor = function(color) {
             selectedColor = color;
             document.querySelectorAll('#color-pills-container .variant-pill').forEach(el => {
@@ -400,7 +405,6 @@
             openCartModal();
         }
 
-        // نافذة تخيير الزبون بعد الإضافة إلى السلة
         function showPostAddModal() {
             let cardModalContent = document.getElementById('cart-modal-card-content');
             cardModalContent.innerHTML = `
