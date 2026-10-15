@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>متجري العالمي - تسوق بأمان وسهولة</title>
+    <title>متجري العالمي - 58 ولاية</title>
     <style>
         :root { --primary: #0f172a; --accent: #2563eb; --success: #10b981; --danger: #ef4444; --bg: #f8fafc; --card-bg: #ffffff; --border: #e2e8f0; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--primary); }
@@ -38,7 +38,6 @@
         
         .promo-box { background: #fdf2f8; border: 1px dashed #f472b6; padding: 8px; border-radius: 6px; margin-bottom: 12px; font-size: 12px; color: #db2777; }
         
-        /* أزرار زيادة ونقصان الكمية داخل الكارت */
         .qty-selector { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; background: #f1f5f9; padding: 6px; border-radius: 8px; }
         .qty-btn { background: white; border: 1px solid var(--border); width: 28px; height: 28px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
         .qty-input { width: 40px; text-align: center; border: none; background: transparent; font-weight: bold; font-size: 14px; outline: none; }
@@ -93,7 +92,7 @@
         <div id="store-products-grid" class="products-grid">جاري تحميل المنتجات...</div>
     </div>
 
-    <!-- نافذة تفاصيل المنتج والمقترحات المشابهة -->
+    <!-- نافذة تفاصيل المنتج -->
     <div class="modal-overlay" id="productModal">
         <div class="modal-card" id="modal-product-content"></div>
     </div>
@@ -114,35 +113,97 @@
         </div>
     </div>
 
-    <!-- نافذة إتمام الطلب الشاملة -->
+    <!-- نافذة إتمام الطلب أو رسالة النجاح -->
     <div class="modal-overlay" id="checkoutModal">
-        <div class="modal-card">
-            <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px;">📋 تأكيد الطلب ومعلومات التوصيل</h3>
+        <div class="modal-card" id="checkout-modal-body">
+            <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px;">📋 تأكيد الطلب ومعلومات التوصيل (58 ولاية)</h3>
+            
             <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="order-fullname"></div>
             <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone"></div>
-            <div class="form-group"><label>الولاية:</label>
-                <select id="order-wilaya">
-                    <option value="الشلف">الشلف (02)</option>
-                    <option value="الجزائر العاصمة">الجزائر العاصمة (16)</option>
-                    <option value="وهران">وهران (31)</option>
-                    <option value="قسنطينة">قسنطينة (25)</option>
-                    <option value="باتنة">باتنة (05)</option>
-                    <option value="سطيف">سطيف (19)</option>
+            
+            <div class="form-group">
+                <label>الولاية:</label>
+                <select id="order-wilaya" onchange="updateShippingFees()">
+                    <option value="01|أدرار">01 - أدرار</option>
+                    <option value="02|الشلف">02 - الشلف</option>
+                    <option value="03|الأغواط">03 - الأغواط</option>
+                    <option value="04|أم البواقي">04 - أم البواقي</option>
+                    <option value="05|باتنة">05 - باتنة</option>
+                    <option value="06|بجاية">06 - بجاية</option>
+                    <option value="07|بسكرة">07 - بسكرة</option>
+                    <option value="08|بشار">08 - بشار</option>
+                    <option value="09|البليدة">09 - البليدة</option>
+                    <option value="10|البويرة">10 - البويرة</option>
+                    <option value="11|تمنراست">11 - تمنراست</option>
+                    <option value="12|تبسة">12 - تبسة</option>
+                    <option value="13|تلمسان">13 - تلمسان</option>
+                    <option value="14|تيارت">14 - تيارت</option>
+                    <option value="15|تيزي وزو">15 - تيزي وزو</option>
+                    <option value="16|الجزائر" selected>16 - الجزائر العاصمة</option>
+                    <option value="17|الجلفة">17 - الجلفة</option>
+                    <option value="18|جيجل">18 - جيجل</option>
+                    <option value="19|سطيف">19 - سطيف</option>
+                    <option value="20|سعيدة">20 - سعيدة</option>
+                    <option value="21|سكيكدة">21 - سكيكدة</option>
+                    <option value="22|سيدي بلعباس">22 - سيدي بلعباس</option>
+                    <option value="23|عنابة">23 - عنابة</option>
+                    <option value="24|قالمة">24 - قالمة</option>
+                    <option value="25|قسنطينة">25 - قسنطينة</option>
+                    <option value="26|المدية">26 - المدية</option>
+                    <option value="27|مستغانم">27 - مستغانم</option>
+                    <option value="28|المسيلة">28 - المسيلة</option>
+                    <option value="29|معسكر">29 - معسكر</option>
+                    <option value="30|ورقلة">30 - ورقلة</option>
+                    <option value="31|وهران">31 - وهران</option>
+                    <option value="32|البيض">32 - البيض</option>
+                    <option value="33|إليزي">33 - إليزي</option>
+                    <option value="34|برج بوعريريج">34 - برج بوعريريج</option>
+                    <option value="35|بومرداس">35 - بومرداس</option>
+                    <option value="36|الطارف">36 - الطارف</option>
+                    <option value="37|تندوف">37 - تندوف</option>
+                    <option value="38|تيسمسيلت">38 - تيسمسيلت</option>
+                    <option value="39|الوادي">39 - الوادي</option>
+                    <option value="40|خنشلة">40 - خنشلة</option>
+                    <option value="41|سوق أهراس">41 - سوق أهراس</option>
+                    <option value="42|تيبازة">42 - تيبازة</option>
+                    <option value="43|ميلة">43 - ميلة</option>
+                    <option value="44|عين الدفلى">44 - عين الدفلى</option>
+                    <option value="45|النعامة">45 - النعامة</option>
+                    <option value="46|عين تموشنت">46 - عين تموشنت</option>
+                    <option value="47|غرداية">47 - غرداية</option>
+                    <option value="48|غليزان">48 - غليزان</option>
+                    <option value="49|تيميمون">49 - تيميمون</option>
+                    <option value="50|برج باجي مختار">50 - برج باجي مختار</option>
+                    <option value="51|أولاد جلال">51 - أولاد جلال</option>
+                    <option value="52|بني عباس">52 - بني عباس</option>
+                    <option value="53|عين صالح">53 - عين صالح</option>
+                    <option value="54|عين قزام">54 - عين قزام</option>
+                    <option value="55|تقرت">55 - تقرت</option>
+                    <option value="56|جانت">56 - جانت</option>
+                    <option value="57|المغير">57 - المغير</option>
+                    <option value="58|المنيعة">58 - المنيعة</option>
                 </select>
             </div>
-            <div class="form-group"><label>العنوان التفصيلي / البلدية:</label><input type="text" id="order-commune"></div>
-            <div class="form-group"><label>نوع التوصيل:</label>
-                <select id="order-delivery-type" onchange="calculateFinalTotal()">
-                    <option value="توصيل للمنزل 🏠">توصيل للمنزل 🏠</option>
-                    <option value="توصيل للمكتب 🏢">توصيل للمكتب 🏢</option>
+
+            <div class="form-group"><label>العنوان التفصيلي / البلدية:</label><input type="text" id="order-commune" placeholder="اسم البلدية أو الحي..."></div>
+            
+            <div class="form-group">
+                <label>نوع التوصيل:</label>
+                <select id="order-delivery-type" onchange="updateShippingFees()">
+                    <option value="home">توصيل للمنزل 🏠</option>
+                    <option value="desk">توصيل للمكتب (Stop-Desk) 🏢</option>
                 </select>
             </div>
-            <div style="background:#f1f5f9; padding:12px; border-radius:8px; margin-bottom:15px; font-size:16px;">
-                <b>💰 السعر الإجمالي النهائي:</b> <span id="checkout-final-total" style="color:var(--danger); font-weight:bold;">0</span> دج
+
+            <div style="background:#f1f5f9; padding:12px; border-radius:8px; margin-bottom:15px; font-size:15px; line-height:1.6;">
+                📦 سعر المنتجات: <b id="subtotal-display">0 دج</b><br>
+                🚚 تكلفة التوصيل: <b id="shipping-display" style="color:var(--accent);">0 دج</b><br>
+                <hr style="border:0; border-top:1px solid #cbd5e1; margin:6px 0;">
+                💰 <b>المجموع الكلي النهائي:</b> <span id="checkout-final-total" style="color:var(--danger); font-weight:bold; font-size:18px;">0</span> دج
             </div>
 
             <hr style="border:0; border-top:1px solid var(--border); margin:15px 0;">
-            <h4 style="margin:0 0 8px 0; font-size:14px;">⭐ اترك تقييمك ورأيك:</h4>
+            <h4 style="margin:0 0 8px 0; font-size:14px;">⭐ تقييمك ورأيك:</h4>
             <div class="form-group"><label>التقييم بالنجوم:</label>
                 <select id="order-rating">
                     <option value="5">⭐⭐⭐⭐⭐ (ممتاز)</option>
@@ -172,6 +233,28 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        const shippingRates = {
+            "01": { home: 1400, desk: 950 }, "02": { home: 750, desk: 450 }, "03": { home: 850, desk: 550 },
+            "04": { home: 750, desk: 450 }, "05": { home: 750, desk: 450 }, "06": { home: 750, desk: 450 },
+            "07": { home: 900, desk: 550 }, "08": { home: 1000, desk: 600 }, "09": { home: 500, desk: 300 },
+            "10": { home: 700, desk: 450 }, "11": { home: 1600, desk: 950 }, "12": { home: 800, desk: 500 },
+            "13": { home: 700, desk: 450 }, "14": { home: 750, desk: 450 }, "15": { home: 750, desk: 400 },
+            "16": { home: 400, desk: 350 }, "17": { home: 850, desk: 500 }, "18": { home: 750, desk: 450 },
+            "19": { home: 750, desk: 450 }, "20": { home: 750, desk: 500 }, "21": { home: 750, desk: 450 },
+            "22": { home: 750, desk: 500 }, "23": { home: 750, desk: 400 }, "24": { home: 750, desk: 500 },
+            "25": { home: 750, desk: 400 }, "26": { home: 700, desk: 450 }, "27": { home: 750, desk: 450 },
+            "28": { home: 750, desk: 500 }, "29": { home: 750, desk: 500 }, "30": { home: 900, desk: 600 },
+            "31": { home: 750, desk: 400 }, "32": { home: 1000, desk: 650 }, "33": { home: 1900, desk: 1200 },
+            "34": { home: 750, desk: 500 }, "35": { home: 550, desk: 400 }, "36": { home: 750, desk: 500 },
+            "37": { home: 1500, desk: 700 }, "38": { home: 700, desk: 500 }, "39": { home: 1000, desk: 650 },
+            "40": { home: 850, desk: 500 }, "41": { home: 800, desk: 500 }, "42": { home: 550, desk: 400 },
+            "43": { home: 750, desk: 500 }, "44": { home: 750, desk: 500 }, "45": { home: 1000, desk: 700 },
+            "46": { home: 750, desk: 500 }, "47": { home: 900, desk: 550 }, "48": { home: 750, desk: 500 },
+            "49": { home: 1500, desk: 800 }, "50": { home: 1600, desk: 1000 }, "51": { home: 900, desk: 550 },
+            "52": { home: 1100, desk: 750 }, "53": { home: 1900, desk: 1300 }, "54": { home: 2000, desk: 1400 },
+            "55": { home: 900, desk: 650 }, "56": { home: 1900, desk: 1200 }, "57": { home: 950, desk: 650 }, "58": { home: 1100, desk: 700 }
+        };
 
         let allProducts = [];
         let cart = [];
@@ -244,7 +327,6 @@
                             </div>
                             ${promosHtml}
                             
-                            <!-- أزرار الزائد (+) والناقص (-) لتحديد الكمية -->
                             <div class="qty-selector" onclick="event.stopPropagation()">
                                 <button class="qty-btn" onclick="changeCardQty('${p.id}', -1)">-</button>
                                 <input type="text" id="card-qty-${p.id}" class="qty-input" value="1" readonly>
@@ -353,7 +435,6 @@
             updateCartUI();
         }
 
-        // تفاصيل المنتج + النزول للأسفل لعرض منتجات أخرى من نفس الصنف
         window.openProductModal = async function(id) {
             let docSnap = await getDoc(doc(db, "products", id));
             if(!docSnap.exists()) return;
@@ -372,7 +453,6 @@
                 reviewsHtml = '<p style="font-size:13px; color:#64748b;">لا توجد تقييمات لهذا المنتج بعد.</p>';
             }
 
-            // تصفية المنتجات الأخرى من نفس الصنف
             let relatedProducts = allProducts.filter(item => item.category === p.category && item.id !== p.id);
             let relatedHtml = '';
             if(relatedProducts.length > 0) {
@@ -451,57 +531,170 @@
             selectedProductForModal = p;
             currentModalQty = Number(document.getElementById(`card-qty-${id}`).value) || 1;
             checkoutType = 'single';
-            calculateFinalTotal();
-            document.getElementById('checkoutModal').style.display = 'flex';
+            openCheckoutModalView();
         }
 
         window.buyNowFromModal = function() {
             if(!selectedProductForModal) return;
             checkoutType = 'single';
-            calculateFinalTotal();
             document.getElementById('productModal').style.display = 'none';
-            document.getElementById('checkoutModal').style.display = 'flex';
+            openCheckoutModalView();
         }
 
         window.openCheckoutFromCart = function() {
             if(cart.length === 0) { alert('سلة المشتريات فارغة!'); return; }
             checkoutType = 'cart';
             toggleCartDrawer();
-            calculateFinalTotal();
+            openCheckoutModalView();
+        }
+
+        function openCheckoutModalView() {
+            let html = `
+                <h3 style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px;">📋 تأكيد الطلب ومعلومات التوصيل (58 ولاية)</h3>
+                
+                <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="order-fullname"></div>
+                <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone"></div>
+                
+                <div class="form-group">
+                    <label>الولاية:</label>
+                    <select id="order-wilaya" onchange="updateShippingFees()">
+                        <option value="01|أدرار">01 - أدرار</option>
+                        <option value="02|الشلف">02 - الشلف</option>
+                        <option value="03|الأغواط">03 - الأغواط</option>
+                        <option value="04|أم البواقي">04 - أم البواقي</option>
+                        <option value="05|باتنة">05 - باتنة</option>
+                        <option value="06|بجاية">06 - بجاية</option>
+                        <option value="07|بسكرة">07 - بسكرة</option>
+                        <option value="08|بشار">08 - بشار</option>
+                        <option value="09|البليدة">09 - البليدة</option>
+                        <option value="10|البويرة">10 - البويرة</option>
+                        <option value="11|تمنراست">11 - تمنراست</option>
+                        <option value="12|تبسة">12 - تبسة</option>
+                        <option value="13|تلمسان">13 - تلمسان</option>
+                        <option value="14|تيارت">14 - تيارت</option>
+                        <option value="15|تيزي وزو">15 - تيزي وزو</option>
+                        <option value="16|الجزائر" selected>16 - الجزائر العاصمة</option>
+                        <option value="17|الجلفة">17 - الجلفة</option>
+                        <option value="18|جيجل">18 - جيجل</option>
+                        <option value="19|سطيف">19 - سطيف</option>
+                        <option value="20|سعيدة">20 - سعيدة</option>
+                        <option value="21|سكيكدة">21 - سكيكدة</option>
+                        <option value="22|سيدي بلعباس">22 - سيدي بلعباس</option>
+                        <option value="23|عنابة">23 - عنابة</option>
+                        <option value="24|قالمة">24 - قالمة</option>
+                        <option value="25|قسنطينة">25 - قسنطينة</option>
+                        <option value="26|المدية">26 - المدية</option>
+                        <option value="27|مستغانم">27 - مستغانم</option>
+                        <option value="28|المسيلة">28 - المسيلة</option>
+                        <option value="29|معسكر">29 - معسكر</option>
+                        <option value="30|ورقلة">30 - ورقلة</option>
+                        <option value="31|وهران">31 - وهران</option>
+                        <option value="32|البيض">32 - البيض</option>
+                        <option value="33|إليزي">33 - إليزي</option>
+                        <option value="34|برج بوعريريج">34 - برج بوعريريج</option>
+                        <option value="35|بومرداس">35 - بومرداس</option>
+                        <option value="36|الطارف">36 - الطارف</option>
+                        <option value="37|تندوف">37 - تندوف</option>
+                        <option value="38|تيسمسيلت">38 - تيسمسيلت</option>
+                        <option value="39|الوادي">39 - الوادي</option>
+                        <option value="40|خنشلة">40 - خنشلة</option>
+                        <option value="41|سوق أهراس">41 - سوق أهراس</option>
+                        <option value="42|تيبازة">42 - تيبازة</option>
+                        <option value="43|ميلة">43 - ميلة</option>
+                        <option value="44|عين الدفلى">44 - عين الدفلى</option>
+                        <option value="45|النعامة">45 - النعامة</option>
+                        <option value="46|عين تموشنت">46 - عين تموشنت</option>
+                        <option value="47|غرداية">47 - غرداية</option>
+                        <option value="48|غليزان">48 - غليزان</option>
+                        <option value="49|تيميمون">49 - تيميمون</option>
+                        <option value="50|برج باجي مختار">50 - برج باجي مختار</option>
+                        <option value="51|أولاد جلال">51 - أولاد جلال</option>
+                        <option value="52|بني عباس">52 - بني عباس</option>
+                        <option value="53|عين صالح">53 - عين صالح</option>
+                        <option value="54|عين قزام">54 - عين قزام</option>
+                        <option value="55|تقرت">55 - تقرت</option>
+                        <option value="56|جانت">56 - جانت</option>
+                        <option value="57|المغير">57 - المغير</option>
+                        <option value="58|المنيعة">58 - المنيعة</option>
+                    </select>
+                </div>
+
+                <div class="form-group"><label>العنوان التفصيلي / البلدية:</label><input type="text" id="order-commune" placeholder="اسم البلدية أو الحي..."></div>
+                
+                <div class="form-group">
+                    <label>نوع التوصيل:</label>
+                    <select id="order-delivery-type" onchange="updateShippingFees()">
+                        <option value="home">توصيل للمنزل 🏠</option>
+                        <option value="desk">توصيل للمكتب (Stop-Desk) 🏢</option>
+                    </select>
+                </div>
+
+                <div style="background:#f1f5f9; padding:12px; border-radius:8px; margin-bottom:15px; font-size:15px; line-height:1.6;">
+                    📦 سعر المنتجات: <b id="subtotal-display">0 دج</b><br>
+                    🚚 تكلفة التوصيل: <b id="shipping-display" style="color:var(--accent);">0 دج</b><br>
+                    <hr style="border:0; border-top:1px solid #cbd5e1; margin:6px 0;">
+                    💰 <b>المجموع الكلي النهائي:</b> <span id="checkout-final-total" style="color:var(--danger); font-weight:bold; font-size:18px;">0</span> دج
+                </div>
+
+                <hr style="border:0; border-top:1px solid var(--border); margin:15px 0;">
+                <h4 style="margin:0 0 8px 0; font-size:14px;">⭐ تقييمك ورأيك:</h4>
+                <div class="form-group"><label>التقييم بالنجوم:</label>
+                    <select id="order-rating">
+                        <option value="5">⭐⭐⭐⭐⭐ (ممتاز)</option>
+                        <option value="4">⭐⭐⭐⭐ (جيد جداً)</option>
+                        <option value="3">⭐⭐⭐ (متوسط)</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>تعليقك:</label><textarea id="order-comment" placeholder="اكتب رأيك هنا..."></textarea></div>
+
+                <button onclick="submitOrder()" style="background:var(--success); color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:15px; margin-top:10px;">تأكيد وإرسال الطلب 🚀</button>
+                <button onclick="document.getElementById('checkoutModal').style.display='none'" style="background:#64748b; color:white; border:none; width:100%; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:8px;">إلغاء</button>
+            `;
+            document.getElementById('checkout-modal-body').innerHTML = html;
+            updateShippingFees();
             document.getElementById('checkoutModal').style.display = 'flex';
         }
 
-        window.calculateFinalTotal = function() {
-            let delivery = document.getElementById('order-delivery-type').value;
-            let shippingFee = delivery.includes('المنزل') ? 600 : 400;
-            let subtotal = 0;
+        window.updateShippingFees = function() {
+            let wilayaSelect = document.getElementById('order-wilaya').value;
+            let wilayaCode = wilayaSelect.split('|')[0];
+            let deliveryType = document.getElementById('order-delivery-type').value;
 
+            let rates = shippingRates[wilayaCode] || { home: 800, desk: 500 };
+            let shippingFee = (deliveryType === 'home') ? rates.home : rates.desk;
+
+            let subtotal = 0;
             if(checkoutType === 'single' && selectedProductForModal) {
                 subtotal = selectedProductForModal.price * currentModalQty;
             } else if(checkoutType === 'cart') {
                 subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             }
 
-            document.getElementById('checkout-final-total').innerText = subtotal + shippingFee;
+            let finalTotal = subtotal + shippingFee;
+
+            document.getElementById('subtotal-display').innerText = subtotal + ' دج';
+            document.getElementById('shipping-display').innerText = shippingFee + ' دج';
+            document.getElementById('checkout-final-total').innerText = finalTotal;
         }
 
         window.submitOrder = async function() {
             let fullName = document.getElementById('order-fullname').value.trim();
             let phone = document.getElementById('order-phone').value.trim();
-            let wilaya = document.getElementById('order-wilaya').value;
+            let wilayaFull = document.getElementById('order-wilaya').value.split('|')[1];
             let commune = document.getElementById('order-commune').value.trim();
-            let deliveryType = document.getElementById('order-delivery-type').value;
+            let deliveryTypeVal = document.getElementById('order-delivery-type').value;
+            let deliveryTypeText = (deliveryTypeVal === 'home') ? 'توصيل للمنزل 🏠' : 'توصيل للمكتب (Stop-Desk) 🏢';
             let finalTotal = Number(document.getElementById('checkout-final-total').innerText);
             let rating = Number(document.getElementById('order-rating').value);
             let comment = document.getElementById('order-comment').value.trim();
 
             if(!fullName || !phone || !commune) {
-                alert('الرجاء إدخال كامل معلومات التوصيل!');
+                alert('الرجاء إدخال كامل معلومات التوصيل والبلدية!');
                 return;
             }
 
             let orderData = {
-                fullName, phone, wilaya, commune, deliveryType, finalTotal, rating, comment,
+                fullName, phone, wilaya: wilayaFull, commune, deliveryType: deliveryTypeText, finalTotal, rating, comment,
                 status: 'جديد ⏳',
                 createdAt: new Date()
             };
@@ -527,10 +720,23 @@
                     }
                 }
 
-                alert('تم إرسال طلبك بنجاح! شكراً لتسوقك معنا.');
                 cart = [];
                 updateCartUI();
-                document.getElementById('checkoutModal').style.display = 'none';
+
+                // عرض رسالة نجاح الطلب مع زري "إغلاق" أو "تسوق من جديد"
+                let successHtml = `
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="font-size: 60px; margin-bottom: 10px;">🎉</div>
+                        <h2 style="color: var(--success); margin-bottom: 10px;">تم إرسال طلبك بنجاح!</h2>
+                        <p style="color: #64748b; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
+                            شكراً لك لتسوقك معنا. سنتصل بك قريباً عبر الهاتف لتأكيد تفاصيل الطلب والتوصيل.
+                        </p>
+                        <button onclick="document.getElementById('checkoutModal').style.display='none'" style="background: var(--accent); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; margin-bottom: 10px;">تسوق من جديد 🛍️</button>
+                        <button onclick="document.getElementById('checkoutModal').style.display='none'" style="background: #64748b; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px;">إغلاق النافذة ❌</button>
+                    </div>
+                `;
+                document.getElementById('checkout-modal-body').innerHTML = successHtml;
+
             } catch(e) {
                 alert('فشل في إرسال الطلب، يرجى المحاولة لاحقاً.');
             }
