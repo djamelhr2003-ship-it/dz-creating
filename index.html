@@ -21,11 +21,11 @@
         .filter-btn { background: white; border: 1px solid #d5d9d9; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; color: #333; transition: 0.2s; flex-shrink: 0; }
         .filter-btn.active, .filter-btn:hover { background: var(--secondary); color: white; border-color: var(--secondary); }
 
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
-        .product-card { background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #d5d9d9; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .product-card { background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #d5d9d9; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; padding: 12px; }
         .product-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .product-img { width: 100%; height: 180px; object-fit: contain; background: #fff; }
-        .product-body { padding: 12px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; }
+        .product-body { display: flex; flex-direction: column; justify-content: space-between; flex: 1; margin-top: 10px; }
         
         /* إشعار سلة التسوق المصغر Toast */
         #toast-notification { position: fixed; bottom: 20px; right: 20px; background: #232f3e; color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 9999; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
@@ -35,9 +35,9 @@
         .detail-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 25px; }
         @media(max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } }
         
-        .qty-box { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
-        .qty-btn { background: #e2e8f0; border: none; width: 35px; height: 35px; font-weight: bold; font-size: 18px; border-radius: 6px; cursor: pointer; }
-        .qty-input { width: 50px; text-align: center; font-size: 16px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; }
+        .qty-box { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
+        .qty-btn { background: #e2e8f0; border: none; width: 32px; height: 32px; font-weight: bold; font-size: 16px; border-radius: 6px; cursor: pointer; }
+        .qty-input { width: 45px; text-align: center; font-size: 15px; padding: 5px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; }
 
         /* العروض والتخفيضات */
         .offer-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
@@ -54,7 +54,7 @@
 </head>
 <body>
 
-    <div id="toast-notification">✅ أضفناها إلى السلة بنجاح!</div>
+    <div id="toast-notification">✅ اضفناها إلى السلة بنجاح!</div>
 
     <header>
         <div class="logo" onclick="backToHome()">🛍️ متجري <span>العالمي</span></div>
@@ -178,7 +178,8 @@
             if(products.length === 0) { grid.innerHTML = '<p style="text-align:center; color:#666; grid-column:1/-1;">لا توجد منتجات في هذا الصنف حالياً.</p>'; return; }
             products.forEach(p => {
                 let img = p.imageUrls?.[0] || 'https://via.placeholder.com/200';
-                let priceDisplay = p.price + ' دج';
+                let basePrice = (p.enableOffers && p.offers?.length > 0) ? p.offers[0].newPrice : p.price;
+                let priceDisplay = basePrice + ' دج';
                 if(p.enableOffers && p.offers?.length > 0) {
                     priceDisplay = `<span class="old-price">❌ ${p.offers[0].oldPrice} دج</span> <span class="new-price">✔️ ${p.offers[0].newPrice} دج</span>`;
                 }
@@ -188,13 +189,33 @@
                         <img src="${img}" class="product-img">
                         <div class="product-body">
                             <h3 style="margin:0 0 6px 0; font-size:15px;">${p.name}</h3>
-                            <div style="font-size:12px; color:#666; margin-bottom:8px;">📁 ${p.category || 'عام'}</div>
-                            <div style="margin-bottom:10px;">${priceDisplay}</div>
-                            <button onclick="event.stopPropagation(); addToCartQuick('${p.id}')" style="background:#ffd814; border:none; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;">أضف للسلة 🛒</button>
+                            <div style="font-size:12px; color:#666; margin-bottom:6px;">📁 ${p.category || 'عام'}</div>
+                            <div style="margin-bottom:8px;">${priceDisplay}</div>
+                            
+                            <!-- التحكم بالكمية في الواجهة الرئيسية -->
+                            <div class="qty-box" onclick="event.stopPropagation()">
+                                <label style="margin:0; font-size:12px;">الكمية:</label>
+                                <button class="qty-btn" onclick="adjustHomeQty('${p.id}', -1)">-</button>
+                                <input type="text" id="home-qty-${p.id}" class="qty-input" value="1" readonly>
+                                <button class="qty-btn" onclick="adjustHomeQty('${p.id}', 1)">+</button>
+                            </div>
+
+                            <!-- فصل الأزرار تماماً: أضف للسلة وزر طلب مباشر -->
+                            <div style="display:flex; gap:6px; margin-top:8px;" onclick="event.stopPropagation()">
+                                <button onclick="addToCartMain('${p.id}')" style="background:#ffd814; border:1px solid #fcd200; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer; flex:1; font-size:12px;">أضف للسلة 🛒</button>
+                                <button onclick="orderDirectMain('${p.id}')" style="background:#ffa41c; border:none; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer; flex:1; font-size:12px; color:white;">طلب مباشر ⚡</button>
+                            </div>
                         </div>
                     </div>
                 `;
             });
+        }
+
+        window.adjustHomeQty = (id, delta) => {
+            let input = document.getElementById(`home-qty-${id}`);
+            let val = Number(input.value) + delta;
+            if(val < 1) val = 1;
+            input.value = val;
         }
 
         window.showToast = () => {
@@ -203,13 +224,31 @@
             setTimeout(() => { t.style.display = 'none'; }, 2500);
         }
 
-        window.addToCartQuick = (id) => {
+        window.addToCartMain = (id) => {
             let p = allProducts.find(item => item.id === id);
             if(!p) return;
+            let qty = Number(document.getElementById(`home-qty-${id}`).value) || 1;
             let finalP = (p.enableOffers && p.offers?.length > 0) ? p.offers[0].newPrice : p.price;
-            cartItems.push({ name: p.name, price: finalP, qty: 1 });
+            cartItems.push({ name: p.name, price: finalP, qty: qty });
             document.getElementById('cart-counter').innerText = cartItems.length;
             showToast();
+        }
+
+        window.orderDirectMain = (id) => {
+            let p = allProducts.find(item => item.id === id);
+            if(!p) return;
+            let qty = Number(document.getElementById(`home-qty-${id}`).value) || 1;
+            let finalP = (p.enableOffers && p.offers?.length > 0) ? p.offers[0].newPrice : p.price;
+            
+            selectedProduct = p;
+            selectedOfferPrice = finalP;
+            currentQty = qty;
+
+            document.getElementById('summary-product-name').innerText = p.name;
+            document.getElementById('summary-qty').innerText = qty;
+            document.getElementById('summary-product-price').innerText = (finalP * qty) + ' دج';
+            calculateCODTotal();
+            document.getElementById('checkoutModal').style.display = 'flex';
         }
 
         window.openProductDetail = async (id) => {
@@ -257,7 +296,6 @@
                         <div id="display-product-price" style="font-size:24px; color:var(--danger); font-weight:bold; margin:10px 0;">${selectedOfferPrice * currentQty} دج</div>
                         ${offersHtml}
                         
-                        <!-- نظام الكمية + و - -->
                         <div class="qty-box">
                             <label style="margin:0;">الكمية:</label>
                             <button class="qty-btn" onclick="changeQty(-1)">-</button>
@@ -269,7 +307,7 @@
                         
                         <div style="display:flex; gap:10px; margin-top:20px;">
                             <button onclick="addToCartFromDetail()" style="background:#ffa41c; border:none; flex:1; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">أضف للسلة 🛒</button>
-                            <button onclick="openCheckoutSingle()" style="background:#ffd814; border:1px solid #fcd200; flex:1; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">شراء سريع ⚡</button>
+                            <button onclick="openCheckoutSingle()" style="background:#ffd814; border:1px solid #fcd200; flex:1; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">طلب مباشر ⚡</button>
                         </div>
                     </div>
                 </div>
