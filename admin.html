@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لوحة التحكم - إدارة الصلاحيات الفردية والتحليلات</title>
+    <title>لوحة التحكم - الصلاحيات وإدارة الحذف</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
@@ -64,9 +64,9 @@
 
     <div class="modal-overlay" id="centerModal" style="z-index: 4000;">
         <div class="modal-card" style="text-align: center; max-width: 400px;">
-            <h3 id="modalTitle" style="color: #2563eb; margin-top:0;">⚠️ تنبيه نظام الطلبات</h3>
+            <h3 id="modalTitle" style="color: #2563eb; margin-top:0;">⚠️ تنبيه النظام</h3>
             <p id="modalMessage" style="color: #475569; font-size: 15px; line-height: 1.6;"></p>
-            <button onclick="closeCenterModal()" style="margin-top: 15px; background: #ef4444; width: 100%;">فهمت التحذير 🚨</button>
+            <button onclick="closeCenterModal()" style="margin-top: 15px; background: #ef4444; width: 100%;">فهمت 🚨</button>
         </div>
     </div>
 
@@ -102,14 +102,14 @@
                 <button class="tab-btn active" id="btn-orders-tab" onclick="switchTab('orders-tab', event)">⏳ الجديدة</button>
                 <button class="tab-btn" id="btn-processing-tab" onclick="switchTab('processing-tab', event)">🔄 المعالجة</button>
                 <button class="tab-btn" id="btn-shipping-tab" onclick="switchTab('shipping-tab', event)">🚚 التوصيل</button>
-                <button class="tab-btn" id="btn-archive-tab" onclick="switchTab('archive-tab', event)">✅ المسلمة</button>
+                <button class="tab-btn" id="btn-archive-tab" onclick="switchTab('archive-tab', event)">✅ الأرشيف</button>
                 <button class="tab-btn" id="btn-return-tab" onclick="switchTab('return-tab', event)">⚠️ الروتور</button>
                 <button class="tab-btn" id="btn-fake-tab" onclick="switchTab('fake-tab', event)" style="background: #ef4444; color: white;">🚨 الوهمية</button>
                 <button class="tab-btn" id="btn-trash-tab" onclick="switchTab('trash-tab', event)" style="background: #64748b; color: white;">🗑️ المهملات</button>
                 <button class="tab-btn" id="btn-wilaya-report-tab" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
-                <button class="tab-btn" id="btn-analytics-tab" onclick="switchTab('analytics-tab', event)">💰 التحليلات والأرباح</button>
+                <button class="tab-btn" id="btn-analytics-tab" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
                 <button class="tab-btn" id="btn-reviews-tab" onclick="switchTab('reviews-tab', event)">💬 التعليقات</button>
-                <button class="tab-btn" id="btn-staff-tab" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 الفريق والصلاحيات</button>
+                <button class="tab-btn" id="btn-staff-tab" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 الفريق</button>
                 <button class="tab-btn" id="btn-add-product-tab" onclick="switchTab('add-product-tab', event)">➕ إضافة</button>
                 <button class="tab-btn" id="btn-manage-products-tab" onclick="switchTab('manage-products-tab', event)">🏷️ المنتجات</button>
                 <button class="tab-btn" id="btn-settings-tab" onclick="switchTab('settings-tab', event)">⚙️ الإعدادات</button>
@@ -120,7 +120,7 @@
             <div class="container">
                 <h2>الطلبات الجديدة (قيد الانتظار) ⏳</h2>
                 <div class="search-filter-box">
-                    <input type="text" id="search-input-new" placeholder="🔍 بحث بالاسم، الهاتف، الولاية..." onkeyup="filterOrdersList('new')">
+                    <input type="text" id="search-input-new" placeholder="🔍 بحث..." onkeyup="filterOrdersList('new')">
                     <input type="date" id="date-filter-new" onchange="filterOrdersList('new')">
                     <button onclick="resetFilters('new')" class="btn-secondary" style="width:auto; padding:8px 12px;">إلغاء الفلتر</button>
                 </div>
@@ -132,7 +132,7 @@
             <div class="container">
                 <h2>الطلبات قيد المعالجة والتجهيز 🔄</h2>
                 <div class="search-filter-box">
-                    <input type="text" id="search-input-processing" placeholder="🔍 بحث بالاسم، الهاتف، الولاية..." onkeyup="filterOrdersList('processing')">
+                    <input type="text" id="search-input-processing" placeholder="🔍 بحث..." onkeyup="filterOrdersList('processing')">
                     <input type="date" id="date-filter-processing" onchange="filterOrdersList('processing')">
                     <button onclick="resetFilters('processing')" class="btn-secondary" style="width:auto; padding:8px 12px;">إلغاء الفلتر</button>
                 </div>
@@ -144,7 +144,7 @@
             <div class="container">
                 <h2>طلبات جاري توصيلها عبر شركاء الشحن 🚚</h2>
                 <div class="search-filter-box">
-                    <input type="text" id="search-input-shipping" placeholder="🔍 بحث بالاسم، الهاتف، الولاية..." onkeyup="filterOrdersList('shipping')">
+                    <input type="text" id="search-input-shipping" placeholder="🔍 بحث..." onkeyup="filterOrdersList('shipping')">
                     <input type="date" id="date-filter-shipping" onchange="filterOrdersList('shipping')">
                     <button onclick="resetFilters('shipping')" class="btn-secondary" style="width:auto; padding:8px 12px;">إلغاء الفلتر</button>
                 </div>
@@ -156,7 +156,7 @@
             <div class="container">
                 <h2>أرشيف الطلبات المسلمة والمؤكدة بنجاح ✅</h2>
                 <div class="search-filter-box">
-                    <input type="text" id="search-input-archive" placeholder="🔍 بحث بالاسم، الهاتف، الولاية..." onkeyup="filterOrdersList('archive')">
+                    <input type="text" id="search-input-archive" placeholder="🔍 بحث..." onkeyup="filterOrdersList('archive')">
                     <input type="date" id="date-filter-archive" onchange="filterOrdersList('archive')">
                     <button onclick="resetFilters('archive')" class="btn-secondary" style="width:auto; padding:8px 12px;">إلغاء الفلتر</button>
                 </div>
@@ -168,7 +168,7 @@
             <div class="container">
                 <h2>قائمة المرتجعات (الروتور) ⚠️</h2>
                 <div class="search-filter-box">
-                    <input type="text" id="search-input-return" placeholder="🔍 بحث بالاسم، الهاتف، الولاية..." onkeyup="filterOrdersList('return')">
+                    <input type="text" id="search-input-return" placeholder="🔍 بحث..." onkeyup="filterOrdersList('return')">
                     <input type="date" id="date-filter-return" onchange="filterOrdersList('return')">
                     <button onclick="resetFilters('return')" class="btn-secondary" style="width:auto; padding:8px 12px;">إلغاء الفلتر</button>
                 </div>
@@ -192,15 +192,14 @@
 
         <div id="wilaya-report-tab" class="tab-content">
             <div class="container">
-                <h2>📍 تقرير توزيع الطلبات حسب الولايات وأماكن التوصيل</h2>
+                <h2>📍 تقرير توزيع الطلبات حسب الولايات</h2>
                 <div id="wilaya-report-content">جاري تجهيز التقرير...</div>
             </div>
         </div>
 
-        <!-- قسم التحليلات والأرباح المتاح للأفراد حسب الصلاحية -->
         <div id="analytics-tab" class="tab-content">
             <div class="container">
-                <h2>💰 التحليلات المالية، الأرباح، وخسائر الروتور</h2>
+                <h2>💰 التحليلات المالية والأرباح</h2>
                 <div class="search-filter-box" style="background:#e2e8f0; border-color:#cbd5e1;">
                     <label style="align-self: center; margin:0;">📅 فلتر التحليلات حسب التاريخ:</label>
                     <input type="date" id="analytics-date-filter" onchange="filterAnalyticsByDate()" style="max-width:250px;">
@@ -241,32 +240,27 @@
             </div>
         </div>
 
-        <!-- تبويب الفريق والصلاحيات لكل فرد عبر مربعات الاختيار -->
         <div id="staff-tab" class="tab-content">
             <div class="container" style="border: 2px solid #7c3aed;">
                 <h2 style="color: #7c3aed;">👥 إدارة الأفراد وتحديد الصلاحيات الفردية</h2>
-                <p style="color:#64748b; font-size:13px;">اختر اسم الموظف أو أنشئ حساباً جديداً، ثم ضع علامة صح (✓) على الصلاحيات التي تريد إضافتها لملفه الشخصي:</p>
-                
                 <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:20px;">
                     <h3>➕ إنشاء أو تعديل ملف موظف</h3>
                     <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="staff-username" placeholder="مثال: employé1"></div>
-                    <div class="form-group"><label>كلمة المرور:</label><input type="password" id="staff-password" placeholder="كلمة المرور الخاصة به"></div>
-                    
+                    <div class="form-group"><label>كلمة المرور:</label><input type="password" id="staff-password" placeholder="كلمة المرور"></div>
                     <div style="margin: 15px 0;">
                         <label><b>حدد الصلاحيات الخاصة بهذا الفرد (علّم بـ ✓):</b></label>
                         <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:10px; margin-top:10px;">
-                            <label><input type="checkbox" class="perm-chk" value="orders-tab"> الطلبات (الجديدة، المعالجة، الشحن، الأرشيف، الروتور، الوهمية، المهملات)</label>
-                            <label><input type="checkbox" class="perm-chk" value="wilaya-report-tab"> تقرير الولايات والتوصيل</label>
-                            <label><input type="checkbox" class="perm-chk" value="analytics-tab"> التحليلات والأرباح الكاملة</label>
+                            <label><input type="checkbox" class="perm-chk" value="orders-tab"> الطلبات</label>
+                            <label><input type="checkbox" class="perm-chk" value="wilaya-report-tab"> تقرير الولايات</label>
+                            <label><input type="checkbox" class="perm-chk" value="analytics-tab"> التحليلات والأرباح</label>
                             <label><input type="checkbox" class="perm-chk" value="reviews-tab"> التعليقات والتقييمات</label>
-                            <label><input type="checkbox" class="perm-chk" value="add-product-tab"> إضافة منتجات جديدة</label>
-                            <label><input type="checkbox" class="perm-chk" value="manage-products-tab"> إدارة وتعديل المنتجات</label>
+                            <label><input type="checkbox" class="perm-chk" value="add-product-tab"> إضافة منتجات</label>
+                            <label><input type="checkbox" class="perm-chk" value="manage-products-tab"> إدارة المنتجات</label>
                         </div>
                     </div>
                     <button onclick="saveStaffMember()" class="btn-secondary" style="background:#7c3aed;">حفظ ملف الصلاحيات للفرد 💾</button>
                 </div>
-
-                <h3>قائمة الأفراد والموظفين المسجلين:</h3>
+                <h3>قائمة الموظفين المسجلين:</h3>
                 <div id="staff-list-container">جاري التحميل...</div>
             </div>
         </div>
@@ -275,28 +269,21 @@
             <div class="container">
                 <h2>إضافة منتج جديد للمتجر ➕</h2>
                 <div class="form-group"><label>اسم المنتج:</label><input type="text" id="prod-name"></div>
-                <div class="form-group"><label>سعر الشراء (التكلفة الأساسية دج):</label><input type="number" id="prod-buy-price" oninput="calculateMarginPreview()"></div>
-                <div class="form-group"><label>سعر البيع للزبون (دج):</label><input type="number" id="prod-price" oninput="calculateMarginPreview()"></div>
+                <div class="form-group"><label>سعر الشراء (التكلفة دج):</label><input type="number" id="prod-buy-price" oninput="calculateMarginPreview()"></div>
+                <div class="form-group"><label>سعر البيع (دج):</label><input type="number" id="prod-price" oninput="calculateMarginPreview()"></div>
                 <div style="background:#e0f2fe; padding:10px; border-radius:6px; margin-bottom:15px; font-size:14px; color:#0369a1;">
-                    <b>💡 هامش الربح المتوقع للقطعة الواحدة:</b> <span id="margin-preview" style="font-weight:bold; font-size:16px;">0</span> دج
+                    <b>💡 هامش الربح للقطعة:</b> <span id="margin-preview" style="font-weight:bold; font-size:16px;">0</span> دج
                 </div>
                 <div class="form-group"><label>الكمية في المخزون:</label><input type="number" id="prod-stock"></div>
                 <div class="form-group"><label>الحد الأقصى للطلب:</label><input type="number" id="prod-max-limit" placeholder="99"></div>
-                <div class="form-group"><label>التصنيف:</label><input type="text" id="prod-category-new" placeholder="أدخل التصنيف"></div>
+                <div class="form-group"><label>التصنيف:</label><input type="text" id="prod-category-new" placeholder="التصنيف"></div>
                 <div class="form-group">
                     <label>روابط الصور:</label>
                     <div id="image-inputs-container">
                         <div class="image-input-row">
-                            <input type="text" class="image-url-input" placeholder="https://i.postimg.cc/...">
+                            <input type="text" class="image-url-input" placeholder="https://...">
                             <button type="button" class="btn-add-img" onclick="addImageInput()">＋</button>
                         </div>
-                    </div>
-                </div>
-                <div style="background: #fdf2f8; padding: 15px; border-radius: 8px; border: 1px dashed #f472b6; margin-bottom: 15px;">
-                    <label><input type="checkbox" id="prod-is-special" onchange="document.getElementById('special-options').style.display = this.checked ? 'block' : 'none'"> <b>🔥 عرض خاص</b></label>
-                    <div id="special-options" style="display:none; margin-top:10px;">
-                        <input type="number" id="prod-promo-price" placeholder="سعر التخفيض">
-                        <label style="margin-top:8px;"><input type="checkbox" id="prod-free-shipping"> توصيل مجاني</label>
                     </div>
                 </div>
                 <button onclick="addProduct()">نشر المنتج 🚀</button>
@@ -382,6 +369,7 @@
 
             let actionsHtml = '';
             const status = o.status || 'جديد ⏳';
+            const currentUser = sessionStorage.getItem('ecom_logged_user');
 
             if(status.includes('مهملات')) {
                 actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'جديد ⏳')" class="btn-warning">استرجاع الطلب ♻️</button>`;
@@ -403,7 +391,14 @@
                 } else {
                     actionsHtml = `<span style="color:#64748b; font-weight:bold;">الطلب مكتمل نهائياً</span>`;
                 }
-                actionsHtml += `<button onclick="moveToTrash('${o.id}')" class="btn-danger" style="background:#64748b; margin-right:5px;">حذف 🗑️</button>`;
+
+                // شرط إظهار زر الحذف: حصرياً في "الطلبات الجديدة" أو "الأرشيف"، وفقط للأدمن الرئيسي (admin) وليس للأفراد
+                let isNewOrder = status.includes('جديد');
+                let isArchiveOrder = status.includes('مسلم') || status.includes('مؤكد');
+
+                if (currentUser === 'admin' && (isNewOrder || isArchiveOrder)) {
+                    actionsHtml += `<button onclick="moveToTrash('${o.id}')" class="btn-danger" style="background:#64748b; margin-right:5px;">حذف 🗑️</button>`;
+                }
             }
 
             document.getElementById('orderModalActions').innerHTML = actionsHtml;
@@ -460,15 +455,10 @@
             loadStaffList();
         }
 
-        // تطبيق صلاحيات الفرد المحددة في ملفه
         function applyPermissions(user) {
             let permissions = JSON.parse(sessionStorage.getItem('ecom_permissions')) || [];
-            if(user === 'admin' || permissions.includes('all')) return; // الأدمن يرى كل شيء
+            if(user === 'admin' || permissions.includes('all')) return;
 
-            // قائمة التبويبات التابعة لصلاحية الطلبات
-            const orderTabs = ['orders-tab', 'processing-tab', 'shipping-tab', 'archive-tab', 'return-tab', 'fake-tab', 'trash-tab'];
-
-            // إخفاء الأزرار غير الممنوحة في ملف الفرد
             const allTabsMap = {
                 'orders-tab': ['btn-orders-tab', 'btn-processing-tab', 'btn-shipping-tab', 'btn-archive-tab', 'btn-return-tab', 'btn-fake-tab', 'btn-trash-tab'],
                 'wilaya-report-tab': ['btn-wilaya-report-tab'],
@@ -487,7 +477,6 @@
                 }
             }
 
-            // فتح أول تبويب متاح للموظف تلقائياً
             let opened = false;
             for(let p of permissions) {
                 if(p === 'orders-tab') {
@@ -518,7 +507,7 @@
             staffList[u] = { password: p, permissions: selectedPerms };
             localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
 
-            showAlert('نجاح', `تم حفظ صلاحيات الفرد (${u}) في ملفه بنجاح!`);
+            showAlert('نجاح', `تم حفظ ملف الصلاحيات للفرد (${u}) بنجاح!`);
             document.getElementById('staff-username').value = '';
             document.getElementById('staff-password').value = '';
             document.querySelectorAll('.perm-chk').forEach(c => c.checked = false);
@@ -534,7 +523,7 @@
                 html += `
                     <div style="background:#fff; padding:10px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <b>👤 الفرد / الموظف:</b> ${u} <br>
+                            <b>👤 الفرد:</b> ${u} <br>
                             <span style="font-size:12px; color:#64748b;">الصلاحيات المفعلة بـ (✓): ${staffList[u].permissions.join(', ')}</span>
                         </div>
                         <button onclick="deleteStaff('${u}')" class="btn-danger" style="padding:6px 10px; font-size:12px;">حذف 🗑️</button>
@@ -568,25 +557,15 @@
             const stock = Number(document.getElementById('prod-stock').value) || 0;
             const maxLimit = Number(document.getElementById('prod-max-limit').value) || 99;
             const category = document.getElementById('prod-category-new').value.trim() || 'عام';
-            const isSpecialOffer = document.getElementById('prod-is-special').checked;
-            const promoPrice = isSpecialOffer ? Number(document.getElementById('prod-promo-price').value) : null;
-            const freeShipping = isSpecialOffer ? document.getElementById('prod-free-shipping').checked : false;
-
             let imageUrls = [];
             document.querySelectorAll('.image-url-input').forEach(i => { if(i.value.trim()) imageUrls.push(i.value.trim()); });
 
             if(!name || !price || !stock) { showAlert('تنبيه', 'الرجاء ملء الحقول الرئيسية!'); return; }
-
             let profitMargin = price - buyPrice;
 
             try {
-                await addDoc(collection(db, "products"), { name, buyPrice, price, profitMargin, stock, maxLimit, category, isSpecialOffer, promoPrice, freeShipping, imageUrls, reviews: [], createdAt: new Date() });
+                await addDoc(collection(db, "products"), { name, buyPrice, price, profitMargin, stock, maxLimit, category, imageUrls, reviews: [], createdAt: new Date() });
                 showAlert('نجاح', `تم إضافة المنتج "${name}" بنجاح!`);
-                document.getElementById('prod-name').value = '';
-                document.getElementById('prod-buy-price').value = '';
-                document.getElementById('prod-price').value = '';
-                document.getElementById('prod-stock').value = '';
-                document.getElementById('margin-preview').innerText = '0';
                 await loadProductsMap();
                 loadProducts();
             } catch(e) { showAlert('خطأ', 'فشل في نشر المنتج.'); }
@@ -622,7 +601,6 @@
                 const snap = await getDocs(collection(db, "orders"));
                 allFetchedOrders = [];
                 ordersCache = {};
-
                 let phoneCounts = {};
 
                 snap.forEach(d => {
@@ -643,10 +621,6 @@
                     }
                 });
 
-                if(fakeDetected) {
-                    showAlert('تنبيه أمني 🚨', 'تم رصد طلبات متكررة وتم تحويلها لقسم الطلبات الوهمية!');
-                }
-
                 renderOrdersFiltered(allFetchedOrders);
                 generateWilayaReport(allFetchedOrders);
                 updateAnalyticsData(allFetchedOrders);
@@ -655,65 +629,36 @@
 
         function generateWilayaReport(orders) {
             let wilayaMap = {};
-
             orders.forEach(o => {
                 let status = o.status || '';
                 if(status.includes('مهملات')) return;
-
                 let w = o.wilaya || 'غير محددة';
                 let isHome = o.deliveryType && o.deliveryType.includes('المنزل');
-
                 if(!wilayaMap[w]) wilayaMap[w] = { home: 0, desk: 0, total: 0 };
                 if(isHome) wilayaMap[w].home++; else wilayaMap[w].desk++;
                 wilayaMap[w].total++;
             });
 
-            let html = `
-                <table class="wilaya-table">
-                    <thead>
-                        <tr>
-                            <th>الولاية</th>
-                            <th>🏠 توصيل للمنزل</th>
-                            <th>🏢 توصيل للمكتب</th>
-                            <th>📦 إجمالي الطلبات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
+            let html = `<table class="wilaya-table"><thead><tr><th>الولاية</th><th>🏠 المنزل</th><th>🏢 المكتب</th><th>📦 الإجمالي</th></tr></thead><tbody>`;
             let hasData = false;
             for(let w in wilayaMap) {
                 hasData = true;
-                html += `
-                    <tr>
-                        <td><b>${w}</b></td>
-                        <td style="color:#059669; font-weight:bold;">${wilayaMap[w].home} طلب</td>
-                        <td style="color:#2563eb; font-weight:bold;">${wilayaMap[w].desk} طلب</td>
-                        <td><span style="background:#e2e8f0; padding:4px 8px; border-radius:4px; font-weight:bold;">${wilayaMap[w].total}</span></td>
-                    </tr>
-                `;
+                html += `<tr><td><b>${w}</b></td><td style="color:#059669; font-weight:bold;">${wilayaMap[w].home}</td><td style="color:#2563eb; font-weight:bold;">${wilayaMap[w].desk}</td><td><b>${wilayaMap[w].total}</b></td></tr>`;
             }
-
-            if(!hasData) html += `<tr><td colspan="4" style="text-align:center; color:#64748b;">لا توجد طلبات مسجلة.</td></tr>`;
+            if(!hasData) html += `<tr><td colspan="4" style="text-align:center;">لا توجد طلبات.</td></tr>`;
             html += `</tbody></table>`;
             document.getElementById('wilaya-report-content').innerHTML = html;
         }
 
         function updateAnalyticsData(orders) {
             const dateFilterVal = document.getElementById('analytics-date-filter').value;
-
-            let totalBuyPrice = 0;
-            let totalSellPrice = 0;
-            let totalProfitFromArchive = 0;
-            let routerLoss = 0;
+            let totalBuyPrice = 0, totalSellPrice = 0, totalProfitFromArchive = 0, routerLoss = 0;
             let dailyProfitsMap = {};
 
             orders.forEach(o => {
                 let status = o.status || '';
                 if(status.includes('مهملات')) return;
-
-                let orderDateStr = '';
-                let orderMonthYear = '';
+                let orderDateStr = '', orderMonthYear = '';
                 if(o.createdAt && o.createdAt.seconds) {
                     let d = new Date(o.createdAt.seconds * 1000);
                     orderDateStr = d.toISOString().split('T')[0];
@@ -724,23 +669,18 @@
 
                 let pData = productsMap[o.productName] || { buyPrice: 0, margin: 0 };
                 let qty = o.quantity || 1;
-                let itemBuyTotal = pData.buyPrice * qty;
-                let itemSellTotal = (o.finalTotal || 0);
-
-                totalBuyPrice += itemBuyTotal;
-                totalSellPrice += itemSellTotal;
+                totalBuyPrice += (pData.buyPrice * qty);
+                totalSellPrice += (o.finalTotal || 0);
 
                 if(status.includes('مسلم') || status.includes('مؤكد')) {
                     let itemProfit = pData.margin * qty;
                     totalProfitFromArchive += itemProfit;
-
                     if(orderDateStr) {
                         if(!dailyProfitsMap[orderDateStr]) dailyProfitsMap[orderDateStr] = { label: orderMonthYear, profit: 0, count: 0 };
                         dailyProfitsMap[orderDateStr].profit += itemProfit;
                         dailyProfitsMap[orderDateStr].count++;
                     }
                 }
-
                 if(status.includes('مرتجع') || status.includes('روتور')) {
                     routerLoss += (o.shippingCost || 600);
                 }
@@ -753,26 +693,11 @@
 
             let dailyHtml = '';
             let sortedDates = Object.keys(dailyProfitsMap).sort().reverse();
-            if(sortedDates.length > 0) {
-                sortedDates.forEach(dateKey => {
-                    let item = dailyProfitsMap[dateKey];
-                    dailyHtml += `📅 <b>${item.label} (${dateKey}):</b> تم تحقيق <span style="color:#059669; font-weight:bold;">${item.profit} دج</span> أرباح من (${item.count}) طلبات مكتملة.<br>`;
-                });
-            } else {
-                dailyHtml = 'لا توجد أرباح مسجلة ضمن هذا التاريخ.';
-            }
-            document.getElementById('daily-profits-list').innerHTML = dailyHtml;
-
-            let summaryHtml = `
-                <h3>📊 ملخص الأداء المالي:</h3>
-                <ul>
-                    <li>إجمالي الأرباح الصافية المحققة (من الأرشيف فقط): <b style="color:#059669;">${totalProfitFromArchive} دج</b></li>
-                    <li>إجمالي تكلفة المشتريات (الشراء): <b>${totalBuyPrice} دج</b></li>
-                    <li>إجمالي المبيعات المحتملة/الفعلية: <b>${totalSellPrice} دج</b></li>
-                    <li>إجمالي الخسائر من طلبات الروتور: <b style="color:#dc2626;">${routerLoss} دج</b></li>
-                </ul>
-            `;
-            document.getElementById('analytics-summary').innerHTML = summaryHtml;
+            sortedDates.forEach(dateKey => {
+                let item = dailyProfitsMap[dateKey];
+                dailyHtml += `📅 <b>${item.label} (${dateKey}):</b> أرباح <span style="color:#059669; font-weight:bold;">${item.profit} دج</span> من (${item.count}) طلبات.<br>`;
+            });
+            document.getElementById('daily-profits-list').innerHTML = dailyHtml !== '' ? dailyHtml : 'لا توجد أرباح ضمن هذا التاريخ.';
         }
 
         window.filterAnalyticsByDate = function() { updateAnalyticsData(allFetchedOrders); }
@@ -792,116 +717,62 @@
 
             newDiv.innerHTML = procDiv.innerHTML = shipDiv.innerHTML = archDiv.innerHTML = retDiv.innerHTML = fakeDiv.innerHTML = trashDiv.innerHTML = '';
 
-            const txtNew = document.getElementById('search-input-new').value.toLowerCase();
-            const dateNew = document.getElementById('date-filter-new').value;
-
-            const txtProc = document.getElementById('search-input-processing').value.toLowerCase();
-            const dateProc = document.getElementById('date-filter-processing').value;
-
-            const txtShip = document.getElementById('search-input-shipping').value.toLowerCase();
-            const dateShip = document.getElementById('date-filter-shipping').value;
-
-            const txtArch = document.getElementById('search-input-archive').value.toLowerCase();
-            const dateArch = document.getElementById('date-filter-archive').value;
-
-            const txtRet = document.getElementById('search-input-return').value.toLowerCase();
-            const dateRet = document.getElementById('date-filter-return').value;
-
             orders.forEach(o => {
                 const status = o.status || 'جديد ⏳';
                 const productData = productsMap[o.productName] || { img: 'https://via.placeholder.com/50' };
-                const thumbUrl = productData.img;
-                
-                let orderDateStr = '';
-                if(o.createdAt && o.createdAt.seconds) {
-                    let d = new Date(o.createdAt.seconds * 1000);
-                    orderDateStr = d.toISOString().split('T')[0];
-                }
-
                 let isFake = status.includes('وهمي');
                 let isTrash = status.includes('مهملات');
                 let cardClass = isFake ? 'order-mini-card fake-warning' : 'order-mini-card';
 
                 let miniCardHtml = `
                     <div class="${cardClass}" onclick="openOrderModal('${o.id}')">
-                        <img src="${thumbUrl}" class="order-mini-thumb">
+                        <img src="${productData.img}" class="order-mini-thumb">
                         <div>
                             <h4>👤 ${o.fullName} ${isFake ? '🚨(وهمي)' : ''}</h4>
                             <p><b>الهاتف:</b> ${o.phone}</p>
-                            <p><b>الولاية:</b> ${o.wilaya} (${o.deliveryType || 'منزل'})</p>
+                            <p><b>الولاية:</b> ${o.wilaya}</p>
                             <p style="color:#ef4444; font-weight:bold;">${o.finalTotal || 0} دج</p>
                         </div>
                     </div>
                 `;
 
-                const matchSearch = (term, dateVal) => {
-                    let matchesTxt = `${o.fullName} ${o.phone} ${o.wilaya} ${o.commune} ${o.productName}`.toLowerCase().includes(term);
-                    let matchesDate = !dateVal || orderDateStr === dateVal;
-                    return matchesTxt && matchesDate;
-                };
-
-                if(isTrash) {
-                    trashDiv.innerHTML += miniCardHtml;
-                } else if(isFake) {
-                    fakeDiv.innerHTML += miniCardHtml;
-                } else if(status.includes('جديد') && matchSearch(txtNew, dateNew)) {
-                    newDiv.innerHTML += miniCardHtml;
-                } else if(status.includes('المعالجة') && matchSearch(txtProc, dateProc)) {
-                    procDiv.innerHTML += miniCardHtml;
-                } else if(status.includes('التوصيل') && matchSearch(txtShip, dateShip)) {
-                    shipDiv.innerHTML += miniCardHtml;
-                } else if(status.includes('مسلم') && matchSearch(txtArch, dateArch)) {
-                    archDiv.innerHTML += miniCardHtml;
-                } else if(status.includes('مرتجع') && matchSearch(txtRet, dateRet)) {
-                    retDiv.innerHTML += miniCardHtml;
-                }
+                if(isTrash) trashDiv.innerHTML += miniCardHtml;
+                else if(isFake) fakeDiv.innerHTML += miniCardHtml;
+                else if(status.includes('جديد')) newDiv.innerHTML += miniCardHtml;
+                else if(status.includes('المعالجة')) procDiv.innerHTML += miniCardHtml;
+                else if(status.includes('التوصيل')) shipDiv.innerHTML += miniCardHtml;
+                else if(status.includes('مسلم')) archDiv.innerHTML += miniCardHtml;
+                else if(status.includes('مرتجع')) retDiv.innerHTML += miniCardHtml;
             });
 
             if(trashDiv.innerHTML === '') trashDiv.innerHTML = '<p style="color:#64748b; text-align:center;">سلة المهملات فارغة.</p>';
         }
 
         window.filterOrdersList = function(tabKey) { renderOrdersFiltered(allFetchedOrders); }
-        window.resetFilters = function(tabKey) {
-            document.getElementById(`search-input-${tabKey}`).value = '';
-            document.getElementById(`date-filter-${tabKey}`).value = '';
-            renderOrdersFiltered(allFetchedOrders);
-        }
+        window.resetFilters = function(tabKey) { renderOrdersFiltered(allFetchedOrders); }
 
         async function loadAdminReviews() {
             const listDiv = document.getElementById('admin-reviews-list');
             try {
                 const snap = await getDocs(collection(db, "products"));
                 listDiv.innerHTML = '';
-                let totalReviewsCount = 0;
-
                 snap.forEach(d => {
                     const p = d.data();
-                    if(p.reviews && p.reviews.length > 0) {
+                    if(p.reviews) {
                         p.reviews.forEach(r => {
-                            totalReviewsCount++;
-                            let stars = '⭐'.repeat(r.rating);
-                            listDiv.innerHTML += `
-                                <div class="review-admin-card">
-                                    <b>📦 المنتج:</b> <span style="color:#2563eb;">${p.name}</span><br>
-                                    <b>👤 الزبون:</b> ${r.name} | <b>التقييم:</b> ${stars}<br>
-                                    <b>💬 التعليق:</b> ${r.comment}
-                                </div>
-                            `;
+                            listDiv.innerHTML += `<div class="review-admin-card"><b>${p.name}</b> - ${r.name}: ${r.comment}</div>`;
                         });
                     }
                 });
-
-                if(totalReviewsCount === 0) listDiv.innerHTML = '<p style="color:#64748b; text-align:center;">لا توجد تعليقات مسجلة.</p>';
-            } catch(e) { listDiv.innerHTML = '<p style="color:red;">خطأ في تحميل التعليقات.</p>'; }
+            } catch(e) {}
         }
 
         window.updateOrderStatus = async function(id, newStatus) {
             try {
                 await updateDoc(doc(db, "orders", id), { status: newStatus });
                 closeOrderModal();
-                showAlert('تم التحديث', `تم نقل الطلب إلى حالة: (${newStatus}) بنجاح!`);
                 loadAllOrders();
-            } catch(e) { showAlert('خطأ', 'فشل تحديث حالة الطلب.'); }
+            } catch(e) {}
         }
 
         async function loadProducts() {
@@ -910,8 +781,7 @@
             list.innerHTML = '';
             snap.forEach(d => {
                 const p = d.data();
-                let margin = p.profitMargin || (p.price - p.buyPrice || 0);
-                list.innerHTML += `<div class="product-row"><span><b>${p.name}</b> [شراء: ${p.buyPrice || 0} دج | بيع: ${p.price} دج | ربح القطعة: <b style="color:green;">+${margin} دج</b>] - المخزون: ${p.stock}</span></div>`;
+                list.innerHTML += `<div class="product-row"><span><b>${p.name}</b> [سعر: ${p.price} دج]</span></div>`;
             });
         }
     </script>
