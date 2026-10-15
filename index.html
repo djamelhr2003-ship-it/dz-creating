@@ -25,10 +25,10 @@
         .cat-btn.active { background: #2563eb; color: white; }
 
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
-        .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04); cursor: pointer; transition: 0.2s; }
+        .product-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: 0.2s; }
         .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
-        .product-img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; background: #eee; }
-        .product-title { font-size: 15px; font-weight: bold; margin: 8px 0 4px 0; color: #1e293b; }
+        .product-img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; background: #eee; cursor: pointer; }
+        .product-title { font-size: 15px; font-weight: bold; margin: 8px 0 4px 0; color: #1e293b; cursor: pointer; }
         .product-price { color: #e11d48; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
         
         .btn-group { display: flex; gap: 6px; margin-top: 8px; }
@@ -45,26 +45,10 @@
         label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; }
         input, select, textarea { width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 14px; }
 
-        .gold-offer-box {
-            background: linear-gradient(135deg, #fef9c3, #fef08a);
-            border: 2px solid #eab308;
-            border-radius: 8px;
-            padding: 10px 12px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-        }
-        .crossed-old-price { position: relative; color: #64748b; font-weight: bold; font-size: 13px; margin-left: 8px; }
-        .crossed-old-price::after { content: ""; position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background-color: #ef4444; transform: translateY(-50%); }
-        .new-offer-price { color: #16a34a; font-weight: bold; font-size: 15px; }
-
         .rating-stars { color: #f59e0b; font-size: 18px; margin-bottom: 5px; }
         .review-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: flex-start; }
         .variant-pill { display: inline-block; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 3px; cursor: pointer; font-size: 13px; background: #f8fafc; }
         .variant-pill.selected { background: #2563eb; color: white; border-color: #2563eb; }
-        .variant-pill.disabled { opacity: 0.4; text-decoration: line-through; background: #e2e8f0; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -82,7 +66,7 @@
     <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
     <div class="side-drawer" id="sideDrawer">
         <h3 style="margin-top:0; border-bottom:1px solid #374151; padding-bottom:10px;">📌 القائمة الرئيسية</h3>
-        <a href="admin.html" class="drawer-link">🔐 تسجيل</a>
+        <a href="admin.html" class="drawer-link">🔐 تسجيل دخول الأدمن</a>
         <a href="#" id="whatsapp-support-link" target="_blank" class="drawer-link whatsapp">💬 الدعم عبر واتساب</a>
         <button class="drawer-close" onclick="toggleDrawer()">إغلاق ❌</button>
     </div>
@@ -106,102 +90,44 @@
             <div id="modal-product-content"></div>
             
             <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
-            <h4 style="color:#1e293b; margin-bottom:10px;">📦 منتجات أخرى من نفس الصنف:</h4>
-            <div class="products-grid" id="related-products-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
-
-            <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
-            <h4 style="color:#1e293b; margin-bottom:10px;">⭐ التقييمات والتعليقات:</h4>
+            <h4 style="color:#1e293b; margin-bottom:10px;">⭐ التقييمات والتعليقات والرسائل:</h4>
             <div id="reviews-list-container" style="margin-bottom:15px;"></div>
+
+            <!-- نموذج إضافة تعليق أو رسالة جديدة للمنتج -->
+            <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; margin-top:10px;">
+                <h4 style="margin:0 0 8px 0; font-size:13px; color:#1e293b;">أضف تعليقك أو رسالتك حول هذا المنتج:</h4>
+                <div class="form-group" style="margin-bottom:8px;"><input type="text" id="review-user-name" placeholder="اسمك الكريم"></div>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <select id="review-user-rating">
+                        <option value="5">⭐⭐⭐⭐⭐ (ممتاز)</option>
+                        <option value="4">⭐⭐⭐⭐ (جيد جداً)</option>
+                        <option value="3">⭐⭐⭐ (متوسط)</option>
+                        <option value="2">⭐⭐ (ضعيف)</option>
+                        <option value="1">⭐ (سيء)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:8px;"><textarea id="review-user-comment" placeholder="اكتب تعليقك أو رسالتك هنا..." style="height:50px;"></textarea></div>
+                <button onclick="submitUserReview()" style="background:#2563eb; color:white; width:100%; padding:8px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:13px;">إرسال التعليق/الرسالة 💬</button>
+            </div>
 
             <button onclick="document.getElementById('productDetailsModal').style.display='none'" style="margin-top:15px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إغلاق التبويب ❌</button>
         </div>
     </div>
 
+    <!-- نافذة السلة الكبيرة والتفاعلية -->
     <div class="modal-overlay" id="cartModal">
         <div class="modal-card" id="cart-modal-card-content">
-            <h3 style="margin-top:0; color:#1e293b;">🛒 سلة الشراء وإتمام الطلب (الدفع عند الاستلام)</h3>
-            <div id="cart-items-list" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
-
-            <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="order-fullname" placeholder="أدخل اسمك الكامل"></div>
-            <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone" placeholder="07xxxxxxxx"></div>
-            <div class="form-group">
-                <label>الولاية (جميع ولايات الجزائر 58):</label>
-                <select id="order-wilaya" onchange="calculateCartTotal()">
-                    <option value="Adrar">01 - أدرار</option>
-                    <option value="Chlef" selected>02 - الشلف</option>
-                    <option value="Laghouat">03 - الأغواط</option>
-                    <option value="Oum El Bouaghi">04 - أم البواقي</option>
-                    <option value="Batna">05 - باتنة</option>
-                    <option value="Béjaïa">06 - بجاية</option>
-                    <option value="Biskra">07 - بسكرة</option>
-                    <option value="Béchar">08 - بشار</option>
-                    <option value="Blida">09 - البليدة</option>
-                    <option value="Bouira">10 - البويرة</option>
-                    <option value="Tamanrasset">11 - تمنراست</option>
-                    <option value="Tébessa">12 - تبسة</option>
-                    <option value="Tlemcen">13 - تلمسان</option>
-                    <option value="Tiaret">14 - تيارت</option>
-                    <option value="Tizi Ouzou">15 - تيزي وزو</option>
-                    <option value="Algiers">16 - الجزائر العاصمة</option>
-                    <option value="Djelfa">17 - الجلفة</option>
-                    <option value="Jijel">18 - جيجل</option>
-                    <option value="Sétif">19 - سطيف</option>
-                    <option value="Saïda">20 - سعيدة</option>
-                    <option value="Skikda">21 - سكيكدة</option>
-                    <option value="Sidi Bel Abbès">22 - سيدي بلعباس</option>
-                    <option value="Annaba">23 - عنابة</option>
-                    <option value="Guelma">24 - قالمة</option>
-                    <option value="Constantine">25 - قسنطينة</option>
-                    <option value="Médéa">26 - المدية</option>
-                    <option value="Mostaganem">27 - مستغانم</option>
-                    <option value="M'Sila">28 - المسيلة</option>
-                    <option value="Mascara">29 - معسكر</option>
-                    <option value="Ouargla">30 - ورقلة</option>
-                    <option value="Oran">31 - وهران</option>
-                    <option value="El Bayadh">32 - البيض</option>
-                    <option value="Illizi">33 - إليزي</option>
-                    <option value="Bordj Bou Arréridj">34 - برج بوعريريج</option>
-                    <option value="Boumerdès">35 - بومرداس</option>
-                    <option value="El Tarf">36 - الطارف</option>
-                    <option value="Tindouf">37 - تندوف</option>
-                    <option value="Tissemsilt">38 - تيسمسيلت</option>
-                    <option value="El Oued">39 - الوادي</option>
-                    <option value="Khenchela">40 - خنشلة</option>
-                    <option value="Souk Ahras">41 - سوق أهراس</option>
-                    <option value="Tipaza">42 - تيبازة</option>
-                    <option value="Mila">43 - ميلة</option>
-                    <option value="Aïn Defla">44 - عين الدفلى</option>
-                    <option value="Naâma">45 - النعامة</option>
-                    <option value="Aïn Témouchent">46 - عين تموشنت</option>
-                    <option value="Ghardaïa">47 - غرداية</option>
-                    <option value="Relizane">48 - غليزان</option>
-                    <option value="Timimoun">49 - تيميمون</option>
-                    <option value="Bordj Badji Mokhtar">50 - برج باجي مختار</option>
-                    <option value="Ouled Djellal">51 - أولاد جلال</option>
-                    <option value="Béni Abbès">52 - بني عباس</option>
-                    <option value="In Salah">53 - إن صالح</option>
-                    <option value="In Guezzam">54 - إن قزام</option>
-                    <option value="Touggourt">55 - تقرت</option>
-                    <option value="Djanet">56 - جانت</option>
-                    <option value="El M'Ghair">57 - المغير</option>
-                    <option value="El Meniaa">58 - المنيعة</option>
-                </select>
-            </div>
-            <div class="form-group"><label>البلدية / العنوان بالتفصيل:</label><input type="text" id="order-commune" placeholder="اسم البلدية والحي"></div>
-            <div class="form-group">
-                <label>نوع التوصيل:</label>
-                <select id="order-delivery-type" onchange="calculateCartTotal()">
-                    <option value="توصيل للمنزل 🏠">توصيل للمنزل 🏠</option>
-                    <option value="توصيل للمكتب 🏢">توصيل للمكتب (ستوب ديسك) 🏢</option>
-                </select>
+            <h3 style="margin-top:0; color:#1e293b;">🛒 محتويات سلة الشراء</h3>
+            <div id="cart-items-list" style="margin-bottom: 15px; max-height: 250px; overflow-y: auto;"></div>
+            
+            <div style="background:#f1f5f9; padding:10px; border-radius:6px; margin-bottom:15px; font-size:14px; display:flex; justify-content:space-between; align-items:center;">
+                <span>المجموع الجزئي:</span> <b id="cart-subtotal-price" style="color:#1e293b;">0 دج</b>
             </div>
 
-            <div style="background:#f1f5f9; padding:10px; border-radius:6px; margin-bottom:15px; font-size:14px;">
-                <span>💰 المجموع الكلي النهائي (COD):</span> <b id="cart-final-total" style="color:#e11d48; font-size:18px;">0 دج</b>
+            <div style="display:flex; gap:10px;">
+                <button onclick="document.getElementById('cartModal').style.display='none'" style="background:#64748b; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">مواصلة التسوق 🛍️</button>
+                <button onclick="proceedToCheckoutForm()" style="background:#16a34a; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إتمام الطلب 🚀</button>
             </div>
-
-            <button onclick="submitCartOrder()" style="background:#16a34a; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب نهائياً 🚀</button>
-            <button onclick="document.getElementById('cartModal').style.display='none'" style="margin-top:8px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إلغاء ❌</button>
         </div>
     </div>
 
@@ -218,10 +144,6 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             setupWhatsappSupport();
-            let savedName = localStorage.getItem('dz_user_name');
-            let savedPhone = localStorage.getItem('dz_user_phone');
-            if(savedName) document.getElementById('order-fullname').value = savedName;
-            if(savedPhone) document.getElementById('order-phone').value = savedPhone;
             fetchStoreProducts();
         });
 
@@ -240,9 +162,7 @@
         function setupWhatsappSupport() {
             let supportPhone = localStorage.getItem('dz_whatsapp_support') || '213700000000';
             let waLink = document.getElementById('whatsapp-support-link');
-            if(waLink) {
-                waLink.href = `https://wa.me/${supportPhone}?text=مرحباً، أريد الاستفسار عن منتج في المتجر.`;
-            }
+            if(waLink) waLink.href = `https://wa.me/${supportPhone}?text=مرحباً، أريد الاستفسار عن منتج في المتجر.`;
         }
 
         async function fetchStoreProducts() {
@@ -276,15 +196,16 @@
                 let stockVal = p.stock !== undefined ? p.stock : 10;
                 grid.innerHTML += `
                     <div class="product-card">
-                        <div onclick='openProductDetails(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
-                            <img src="${img}" class="product-img">
-                            <h3 class="product-title">${p.name}</h3>
+                        <div>
+                            <img src="${img}" class="product-img" onclick='openProductDetails(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
+                            <h3 class="product-title" onclick='openProductDetails(${JSON.stringify(p).replace(/'/g, "&apos;")})'>${p.name}</h3>
                             <p class="product-price">${p.price} دج</p>
                         </div>
                         <div>
                             <p style="font-size:11px; color:${stockVal > 0 ? 'green':'red'}; margin-bottom:6px;">${stockVal > 0 ? '📦 متوفر' : '❌ نفذت الكمية'}</p>
                             <div class="btn-group">
-                                <button onclick='openProductDetails(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-buy" ${stockVal <= 0 ? 'disabled':''}>اطلب الآن ⚡</button>
+                                <button onclick='addToCartDirect(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-cart" ${stockVal <= 0 ? 'disabled':''}>أضف للسلة 🛒</button>
+                                <button onclick='buyNowDirect(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-buy" ${stockVal <= 0 ? 'disabled':''}>اطلب الآن ⚡</button>
                             </div>
                         </div>
                     </div>
@@ -309,47 +230,15 @@
                 variantsHtml += '<div style="margin:10px 0;">';
                 if(colors.length > 0) {
                     variantsHtml += '<label style="font-size:12px; margin-bottom:5px;">اختر اللون:</label><div id="color-pills-container">';
-                    colors.forEach(c => {
-                        variantsHtml += `<span class="variant-pill" onclick="selectColor('${c}')">${c}</span>`;
-                    });
+                    colors.forEach(c => { variantsHtml += `<span class="variant-pill" onclick="selectColor('${c}')">${c}</span>`; });
                     variantsHtml += '</div>';
                 }
                 if(sizes.length > 0) {
                     variantsHtml += '<label style="font-size:12px; margin:8px 0 5px 0;">اختر المقاس:</label><div id="size-pills-container">';
-                    sizes.forEach(s => {
-                        variantsHtml += `<span class="variant-pill" onclick="selectSize('${s}')">${s}</span>`;
-                    });
+                    sizes.forEach(s => { variantsHtml += `<span class="variant-pill" onclick="selectSize('${s}')">${s}</span>`; });
                     variantsHtml += '</div>';
                 }
                 variantsHtml += '</div>';
-            }
-
-            let offersHtml = '';
-            if(product.enableOffers && product.offers && product.offers.length > 0) {
-                offersHtml += '<h4 style="margin:10px 0 5px 0; color:#b45309; font-size:13px;">🔥 اختر أحد العروض الذهبية:</h4>';
-                offersHtml += `
-                    <label class="gold-offer-box">
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <input type="radio" name="modalOffer" value="base" checked onchange="currentSelectedPrice=${product.price}; updateModalTotal()">
-                            <span><b>السعر العادي الأساسي</b></span>
-                        </div>
-                        <span class="new-offer-price">${product.price} دج</span>
-                    </label>
-                `;
-                product.offers.forEach((offer, i) => {
-                    offersHtml += `
-                        <label class="gold-offer-box">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <input type="radio" name="modalOffer" value="${i}" onchange="currentSelectedPrice=${offer.newPrice}; updateModalTotal()">
-                                <span><b>${offer.title}</b> ✔️</span>
-                            </div>
-                            <div>
-                                <span class="crossed-old-price">${offer.oldPrice} دج</span>
-                                <span class="new-offer-price">${offer.newPrice} دج ✅</span>
-                            </div>
-                        </label>
-                    `;
-                });
             }
 
             let contentHtml = `
@@ -362,7 +251,6 @@
                     </div>
                 </div>
                 ${variantsHtml}
-                ${offersHtml}
                 <div class="qty-container">
                     <span>الكمية:</span>
                     <button class="qty-btn" onclick="changeQty(-1)">-</button>
@@ -370,7 +258,10 @@
                     <button class="qty-btn" onclick="changeQty(1)">+</button>
                 </div>
                 <div style="margin-bottom:10px; font-size:15px;">المجموع الجزئي: <b id="modal-total-price" style="color:#e11d48;">${product.price} دج</b></div>
-                <button onclick="buyCurrentNow()" style="background:#16a34a; color:white; width:100%; padding:12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">اطلب الآن 🚀</button>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="addCurrentToCartFromModal()" style="background:#f59e0b; color:white; flex:1; padding:12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">أضف للسلة 🛒</button>
+                    <button onclick="buyCurrentNowModal()" style="background:#16a34a; color:white; flex:1; padding:12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">اطلب الآن 🚀</button>
+                </div>
             `;
 
             document.getElementById('modal-product-content').innerHTML = contentHtml;
@@ -384,7 +275,6 @@
                 el.classList.remove('selected');
                 if(el.innerText === color) el.classList.add('selected');
             });
-            checkVariantsStock();
         }
 
         window.selectSize = function(size) {
@@ -393,17 +283,6 @@
                 el.classList.remove('selected');
                 if(el.innerText === size) el.classList.add('selected');
             });
-            checkVariantsStock();
-        }
-
-        function checkVariantsStock() {
-            if(!currentOpenedProduct.variants) return;
-            if(selectedColor && selectedSize) {
-                let match = currentOpenedProduct.variants.find(v => v.color === selectedColor && v.size === selectedSize);
-                if(match && match.stock <= 0) {
-                    alert('عذراً، هذا اللون بهذا المقاس غير متوفر حالياً في المخزن!');
-                }
-            }
         }
 
         window.changeQty = function(delta) {
@@ -419,28 +298,33 @@
             document.getElementById('modal-total-price').innerText = total + ' دج';
         }
 
-        window.buyCurrentNow = function() {
-            if(currentOpenedProduct.category === 'الملابس' && currentOpenedProduct.variants && currentOpenedProduct.variants.length > 0) {
-                if(!selectedColor || !selectedSize) {
-                    alert('الرجاء اختيار اللون والمقاس أولاً!');
-                    return;
-                }
-                let match = currentOpenedProduct.variants.find(v => v.color === selectedColor && v.size === selectedSize);
-                if(match && match.stock <= 0) {
-                    alert('عذراً، هذا المنتج بهذا اللون والمقاس غير متوفر حالياً!');
-                    return;
-                }
-            }
+        window.addToCartDirect = function(product) {
+            cart.push({ id: product.id, productName: product.name, price: product.price, quantity: 1, color: '', size: '', imageUrl: product.imageUrls?.[0] || '' });
+            document.getElementById('cart-count').innerText = cart.length;
+            alert(`تمت إضافة (${product.name}) إلى السلة بنجاح! 🛒`);
+        }
 
-            cart = [{ 
-                id: currentOpenedProduct.id, 
-                productName: currentOpenedProduct.name, 
-                price: currentSelectedPrice, 
-                quantity: currentQty,
-                color: selectedColor,
-                size: selectedSize,
-                imageUrl: currentOpenedProduct.imageUrls?.[0] || ''
-            }];
+        window.buyNowDirect = function(product) {
+            cart = [{ id: product.id, productName: product.name, price: product.price, quantity: 1, color: '', size: '', imageUrl: product.imageUrls?.[0] || '' }];
+            document.getElementById('cart-count').innerText = 1;
+            openCartModal();
+        }
+
+        window.addCurrentToCartFromModal = function() {
+            if(currentOpenedProduct.category === 'الملابس' && currentOpenedProduct.variants && currentOpenedProduct.variants.length > 0) {
+                if(!selectedColor || !selectedSize) { alert('الرجاء اختيار اللون والمقاس أولاً!'); return; }
+            }
+            cart.push({ id: currentOpenedProduct.id, productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty, color: selectedColor, size: selectedSize, imageUrl: currentOpenedProduct.imageUrls?.[0] || '' });
+            document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('productDetailsModal').style.display = 'none';
+            alert('تمت إضافة المنتج إلى السلة بنجاح! 🛒');
+        }
+
+        window.buyCurrentNowModal = function() {
+            if(currentOpenedProduct.category === 'الملابس' && currentOpenedProduct.variants && currentOpenedProduct.variants.length > 0) {
+                if(!selectedColor || !selectedSize) { alert('الرجاء اختيار اللون والمقاس أولاً!'); return; }
+            }
+            cart = [{ id: currentOpenedProduct.id, productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty, color: selectedColor, size: selectedSize, imageUrl: currentOpenedProduct.imageUrls?.[0] || '' }];
             document.getElementById('cart-count').innerText = 1;
             document.getElementById('productDetailsModal').style.display = 'none';
             openCartModal();
@@ -451,19 +335,54 @@
                 alert('سلة الشراء فارغة حالياً!');
                 return;
             }
-            renderCartModalForm();
+            renderCartModalContent();
+            document.getElementById('cartModal').style.display = 'flex';
         }
 
-        function renderCartModalForm() {
-            let cardHtml = `
-                <h3 style="margin-top:0; color:#1e293b;">🛒 سلة الشراء وإتمام الطلب (الدفع عند الاستلام)</h3>
-                <div id="cart-items-list" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
+        function renderCartModalContent() {
+            let container = document.getElementById('cart-items-list');
+            let subtotal = 0;
+            let html = '';
+            cart.forEach((item, index) => {
+                let itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                let variantInfo = (item.color || item.size) ? ` [اللون: ${item.color || '-'} | المقاس: ${item.size || '-'}]` : '';
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:10px; border-radius:6px; margin-bottom:8px; font-size:13px;">
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <img src="${item.imageUrl}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
+                            <div>
+                                <b>${item.productName}</b>${variantInfo}<br>
+                                <span style="color:#e11d48; font-weight:bold;">${item.price} دج × ${item.quantity} = ${itemTotal} دج</span>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${index})" style="background:#ef4444; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:12px;">حذف 🗑️</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            document.getElementById('cart-subtotal-price').innerText = subtotal + ' دج';
+        }
 
+        window.removeFromCart = function(index) {
+            cart.splice(index, 1);
+            document.getElementById('cart-count').innerText = cart.length;
+            if(cart.length === 0) {
+                document.getElementById('cartModal').style.display = 'none';
+            } else {
+                renderCartModalContent();
+            }
+        }
+
+        window.proceedToCheckoutForm = function() {
+            let cardModalContent = document.getElementById('cart-modal-card-content');
+            cardModalContent.innerHTML = `
+                <h3 style="margin-top:0; color:#1e293b;">🛒 إتمام الطلب (الدفع عند الاستلام)</h3>
                 <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="order-fullname" placeholder="أدخل اسمك الكامل"></div>
                 <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone" placeholder="07xxxxxxxx"></div>
                 <div class="form-group">
-                    <label>الولاية (جميع ولايات الجزائر 58):</label>
-                    <select id="order-wilaya" onchange="calculateCartTotal()">
+                    <label>الولاية (58 ولاية):</label>
+                    <select id="order-wilaya" onchange="calcCheckoutTotal()">
                         <option value="Adrar">01 - أدرار</option>
                         <option value="Chlef" selected>02 - الشلف</option>
                         <option value="Laghouat">03 - الأغواط</option>
@@ -527,60 +446,28 @@
                 <div class="form-group"><label>البلدية / العنوان بالتفصيل:</label><input type="text" id="order-commune" placeholder="اسم البلدية والحي"></div>
                 <div class="form-group">
                     <label>نوع التوصيل:</label>
-                    <select id="order-delivery-type" onchange="calculateCartTotal()">
+                    <select id="order-delivery-type" onchange="calcCheckoutTotal()">
                         <option value="توصيل للمنزل 🏠">توصيل للمنزل 🏠</option>
                         <option value="توصيل للمكتب 🏢">توصيل للمكتب (ستوب ديسك) 🏢</option>
                     </select>
                 </div>
 
                 <div style="background:#f1f5f9; padding:10px; border-radius:6px; margin-bottom:15px; font-size:14px;">
-                    <span>💰 المجموع الكلي النهائي (COD):</span> <b id="cart-final-total" style="color:#e11d48; font-size:18px;">0 دج</b>
+                    <span>💰 المجموع الكلي النهائي (COD):</span> <b id="checkout-final-total" style="color:#e11d48; font-size:18px;">0 دج</b>
                 </div>
 
                 <button onclick="submitCartOrder()" style="background:#16a34a; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب نهائياً 🚀</button>
-                <button onclick="document.getElementById('cartModal').style.display='none'" style="margin-top:8px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إلغاء ❌</button>
+                <button onclick="openCartModal()" style="margin-top:8px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">العودة للسلة 🔙</button>
             `;
-            document.getElementById('cart-modal-card-content').innerHTML = cardHtml;
-            
-            let savedName = localStorage.getItem('dz_user_name');
-            let savedPhone = localStorage.getItem('dz_user_phone');
-            if(savedName) document.getElementById('order-fullname').value = savedName;
-            if(savedPhone) document.getElementById('order-phone').value = savedPhone;
-
-            renderCartItems();
-            calculateCartTotal();
-            document.getElementById('cartModal').style.display = 'flex';
+            calcCheckoutTotal();
         }
 
-        function renderCartItems() {
-            let container = document.getElementById('cart-items-list');
-            if(!container) return;
-            let html = '';
-            cart.forEach((item, index) => {
-                let variantInfo = (item.color || item.size) ? ` [اللون: ${item.color || '-'} | المقاس: ${item.size || '-'}]` : '';
-                html += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:8px; border-radius:6px; margin-bottom:5px; font-size:13px;">
-                        <span><b>${item.productName}</b>${variantInfo} (×${item.quantity}) - ${item.price * item.quantity} دج</span>
-                        <button onclick="removeFromCart(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">حذف</button>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        window.removeFromCart = function(index) {
-            cart.splice(index, 1);
-            document.getElementById('cart-count').innerText = cart.length;
-            if(cart.length === 0) document.getElementById('cartModal').style.display = 'none';
-            else { renderCartItems(); calculateCartTotal(); }
-        }
-
-        window.calculateCartTotal = function() {
+        window.calcCheckoutTotal = function() {
             let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             let deliveryType = document.getElementById('order-delivery-type')?.value || '';
             let deliveryFee = deliveryType.includes('منزل') ? 600 : 400;
             let total = subtotal + deliveryFee;
-            let totalEl = document.getElementById('cart-final-total');
+            let totalEl = document.getElementById('checkout-final-total');
             if(totalEl) totalEl.innerText = total + ' دج';
         }
 
@@ -595,9 +482,6 @@
                 alert('الرجاء تعبئة الاسم، رقم الهاتف، والعنوان بالتفصيل!');
                 return;
             }
-
-            localStorage.setItem('dz_user_name', fullName);
-            localStorage.setItem('dz_user_phone', phone);
 
             let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             let deliveryFee = deliveryType.includes('منزل') ? 600 : 400;
@@ -641,11 +525,11 @@
             let visibleReviews = reviews.filter(r => !r.hidden);
 
             if(visibleReviews.length === 0) {
-                container.innerHTML = '<p style="font-size:12px; color:#64748b;">لا توجد تعليقات ظاهرة بعد لهذا المنتج.</p>';
+                container.innerHTML = '<p style="font-size:12px; color:#64748b;">لا توجد تعليقات أو رسائل ظاهرة بعد لهذا المنتج.</p>';
                 return;
             }
             let html = '';
-            reviews.forEach((r, originalIndex) => {
+            reviews.forEach((r) => {
                 if(r.hidden) return;
                 let stars = '⭐'.repeat(Number(r.rating));
                 html += `
@@ -662,6 +546,35 @@
                 `;
             });
             container.innerHTML = html;
+        }
+
+        window.submitUserReview = function() {
+            if(!currentOpenedProduct) return;
+            let name = document.getElementById('review-user-name').value.trim();
+            let rating = document.getElementById('review-user-rating').value;
+            let comment = document.getElementById('review-user-comment').value.trim();
+
+            if(!name || !comment) {
+                alert('الرجاء إدخال الاسم ومحتوى التعليق/الرسالة!');
+                return;
+            }
+
+            let reviewsKey = `dz_reviews_${currentOpenedProduct.id}`;
+            let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+            
+            reviews.push({
+                name,
+                rating,
+                comment,
+                date: new Date().toLocaleDateString('ar-DZ'),
+                hidden: false
+            });
+
+            localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+            document.getElementById('review-user-name').value = '';
+            document.getElementById('review-user-comment').value = '';
+            alert('تم إرسال تعليقك/رسالتك بنجاح! شكراً لك.');
+            renderReviews(currentOpenedProduct.id);
         }
     </script>
 </body>
