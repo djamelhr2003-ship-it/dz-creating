@@ -125,6 +125,7 @@
         </div>
     </div>
 
+    <!-- نافذة السلة الكبيرة أو خيار ما بعد الإضافة -->
     <div class="modal-overlay" id="cartModal">
         <div class="modal-card" id="cart-modal-card-content">
             <h3 style="margin-top:0; color:#1e293b;">🛒 محتويات سلة الشراء</h3>
@@ -221,6 +222,11 @@
             products.forEach(p => {
                 let img = p.imageUrls?.[0] || 'https://via.placeholder.com/200';
                 let stockVal = p.stock !== undefined ? p.stock : 10;
+                
+                // حساب عدد القطع الموجودة في السلة لهذا المنتج لعرضه في الواجهة الأولى
+                let existingCartItem = cart.find(item => item.id === p.id);
+                let cartQtyText = existingCartItem ? ` (في السلة: ${existingCartItem.quantity})` : '';
+
                 grid.innerHTML += `
                     <div class="product-card">
                         <div>
@@ -231,7 +237,7 @@
                         <div>
                             <p style="font-size:11px; color:${stockVal > 0 ? 'green':'red'}; margin-bottom:6px;">${stockVal > 0 ? '📦 متوفر' : '❌ نفذت الكمية'}</p>
                             <div class="btn-group">
-                                <button onclick='addToCartDirect(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-cart" ${stockVal <= 0 ? 'disabled':''}>أضف للسلة 🛒</button>
+                                <button onclick='addToCartDirect(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-cart" ${stockVal <= 0 ? 'disabled':''}>أضف للسلة 🛒${cartQtyText}</button>
                                 <button onclick='buyNowDirect(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-buy" ${stockVal <= 0 ? 'disabled':''}>اطلب الآن ⚡</button>
                             </div>
                         </div>
@@ -356,9 +362,15 @@
         }
 
         window.addToCartDirect = function(product) {
-            cart.push({ id: product.id, productName: product.name, price: product.price, quantity: 1, color: '', size: '', imageUrl: product.imageUrls?.[0] || '' });
-            document.getElementById('cart-count').innerText = cart.length;
-            alert(`تمت إضافة (${product.name}) إلى السلة بنجاح! 🛒`);
+            let existing = cart.find(item => item.id === product.id);
+            if(existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ id: product.id, productName: product.name, price: product.price, quantity: 1, color: '', size: '', imageUrl: product.imageUrls?.[0] || '' });
+            }
+            document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
+            renderProducts(allProducts);
+            showPostAddModal();
         }
 
         window.buyNowDirect = function(product) {
@@ -372,9 +384,10 @@
                 if(!selectedColor || !selectedSize) { alert('الرجاء اختيار اللون والمقاس أولاً!'); return; }
             }
             cart.push({ id: currentOpenedProduct.id, productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty, color: selectedColor, size: selectedSize, imageUrl: currentOpenedProduct.imageUrls?.[0] || '' });
-            document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
             document.getElementById('productDetailsModal').style.display = 'none';
-            alert('تمت إضافة المنتج إلى السلة بنجاح! 🛒');
+            renderProducts(allProducts);
+            showPostAddModal();
         }
 
         window.buyCurrentNowModal = function() {
@@ -382,9 +395,25 @@
                 if(!selectedColor || !selectedSize) { alert('الرجاء اختيار اللون والمقاس أولاً!'); return; }
             }
             cart = [{ id: currentOpenedProduct.id, productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty, color: selectedColor, size: selectedSize, imageUrl: currentOpenedProduct.imageUrls?.[0] || '' }];
-            document.getElementById('cart-count').innerText = 1;
+            document.getElementById('cart-count').innerText = currentQty;
             document.getElementById('productDetailsModal').style.display = 'none';
             openCartModal();
+        }
+
+        // نافذة تخيير الزبون بعد الإضافة إلى السلة
+        function showPostAddModal() {
+            let cardModalContent = document.getElementById('cart-modal-card-content');
+            cardModalContent.innerHTML = `
+                <div style="text-align:center; padding:15px;">
+                    <h3 style="color:#2563eb; margin-top:0;">🛒 تمت الإضافة إلى السلة بنجاح!</h3>
+                    <p style="font-size:14px; color:#555; margin-bottom:20px;">ماذا ترغب أن تفعل الآن؟</p>
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="document.getElementById('cartModal').style.display='none'" style="background:#64748b; flex:1; padding:12px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">بقاء للتسوق 🛍️</button>
+                        <button onclick="openCartModal()" style="background:#16a34a; flex:1; padding:12px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إكمال الطلب في السلة 🚀</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('cartModal').style.display = 'flex';
         }
 
         window.openCartModal = function() {
@@ -417,13 +446,23 @@
                     </div>
                 `;
             });
-            container.innerHTML = html;
-            document.getElementById('cart-subtotal-price').innerText = subtotal + ' دج';
+            container.innerHTML = `
+                <h3 style="margin-top:0; color:#1e293b;">🛒 محتويات سلة الشراء</h3>
+                <div style="margin-bottom: 15px; max-height: 250px; overflow-y: auto;">${html}</div>
+                <div style="background:#f1f5f9; padding:10px; border-radius:6px; margin-bottom:15px; font-size:14px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>المجموع الجزئي:</span> <b id="cart-subtotal-price" style="color:#1e293b;">${subtotal} دج</b>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="document.getElementById('cartModal').style.display='none'" style="background:#64748b; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">مواصلة التسوق 🛍️</button>
+                    <button onclick="proceedToCheckoutForm()" style="background:#16a34a; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إتمام الطلب 🚀</button>
+                </div>
+            `;
         }
 
         window.removeFromCart = function(index) {
             cart.splice(index, 1);
-            document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
+            renderProducts(allProducts);
             if(cart.length === 0) {
                 document.getElementById('cartModal').style.display = 'none';
             } else {
@@ -515,7 +554,7 @@
                 </div>
 
                 <button onclick="submitCartOrder()" style="background:#16a34a; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب نهائياً 🚀</button>
-                <button onclick="document.getElementById('cartModal').style.display='none'" style="margin-top:8px; width:100%; background:#ef4444; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إلغاء الطلب / خروج ❌</button>
+                <button onclick="document.getElementById('cartModal').style.display='none'" style="margin-top:8px; width:100%; background:#ef4444; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إلغاء الطلب / خروج ❌</button>
             `;
             calcCheckoutTotal();
         }
@@ -571,6 +610,7 @@
                 localStorage.setItem('dz_user_has_ordered', 'true');
                 cart = [];
                 document.getElementById('cart-count').innerText = '0';
+                renderProducts(allProducts);
                 
                 let cardModalContent = document.getElementById('cart-modal-card-content');
                 cardModalContent.innerHTML = `
