@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>متجري العالمي - الأصناف والفلاتر والـ COD</title>
+    <title>متجري العالمي - الشامل والعملاق (COD DZ)</title>
     <style>
         :root { --primary: #131921; --secondary: #232f3e; --accent: #febd69; --danger: #b12704; --success: #008060; --bg: #eaeded; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #0f1111; }
@@ -12,11 +12,11 @@
         .logo span { color: var(--accent); }
         .header-actions { display: flex; gap: 10px; align-items: center; }
         .cart-btn { background: var(--success); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .admin-btn { background: #f59e0b; color: white; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; text-align: center; }
+        .admin-btn { background: #f59e0b; color: white; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; }
         
         .container { max-width: 1200px; margin: auto; padding: 20px 15px; }
 
-        /* شريط الأصناف والفلتر */
+        /* شريط الفلاتر والأصناف */
         .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 20px; white-space: nowrap; }
         .filter-btn { background: white; border: 1px solid #d5d9d9; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; color: #333; transition: 0.2s; flex-shrink: 0; }
         .filter-btn.active, .filter-btn:hover { background: var(--secondary); color: white; border-color: var(--secondary); }
@@ -27,17 +27,19 @@
         .product-img { width: 100%; height: 180px; object-fit: contain; background: #fff; }
         .product-body { padding: 12px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; }
         
-        /* إشعار سلة التسوق المصغر */
+        /* إشعار سلة التسوق المصغر Toast */
         #toast-notification { position: fixed; bottom: 20px; right: 20px; background: #232f3e; color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 9999; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 
+        /* صفحة تفاصيل المنتج والعروض */
         #product-detail-view { display: none; background: white; padding: 25px; border-radius: 10px; border: 1px solid #d5d9d9; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .detail-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 25px; }
         @media(max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } }
         
         .qty-box { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
         .qty-btn { background: #e2e8f0; border: none; width: 35px; height: 35px; font-weight: bold; font-size: 18px; border-radius: 6px; cursor: pointer; }
         .qty-input { width: 50px; text-align: center; font-size: 16px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; }
 
+        /* العروض والتخفيضات */
         .offer-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
         .offer-card.selected { border-color: var(--success); background: #f0fdf4; }
         .old-price { color: #dc2626; text-decoration: line-through; font-size: 15px; margin-left: 8px; font-weight: bold; }
@@ -52,7 +54,7 @@
 </head>
 <body>
 
-    <div id="toast-notification">✅ تمت إضافة المنتج إلى السلة بنجاح!</div>
+    <div id="toast-notification">✅ أضفناها إلى السلة بنجاح!</div>
 
     <header>
         <div class="logo" onclick="backToHome()">🛍️ متجري <span>العالمي</span></div>
@@ -176,13 +178,18 @@
             if(products.length === 0) { grid.innerHTML = '<p style="text-align:center; color:#666; grid-column:1/-1;">لا توجد منتجات في هذا الصنف حالياً.</p>'; return; }
             products.forEach(p => {
                 let img = p.imageUrls?.[0] || 'https://via.placeholder.com/200';
+                let priceDisplay = p.price + ' دج';
+                if(p.enableOffers && p.offers?.length > 0) {
+                    priceDisplay = `<span class="old-price">❌ ${p.offers[0].oldPrice} دج</span> <span class="new-price">✔️ ${p.offers[0].newPrice} دج</span>`;
+                }
+
                 grid.innerHTML += `
                     <div class="product-card" onclick="openProductDetail('${p.id}')">
                         <img src="${img}" class="product-img">
                         <div class="product-body">
                             <h3 style="margin:0 0 6px 0; font-size:15px;">${p.name}</h3>
                             <div style="font-size:12px; color:#666; margin-bottom:8px;">📁 ${p.category || 'عام'}</div>
-                            <div style="color:var(--danger); font-weight:bold; font-size:17px; margin-bottom:10px;">${p.price} دج</div>
+                            <div style="margin-bottom:10px;">${priceDisplay}</div>
                             <button onclick="event.stopPropagation(); addToCartQuick('${p.id}')" style="background:#ffd814; border:none; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;">أضف للسلة 🛒</button>
                         </div>
                     </div>
@@ -199,7 +206,8 @@
         window.addToCartQuick = (id) => {
             let p = allProducts.find(item => item.id === id);
             if(!p) return;
-            cartItems.push({ name: p.name, price: p.price, qty: 1 });
+            let finalP = (p.enableOffers && p.offers?.length > 0) ? p.offers[0].newPrice : p.price;
+            cartItems.push({ name: p.name, price: finalP, qty: 1 });
             document.getElementById('cart-counter').innerText = cartItems.length;
             showToast();
         }
@@ -209,7 +217,16 @@
             if(!docSnap.exists()) return;
             selectedProduct = { id: docSnap.id, ...docSnap.data() };
             currentQty = 1;
-            selectedOfferPrice = selectedProduct.price;
+            selectedOfferPrice = (selectedProduct.enableOffers && selectedProduct.offers?.length > 0) ? selectedProduct.offers[0].newPrice : selectedProduct.price;
+
+            let imgs = selectedProduct.imageUrls || [];
+            let mainImg = imgs[0] || 'https://via.placeholder.com/300';
+            let thumbsHtml = imgs.map((img) => `<img src="${img}" style="width:50px; height:50px; object-fit:cover; border-radius:6px; border:1px solid #ccc; cursor:pointer;" onclick="document.getElementById('main-detail-img').src='${img}'">`).join('');
+
+            let videoHtml = '';
+            if(selectedProduct.videoUrl) {
+                videoHtml = `<div style="margin-top:15px;"><h4 style="margin-bottom:5px;">🎥 فيديو المنتج:</h4><iframe width="100%" height="200" src="${selectedProduct.videoUrl}" frameborder="0" allowfullscreen style="border-radius:6px;"></iframe></div>`;
+            }
 
             let offersHtml = '';
             if(selectedProduct.enableOffers && selectedProduct.offers?.length > 0) {
@@ -225,18 +242,22 @@
                         </div>
                     `;
                 });
-                selectedOfferPrice = selectedProduct.offers[0].newPrice;
             }
 
             document.getElementById('detail-content-area').innerHTML = `
                 <div class="detail-grid">
-                    <div><img src="${selectedProduct.imageUrls?.[0] || 'https://via.placeholder.com/300'}" style="max-width:100%; height:300px; object-fit:contain; background:#f8fafc; border-radius:8px;"></div>
+                    <div>
+                        <div><img src="${mainImg}" id="main-detail-img" style="max-width:100%; height:280px; object-fit:contain; background:#f8fafc; border-radius:8px; border:1px solid #ddd;"></div>
+                        <div style="display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;">${thumbsHtml}</div>
+                        ${videoHtml}
+                    </div>
                     <div>
                         <h2>${selectedProduct.name}</h2>
                         <div style="font-size:13px; color:#666; margin-bottom:10px;">📁 الصنف: ${selectedProduct.category || 'عام'}</div>
-                        <div id="display-product-price" style="font-size:24px; color:var(--danger); font-weight:bold; margin:10px 0;">${selectedOfferPrice} دج</div>
+                        <div id="display-product-price" style="font-size:24px; color:var(--danger); font-weight:bold; margin:10px 0;">${selectedOfferPrice * currentQty} دج</div>
                         ${offersHtml}
                         
+                        <!-- نظام الكمية + و - -->
                         <div class="qty-box">
                             <label style="margin:0;">الكمية:</label>
                             <button class="qty-btn" onclick="changeQty(-1)">-</button>
@@ -255,6 +276,7 @@
             `;
             document.getElementById('home-view').style.display = 'none';
             document.getElementById('product-detail-view').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         window.selectOffer = (price, el) => {
@@ -286,7 +308,7 @@
         window.openCartModal = () => {
             let list = document.getElementById('cart-items-list');
             if(cartItems.length === 0) { list.innerHTML = 'السلة فارغة.'; return; }
-            list.innerHTML = cartItems.map((i, idx) => `<div style="display:flex; justify-content:space-between; padding:6px; border-bottom:1px solid #eee;"><span>${i.name} (${i.qty}x)</span><b>${i.price * i.qty} دج</b></div>`).join('');
+            list.innerHTML = cartItems.map((i) => `<div style="display:flex; justify-content:space-between; padding:6px; border-bottom:1px solid #eee;"><span>${i.name} (${i.qty}x)</span><b>${i.price * i.qty} دج</b></div>`).join('');
             document.getElementById('cartModal').style.display = 'flex';
         }
 
@@ -303,7 +325,7 @@
             document.getElementById('cartModal').style.display = 'none';
             let sum = cartItems.reduce((acc, i) => acc + (i.price * i.qty), 0);
             let totalQty = cartItems.reduce((acc, i) => acc + i.qty, 0);
-            document.getElementById('summary-product-name').innerText = cartItems.map(i => i.name).join(' + ');
+            document.getElementById('summary-product-name').innerText = cartItems.map(i => `${i.name} (${i.qty}x)`).join(' + ');
             document.getElementById('summary-qty').innerText = totalQty;
             document.getElementById('summary-product-price').innerText = sum + ' دج';
             calculateCODTotal();
@@ -327,10 +349,11 @@
             let deliveryType = document.getElementById('order-delivery-type').value === 'home' ? 'توصيل للمنزل 🏠' : 'توصيل للمكتب 🏢';
             let finalTotal = Number(document.getElementById('checkout-final-total').innerText);
             let productName = document.getElementById('summary-product-name').innerText;
+            let quantity = Number(document.getElementById('summary-qty').innerText);
 
             if(!fullName || !phone || !commune) { alert('أدخل كامل معلومات التوصيل!'); return; }
 
-            await addDoc(collection(db, "orders"), { fullName, phone, wilaya, commune, deliveryType, finalTotal, productName, status: 'جديد ⏳', createdAt: new Date() });
+            await addDoc(collection(db, "orders"), { fullName, phone, wilaya, commune, deliveryType, finalTotal, productName, quantity, status: 'جديد ⏳', createdAt: new Date() });
             cartItems = [];
             document.getElementById('cart-counter').innerText = '0';
             document.getElementById('checkout-modal-body').innerHTML = `<div style="text-align:center; padding:20px;"><h2>🎉 تم إرسال طلبك بنجاح!</h2><p>سنتصل بك قريباً لتأكيد الطلب عبر الدفع عند الاستلام (COD).</p><button onclick="location.reload()" style="background:#ffd814; border:none; padding:10px 20px; font-weight:bold; border-radius:6px; cursor:pointer;">العودة للمتجر</button></div>`;
