@@ -16,7 +16,6 @@
         
         .container { max-width: 1200px; margin: auto; padding: 20px 15px; }
 
-        /* شريط الفلاتر والأصناف */
         .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 20px; white-space: nowrap; }
         .filter-btn { background: white; border: 1px solid #d5d9d9; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; color: #333; transition: 0.2s; flex-shrink: 0; }
         .filter-btn.active, .filter-btn:hover { background: var(--secondary); color: white; border-color: var(--secondary); }
@@ -27,10 +26,8 @@
         .product-img { width: 100%; height: 180px; object-fit: contain; background: #fff; }
         .product-body { display: flex; flex-direction: column; justify-content: space-between; flex: 1; margin-top: 10px; }
         
-        /* إشعار سلة التسوق المصغر Toast */
         #toast-notification { position: fixed; bottom: 20px; right: 20px; background: #232f3e; color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 9999; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 
-        /* صفحة تفاصيل المنتج والعروض */
         #product-detail-view { display: none; background: white; padding: 25px; border-radius: 10px; border: 1px solid #d5d9d9; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .detail-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 25px; }
         @media(max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } }
@@ -39,7 +36,6 @@
         .qty-btn { background: #e2e8f0; border: none; width: 32px; height: 32px; font-weight: bold; font-size: 16px; border-radius: 6px; cursor: pointer; }
         .qty-input { width: 45px; text-align: center; font-size: 15px; padding: 5px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; }
 
-        /* العروض والتخفيضات */
         .offer-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
         .offer-card.selected { border-color: var(--success); background: #f0fdf4; }
         .old-price { color: #dc2626; text-decoration: line-through; font-size: 15px; margin-left: 8px; font-weight: bold; }
@@ -54,7 +50,7 @@
 </head>
 <body>
 
-    <div id="toast-notification">✅ اضفناها إلى السلة بنجاح!</div>
+    <div id="toast-notification">✅ أضفناها إلى السلة بنجاح!</div>
 
     <header>
         <div class="logo" onclick="backToHome()">🛍️ متجري <span>العالمي</span></div>
@@ -66,7 +62,6 @@
 
     <div class="container">
         <div id="home-view">
-            <!-- شريط الفلاتر والأصناف -->
             <div class="filter-bar">
                 <button class="filter-btn active" onclick="filterByCategory('الكل', this)">🔥 الكل</button>
                 <button class="filter-btn" onclick="filterByCategory('ساعات اليد', this)">⌚ ساعات اليد</button>
@@ -85,12 +80,12 @@
         </div>
     </div>
 
-    <!-- نافذة إتمام الطلب والدفع عند الاستلام (COD) -->
+    <!-- نافذة إتمام الطلب (COD) -->
     <div class="modal-overlay" id="checkoutModal">
         <div class="modal-card" id="checkout-modal-body">
             <h3 style="margin-top:0; border-bottom:1px solid #d5d9d9; padding-bottom:8px;">📦 إتمام الطلب والدفع عند الاستلام (COD)</h3>
-            <div class="form-group"><label>الاسم واللقب:</label><input type="text" id="order-fullname" placeholder="الاسم الكامل..."></div>
-            <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone" placeholder="07xxxxxxxx"></div>
+            <div class="form-group"><label>الاسم واللقب:</label><input type="text" id="order-fullname" placeholder=""></div>
+            <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone" placeholder=""></div>
             <div class="form-group">
                 <label>الولاية:</label>
                 <select id="order-wilaya" onchange="calculateCODTotal()">
@@ -98,7 +93,7 @@
                     <option value="31|وهران">31 - وهران</option><option value="25|قسنطينة">25 - قسنطينة</option><option value="02|الشلف">02 - الشلف</option>
                 </select>
             </div>
-            <div class="form-group"><label>البلدية / العنوان التفصيلي:</label><input type="text" id="order-commune" placeholder="البلدية أو الحي..."></div>
+            <div class="form-group"><label>البلدية / العنوان التفصيلي:</label><input type="text" id="order-commune" placeholder=""></div>
             <div class="form-group">
                 <label>نوع التوصيل (شركات الشحن):</label>
                 <select id="order-delivery-type" onchange="calculateCODTotal()">
@@ -150,12 +145,11 @@
                 snap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
                 
                 if(allProducts.length === 0) {
-                    grid.innerHTML = '<p style="text-align:center; color:#666; grid-column:1/-1; padding:20px;">لا توجد منتجات حالياً. يرجى إضافتها من لوحة التحكم 🔐</p>';
+                    grid.innerHTML = '<p style="text-align:center; color:#666; grid-column:1/-1; padding:20px;">لا توجد منتجات حالياً.</p>';
                     return;
                 }
                 renderProductsGrid(allProducts);
             } catch(e) {
-                console.error(e);
                 grid.innerHTML = '<p style="text-align:center; color:red; grid-column:1/-1;">خطأ في الاتصال بقاعدة البيانات.</p>';
             }
         }
@@ -175,7 +169,6 @@
         function renderProductsGrid(products) {
             let grid = document.getElementById('store-products-grid');
             grid.innerHTML = '';
-            if(products.length === 0) { grid.innerHTML = '<p style="text-align:center; color:#666; grid-column:1/-1;">لا توجد منتجات في هذا الصنف حالياً.</p>'; return; }
             products.forEach(p => {
                 let img = p.imageUrls?.[0] || 'https://via.placeholder.com/200';
                 let basePrice = (p.enableOffers && p.offers?.length > 0) ? p.offers[0].newPrice : p.price;
@@ -184,15 +177,18 @@
                     priceDisplay = `<span class="old-price">❌ ${p.offers[0].oldPrice} دج</span> <span class="new-price">✔️ ${p.offers[0].newPrice} دج</span>`;
                 }
 
+                let stockVal = p.stock !== undefined ? p.stock : 10;
+                let stockNotice = stockVal <= 5 ? `<div style="color:red; font-size:12px; font-weight:bold; margin-bottom:5px;">⚠️ كمية محدودة! (${stockVal} متبقية)</div>` : `<div style="color:green; font-size:12px; margin-bottom:5px;">✅ متوفر بكثرة</div>`;
+
                 grid.innerHTML += `
                     <div class="product-card" onclick="openProductDetail('${p.id}')">
                         <img src="${img}" class="product-img">
                         <div class="product-body">
-                            <h3 style="margin:0 0 6px 0; font-size:15px;">${p.name}</h3>
-                            <div style="font-size:12px; color:#666; margin-bottom:6px;">📁 ${p.category || 'عام'}</div>
+                            <h3 style="margin:0 0 4px 0; font-size:15px;">${p.name}</h3>
+                            <div style="font-size:12px; color:#666; margin-bottom:4px;">📁 ${p.category || 'عام'}</div>
+                            ${stockNotice}
                             <div style="margin-bottom:8px;">${priceDisplay}</div>
                             
-                            <!-- التحكم بالكمية في الواجهة الرئيسية -->
                             <div class="qty-box" onclick="event.stopPropagation()">
                                 <label style="margin:0; font-size:12px;">الكمية:</label>
                                 <button class="qty-btn" onclick="adjustHomeQty('${p.id}', -1)">-</button>
@@ -200,7 +196,6 @@
                                 <button class="qty-btn" onclick="adjustHomeQty('${p.id}', 1)">+</button>
                             </div>
 
-                            <!-- فصل الأزرار تماماً: أضف للسلة وزر طلب مباشر -->
                             <div style="display:flex; gap:6px; margin-top:8px;" onclick="event.stopPropagation()">
                                 <button onclick="addToCartMain('${p.id}')" style="background:#ffd814; border:1px solid #fcd200; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer; flex:1; font-size:12px;">أضف للسلة 🛒</button>
                                 <button onclick="orderDirectMain('${p.id}')" style="background:#ffa41c; border:none; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer; flex:1; font-size:12px; color:white;">طلب مباشر ⚡</button>
@@ -262,14 +257,14 @@
             let mainImg = imgs[0] || 'https://via.placeholder.com/300';
             let thumbsHtml = imgs.map((img) => `<img src="${img}" style="width:50px; height:50px; object-fit:cover; border-radius:6px; border:1px solid #ccc; cursor:pointer;" onclick="document.getElementById('main-detail-img').src='${img}'">`).join('');
 
-            let videoHtml = '';
-            if(selectedProduct.videoUrl) {
-                videoHtml = `<div style="margin-top:15px;"><h4 style="margin-bottom:5px;">🎥 فيديو المنتج:</h4><iframe width="100%" height="200" src="${selectedProduct.videoUrl}" frameborder="0" allowfullscreen style="border-radius:6px;"></iframe></div>`;
-            }
+            let stockVal = selectedProduct.stock !== undefined ? selectedProduct.stock : 10;
+            let stockNotice = stockVal <= 5 ? `<div style="color:red; font-size:13px; font-weight:bold; margin-bottom:8px;">⚠️ كمية محدودة! (${stockVal} متبقية)</div>` : `<div style="color:green; font-size:13px; margin-bottom:8px;">✅ متوفر بكثرة</div>`;
+
+            let videoHtml = selectedProduct.videoUrl ? `<div style="margin-top:15px;"><h4 style="margin-bottom:5px;">🎥 فيديو المنتج:</h4><iframe width="100%" height="200" src="${selectedProduct.videoUrl}" frameborder="0" allowfullscreen style="border-radius:6px;"></iframe></div>` : '';
 
             let offersHtml = '';
             if(selectedProduct.enableOffers && selectedProduct.offers?.length > 0) {
-                offersHtml = `<h4 style="margin:15px 0 8px 0;">🎁 اختر العرض المناسب:</h4>`;
+                offersHtml = `<h4 style="margin:15px 0 8px 0;">🎁 العروض المتوفرة:</h4>`;
                 selectedProduct.offers.forEach((o, index) => {
                     offersHtml += `
                         <div class="offer-card ${index === 0 ? 'selected' : ''}" onclick="selectOffer(${o.newPrice}, this)">
@@ -292,7 +287,8 @@
                     </div>
                     <div>
                         <h2>${selectedProduct.name}</h2>
-                        <div style="font-size:13px; color:#666; margin-bottom:10px;">📁 الصنف: ${selectedProduct.category || 'عام'}</div>
+                        <div style="font-size:13px; color:#666; margin-bottom:6px;">📁 الصنف: ${selectedProduct.category || 'عام'}</div>
+                        ${stockNotice}
                         <div id="display-product-price" style="font-size:24px; color:var(--danger); font-weight:bold; margin:10px 0;">${selectedOfferPrice * currentQty} دج</div>
                         ${offersHtml}
                         
