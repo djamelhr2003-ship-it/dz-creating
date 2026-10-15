@@ -3,407 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="store-title-tag">متجري العالمي - Hybrid Store</title>
+    <title>متجري العالمي - COD DZ</title>
     <style>
-        :root { 
-            --amazon-prime: #131921; 
-            --amazon-nav: #232f3e; 
-            --amazon-yellow: #febd69; 
-            --shopify-accent: #008060; 
-            --shopify-btn: #2c6ecb; 
-            --woo-danger: #b12704; 
-            --bg-color: #eaeded; 
-            --card-bg: #ffffff; 
-            --border-color: #d5d9d9; 
-        }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #0f1111; }
+        :root { --primary: #131921; --secondary: #232f3e; --accent: #febd69; --danger: #b12704; --success: #008060; --bg: #eaeded; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #0f1111; }
+        header { background: var(--primary); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 20px; font-weight: bold; cursor: pointer; color: white; }
+        .logo span { color: var(--accent); }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .cart-btn { background: var(--success); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .admin-btn { background: #f59e0b; color: white; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; }
         
-        /* هيدر أمازون وشوبيفاي المدمج */
-        header { background: var(--amazon-primary); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; gap: 10px; flex-wrap: wrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .logo { font-size: 22px; font-weight: bold; cursor: pointer; color: white; display: flex; align-items: center; gap: 6px; }
-        .logo span { color: var(--amazon-yellow); }
+        .container { max-width: 1200px; margin: auto; padding: 20px 15px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
+        .product-card { background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #d5d9d9; display: flex; flex-direction: column; cursor: pointer; }
+        .product-img { width: 100%; height: 180px; object-fit: contain; background: #fff; }
+        .product-body { padding: 12px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; }
         
-        .header-search-bar { flex: 2; display: flex; max-width: 600px; background: white; border-radius: 8px; overflow: hidden; border: 2px solid transparent; transition: 0.2s; }
-        .header-search-bar:focus-within { border-color: var(--amazon-yellow); }
-        .header-search-bar input { flex: 1; padding: 10px 15px; border: none; outline: none; font-size: 14px; }
-        .header-search-btn { background: var(--amazon-yellow); border: none; padding: 0 20px; cursor: pointer; font-weight: bold; font-size: 16px; }
-        
-        .header-actions { display: flex; gap: 12px; align-items: center; }
-        .admin-btn { background: #f59e0b; color: white; text-decoration: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        
-        /* سلة الشراء العائمة (طريقة شوبيفاي) */
-        .cart-float-btn { background: var(--shopify-accent); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 13px; }
-        
-        .container { max-width: 1250px; margin: auto; padding: 25px 15px; }
-        
-        /* شبكة المنتجات (مزج بين امازون وووكومارس) */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-        .product-card { background: var(--card-bg); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); display: flex; flex-direction: column; cursor: pointer; transition: 0.2s; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.04); }
-        .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); border-color: #999; }
-        
-        .product-img-wrap { width: 100%; height: 210px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; }
-        .product-img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s; }
-        .product-card:hover .product-img { transform: scale(1.05); }
-        
-        .product-body { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .product-title { font-size: 15px; font-weight: 600; margin: 0 0 6px 0; color: #0f1111; line-height: 1.4; }
-        
-        .rating-stars { color: #ffa41c; font-size: 13px; margin-bottom: 6px; }
-        .price-box { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
-        .new-price { color: var(--woo-danger); font-weight: bold; font-size: 19px; }
-        
-        /* أزرار الشراء السريع (طريقة شوبيفاي وأمازون) */
-        .btn-quick-buy { background: #ffd814; border: 1px solid #fcd200; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; font-size: 13px; transition: background 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn-quick-buy:hover { background: #f7ca00; }
+        /* إشعار سلة التسوق المصغر (Toast Notification) */
+        #toast-notification { position: fixed; bottom: 20px; right: 20px; background: #232f3e; color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 9999; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 
-        /* صفحة تفاصيل المنتج (طريقة ووكومارس المتقدمة) */
-        #product-detail-view { display: none; background: white; padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .detail-grid { display: grid; grid-template-columns: 1fr 1.2fr 350px; gap: 30px; align-items: start; }
-        @media(max-width: 900px) { .detail-grid { grid-template-columns: 1fr; } }
+        /* صفحة تفاصيل المنتج والعروض */
+        #product-detail-view { display: none; background: white; padding: 25px; border-radius: 10px; border: 1px solid #d5d9d9; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media(max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } }
         
-        .detail-img-container { text-align: center; background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid var(--border-color); }
-        .detail-main-img { max-width: 100%; height: 350px; object-fit: contain; }
+        .qty-box { display: flex; align-items: center; gap: 10px; margin: 15px 0; }
+        .qty-btn { background: #e2e8f0; border: none; width: 35px; height: 35px; font-weight: bold; font-size: 18px; border-radius: 6px; cursor: pointer; }
+        .qty-input { width: 50px; text-align: center; font-size: 16px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; }
+
+        /* عروض الأسعار (خط أحمر مشطوب ❌ وصح أخضر ✔️) */
+        .offer-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
+        .offer-card.selected { border-color: var(--success); background: #f0fdf4; }
+        .old-price { color: #dc2626; text-decoration: line-through; font-size: 15px; margin-left: 8px; font-weight: bold; }
+        .new-price { color: var(--success); font-size: 18px; font-weight: bold; }
         
-        .variant-select-box { background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px; }
-        
-        /* نوافذ منبثقة Modal */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 4000; padding: 15px; box-sizing: border-box; backdrop-filter: blur(3px); }
-        .modal-card { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 550px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 4000; padding: 15px; box-sizing: border-box; }
+        .modal-card { background: white; padding: 20px; border-radius: 10px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
         .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; outline: none; font-size: 14px; }
+        label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #d5d9d9; border-radius: 6px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <!-- الهيدر المدمج (أمازون + شوبيفاي) -->
+    <div id="toast-notification">✅ تمت إضافة المنتج إلى السلة بنجاح!</div>
+
     <header>
-        <div class="logo" onclick="backToHome()">🛍️ <span id="header-store-name">متجري</span> <span>العالمي</span></div>
-        <div class="header-search-bar">
-            <input type="text" id="global-search-input" placeholder="ابحث عما تريده في المتجر..." onkeyup="triggerSearch()">
-            <button class="header-search-btn" onclick="triggerSearch()">🔍</button>
-        </div>
+        <div class="logo" onclick="backToHome()">🛍️ متجري <span>العالمي</span></div>
         <div class="header-actions">
-            <button class="cart-float-btn" onclick="openCartDrawer()">🛒 السلة (<span id="cart-counter">0</span>)</button>
+            <button class="cart-btn" onclick="openCartModal()">🛒 السلة (<span id="cart-counter">0</span>)</button>
             <a href="admin.html" class="admin-btn">🔐 لوحة التحكم</a>
         </div>
     </header>
 
     <div class="container">
-        <!-- عرض المنتجات الرئيسي -->
         <div id="home-view">
-            <div style="background: linear-gradient(135deg, #232f3e, #131921); color: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; text-align: center;">
-                <h1 style="margin: 0 0 10px 0; color: #febd69;">🔥 عروض وتشكيلة الموسم الكبرى</h1>
-                <p style="margin: 0; color: #cbd5e1; font-size: 14px;">أفضل المنتجات العالمية بأفضل الأسعار مع توصيل سريع لـ 58 ولاية.</p>
-            </div>
+            <h2 style="margin-top:0;">🔥 أحدث المنتجات والعروض الخاصة</h2>
             <div id="store-products-grid" class="products-grid">جاري التحميل...</div>
         </div>
 
-        <!-- صفحة تفاصيل المنتج (طريقة ووكومارس مع التوابع والتقييمات) -->
+        <!-- صفحة عرض المنتج وتفاصيل العروض وكمية + و - -->
         <div id="product-detail-view">
-            <button onclick="backToHome()" style="background:#232f3e; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:20px;">← العودة للقائمة الرئيسية</button>
+            <button onclick="backToHome()" style="background:#232f3e; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:15px;">← العودة للمتجر</button>
             <div id="detail-content-area"></div>
         </div>
     </div>
 
-    <!-- نافذة السلة الجانبية أو المنبثقة (طريقة شوبيفاي) -->
-    <div class="modal-overlay" id="cartModal">
-        <div class="modal-card">
-            <h3 style="margin-top:0; border-bottom:1px solid #cbd5e1; padding-bottom:10px;">🛒 عربة التسوق الخاصة بك</h3>
-            <div id="cart-items-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">السلة فارغة.</div>
-            <div style="background:#f8fafc; padding:12px; border-radius:8px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
-                <span>المجموع الكلي للمنتجات:</span>
-                <b id="cart-total-price" style="color:var(--woo-danger); font-size:18px;">0 دج</b>
-            </div>
-            <button onclick="proceedToCheckoutFromCart()" style="background:var(--shopify-accent); color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:15px; margin-bottom:8px;">متابعة إتمام الطلب 🚀</button>
-            <button onclick="document.getElementById('cartModal').style.display='none'" style="background:#64748b; color:white; border:none; width:100%; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">إغلاق ❌</button>
-        </div>
-    </div>
-
-    <!-- نافذة إتمام الطلب الشاملة (58 ولاية - طريقة أمازون وشوبيفاي) -->
+    <!-- نافذة إتمام الطلب (COD شركات التوصيل وتكلفة التوصيل منزل/مكتب) -->
     <div class="modal-overlay" id="checkoutModal">
         <div class="modal-card" id="checkout-modal-body">
-            <h3 style="margin-top:0; border-bottom:1px solid #cbd5e1; padding-bottom:10px;">📋 إتمام الطلب ومعلومات التوصيل (58 ولاية)</h3>
-            <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="order-fullname" placeholder="الاسم واللقب..."></div>
+            <h3 style="margin-top:0; border-bottom:1px solid #d5d9d9; padding-bottom:8px;">📦 إتمام الطلب والدفع عند الاستلام (COD)</h3>
+            <div class="form-group"><label>الاسم واللقب:</label><input type="text" id="order-fullname" placeholder="الاسم الكامل..."></div>
             <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone" placeholder="07xxxxxxxx"></div>
             <div class="form-group">
                 <label>الولاية:</label>
-                <select id="order-wilaya" onchange="updateCheckoutTotal()">
+                <select id="order-wilaya" onchange="calculateCODTotal()">
                     <option value="05|باتنة" selected>05 - باتنة</option><option value="16|الجزائر">16 - الجزائر العاصمة</option>
                     <option value="31|وهران">31 - وهران</option><option value="25|قسنطينة">25 - قسنطينة</option><option value="02|الشلف">02 - الشلف</option>
                 </select>
             </div>
-            <div class="form-group"><label>العنوان التفصيلي / البلدية:</label><input type="text" id="order-commune" placeholder="البلدية أو الحي..."></div>
+            <div class="form-group"><label>البلدية / العنوان التفصيلي:</label><input type="text" id="order-commune" placeholder="البلدية أو الحي..."></div>
             <div class="form-group">
-                <label>نوع التوصيل:</label>
-                <select id="order-delivery-type" onchange="updateCheckoutTotal()">
-                    <option value="home">توصيل للمنزل 🏠</option>
-                    <option value="desk">توصيل للمكتب (Stop-Desk) 🏢</option>
+                <label>نوع التوصيل (شركات الشحن):</label>
+                <select id="order-delivery-type" onchange="calculateCODTotal()">
+                    <option value="home">توصيل للمنزل 🏠 (750 دج)</option>
+                    <option value="desk">توصيل للمكتب Stop-Desk 🏢 (450 دج)</option>
                 </select>
             </div>
+            
             <div style="background:#f1f5f9; padding:12px; border-radius:8px; margin-bottom:15px; font-size:14px; line-height:1.6;">
                 📦 الطلب: <b id="summary-product-name">-</b><br>
-                💵 مجموع المنتجات: <b id="summary-product-price">0 دج</b><br>
-                🚚 رسوم التوصيل: <b id="summary-shipping-price">0 دج</b><br>
+                🔢 الكمية: <b id="summary-qty">1</b><br>
+                💵 سعر المنتجات: <b id="summary-product-price">0 دج</b><br>
+                🚚 سعر التوصيل: <b id="summary-shipping-price">750 دج</b><br>
                 <hr style="border:0; border-top:1px solid #cbd5e1; margin:6px 0;">
-                💰 <b>المجموع الكلي النهائي:</b> <span id="checkout-final-total" style="color:var(--woo-danger); font-weight:bold; font-size:18px;">0</span> دج
+                💰 <b>المجموع الإجمالي للدفع عند الاستلام (COD):</b> <span id="checkout-final-total" style="color:var(--danger); font-weight:bold; font-size:18px;">0</span> دج
             </div>
-            <button onclick="submitOrder()" style="background:#ffd814; border:1px solid #fcd200; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب الآن 🚀</button>
+            <button onclick="submitCODOrder()" style="background:#ffd814; border:1px solid #fcd200; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب الآن 🚀</button>
             <button onclick="document.getElementById('checkoutModal').style.display='none'" style="background:#64748b; color:white; border:none; width:100%; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:8px;">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- نافذة سلة التسوق -->
+    <div class="modal-overlay" id="cartModal">
+        <div class="modal-card">
+            <h3 style="margin-top:0; border-bottom:1px solid #d5d9d9; padding-bottom:8px;">🛒 سلة التسوق</h3>
+            <div id="cart-items-list" style="max-height:220px; overflow-y:auto; margin-bottom:15px;">السلة فارغة.</div>
+            <button onclick="openCheckoutFromCart()" style="background:var(--success); color:white; border:none; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:8px;">متابعة لإتمام الطلب (COD) 🚀</button>
+            <button onclick="document.getElementById('cartModal').style.display='none'" style="background:#64748b; color:white; border:none; width:100%; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer;">إغلاق</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDdJY7mI1DON...", 
-            authDomain: "creater-ecom.firebaseapp.com",
-            projectId: "creater-ecom",
-            storageBucket: "creater-ecom.appspot.com",
-            messagingSenderId: "893449950593",
-            appId: "1:893449950593:web:..."
-        };
-
-        const app = initializeApp(firebaseConfig);
+        const firebaseConfig = { apiKey: "AIzaSyDdJY7mI1DON...", authDomain: "creater-ecom.firebaseapp.com", projectId: "creater-ecom", storageBucket: "creater-ecom.appspot.com", messagingSenderId: "893449950593", appId: "1:893449950593:web:..." };
         const db = getFirestore(app);
 
-        let allProducts = [], selectedProductForDetail = null, cartItems = [];
+        let allProducts = [], selectedProduct = null, selectedOfferPrice = 0, currentQty = 1, cartItems = [];
 
-        window.addEventListener('DOMContentLoaded', () => {
-            let savedName = localStorage.getItem('dz_store_name');
-            if(savedName) document.getElementById('header-store-name').innerText = savedName;
-            loadProducts();
-        });
+        window.addEventListener('DOMContentLoaded', () => { loadProducts(); });
 
         async function loadProducts() {
-            const snap = await getDocs(collection(db, "products"));
+            let snap = await getDocs(collection(db, "products"));
             allProducts = [];
             snap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
-            renderGrid(allProducts);
-        }
-
-        function renderGrid(products) {
             let grid = document.getElementById('store-products-grid');
             grid.innerHTML = '';
-            if(products.length === 0) { grid.innerHTML = '<p>لا توجد منتجات حالياً.</p>'; return; }
-            products.forEach(p => {
+            if(allProducts.length === 0) { grid.innerHTML = '<p>لا توجد منتجات.</p>'; return; }
+            allProducts.forEach(p => {
                 let img = p.imageUrls?.[0] || 'https://via.placeholder.com/200';
-                grid.innerHTML += `
+                grid.innerHTML = `
                     <div class="product-card" onclick="openProductDetail('${p.id}')">
-                        <div class="product-img-wrap"><img src="${img}" class="product-img"></div>
+                        <img src="${img}" class="product-img">
                         <div class="product-body">
-                            <div>
-                                <h3 class="product-title">${p.name}</h3>
-                                <div class="rating-stars">⭐⭐⭐⭐⭐ <span style="color:#555; font-size:11px;">(شوبيفاي وأمازون)</span></div>
-                                <div class="price-box"><span class="new-price">${p.price} دج</span></div>
-                            </div>
-                            <button onclick="event.stopPropagation(); addToCartQuick('${p.id}')" class="btn-quick-buy">أضف للسلة 🛒 أو اطلب فوراً ⚡</button>
+                            <h3 style="margin:0 0 8px 0; font-size:15px;">${p.name}</h3>
+                            <div style="color:var(--danger); font-weight:bold; font-size:17px; margin-bottom:10px;">${p.price} دج</div>
+                            <button onclick="event.stopPropagation(); addToCartQuick('${p.id}')" style="background:#ffd814; border:none; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;">أضف للسلة 🛒</button>
                         </div>
                     </div>
                 `;
             });
         }
 
-        window.openProductDetail = async function(id) {
+        // إشعار سلة التسوق المصغر Toast
+        window.showToast = () => {
+            let t = document.getElementById('toast-notification');
+            t.style.display = 'block';
+            setTimeout(() => { t.style.display = 'none'; }, 2500);
+        }
+
+        window.addToCartQuick = (id) => {
+            let p = allProducts.find(item => item.id === id);
+            if(!p) return;
+            cartItems.push({ name: p.name, price: p.price, qty: 1 });
+            document.getElementById('cart-counter').innerText = cartItems.length;
+            showToast();
+        }
+
+        window.openProductDetail = async (id) => {
             let docSnap = await getDoc(doc(db, "products", id));
             if(!docSnap.exists()) return;
-            selectedProductForDetail = { id: docSnap.id, ...docSnap.data() };
-            let p = selectedProductForDetail;
+            selectedProduct = { id: docSnap.id, ...docSnap.data() };
+            currentQty = 1;
+            selectedOfferPrice = selectedProduct.price;
 
-            let variantsHtml = '';
-            if(p.variants) {
-                if(p.variants.colors?.length > 0) variantsHtml += `<div class="form-group"><label>🎨 اختر اللون:</label><select id="selected-color">${p.variants.colors.map(c=>`<option value="${c}">${c}</option>`).join('')}</select></div>`;
-                if(p.variants.sizes?.length > 0) variantsHtml += `<div class="form-group"><label>📏 اختر المقاس:</label><select id="selected-size">${p.variants.sizes.map(s=>`<option value="${s}">${s}</option>`).join('')}</select></div>`;
+            let offersHtml = '';
+            if(selectedProduct.enableOffers && selectedProduct.offers?.length > 0) {
+                offersHtml = `<h4 style="margin:15px 0 8px 0;">🎁 اختر العرض المناسب:</h4>`;
+                selectedProduct.offers.forEach((o, index) => {
+                    offersHtml += `
+                        <div class="offer-card ${index === 0 ? 'selected' : ''}" onclick="selectOffer(${o.newPrice}, this)">
+                            <div style="font-weight:bold; margin-bottom:4px;">${o.title}</div>
+                            <div>
+                                <span class="old-price">❌ ${o.oldPrice} دج</span>
+                                <span class="new-price">✔️ ${o.newPrice} دج</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                selectedOfferPrice = selectedProduct.offers[0].newPrice;
             }
 
             document.getElementById('detail-content-area').innerHTML = `
                 <div class="detail-grid">
-                    <div class="detail-img-container"><img src="${p.imageUrls?.[0]||''}" class="detail-main-img"></div>
+                    <div><img src="${selectedProduct.imageUrls?.[0] || 'https://via.placeholder.com/300'}" style="max-width:100%; height:300px; object-fit:contain; background:#f8fafc; border-radius:8px;"></div>
                     <div>
-                        <h1>${p.name}</h1>
-                        <div class="rating-stars" style="font-size:16px;">⭐⭐⭐⭐⭐ <span style="color:#555; font-size:12px;">(تقييمات العملاء ووكومارس)</span></div>
-                        <div style="font-size:26px; color:var(--woo-danger); font-weight:bold; margin:15px 0;">${p.price} دج</div>
-                        <div class="variant-select-box">${variantsHtml}</div>
-                        <p style="line-height:1.8; color:#333;">${p.description || 'لا يوجد وصف تفصيلي لهذا المنتج.'}</p>
+                        <h2>${selectedProduct.name}</h2>
+                        <div id="display-product-price" style="font-size:24px; color:var(--danger); font-weight:bold; margin:10px 0;">${selectedOfferPrice} دج</div>
+                        ${offersHtml}
                         
-                        <div style="margin-top:25px; border-top:1px solid var(--border-color); padding-top:15px;">
-                            <h3 style="font-size:16px; margin-bottom:10px;">💬 تقييمات وتعليقات الزبائن</h3>
-                            <div id="product-reviews-container" style="font-size:13px; color:#444; margin-bottom:15px;">لا توجد تعليقات بعد.</div>
-                            
-                            <div style="background:#f8f9fa; padding:12px; border-radius:8px; border:1px solid var(--border-color);">
-                                <h4 style="margin:0 0 8px 0; font-size:13px;">أضف تقييمك وتعليقك:</h4>
-                                <div class="form-group" style="margin-bottom:8px;">
-                                    <select id="review-stars" style="padding:6px; font-size:12px;">
-                                        <option value="5">⭐⭐⭐⭐⭐ (ممتاز)</option><option value="4">⭐⭐⭐⭐ (جيد جداً)</option><option value="3">⭐⭐⭐ (متوسط)</option><option value="2">⭐⭐ (ضعيف)</option><option value="1">⭐ (سيء)</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="margin-bottom:8px;"><input type="text" id="review-author" placeholder="اسمك الكريم..." style="padding:6px; font-size:12px;"></div>
-                                <div class="form-group" style="margin-bottom:8px;"><textarea id="review-text" placeholder="اكتب تعليقاً صغيراً..." style="padding:6px; font-size:12px; height:50px;"></textarea></div>
-                                <button onclick="submitProductReview()" style="background:#ffd814; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">إرسال التعليق 🚀</button>
-                            </div>
+                        <!-- نظام زيادة ونقصان الكمية + و - -->
+                        <div class="qty-box">
+                            <label style="margin:0;">الكمية:</label>
+                            <button class="qty-btn" onclick="changeQty(-1)">-</button>
+                            <input type="text" id="prod-qty-input" class="qty-input" value="1" readonly>
+                            <button class="qty-btn" onclick="changeQty(1)">+</button>
                         </div>
-                    </div>
-                    <div>
-                        <div style="background:#f8f9fa; border:1px solid var(--border-color); padding:20px; border-radius:12px;">
-                            <div style="font-size:22px; color:var(--woo-danger); font-weight:bold; margin-bottom:15px;">${p.price} دج</div>
-                            <button onclick="addToCartFromDetail('${p.id}')" style="background:#ffa41c; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:10px;">أضف للسلة 🛒</button>
-                            <button onclick="openCheckoutForSingle('${p.id}')" style="background:#ffd814; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">شراء فوري ⚡</button>
+
+                        <p style="color:#555; line-height:1.6;">${selectedProduct.description || ''}</p>
+                        
+                        <div style="display:flex; gap:10px; margin-top:20px;">
+                            <button onclick="addToCartFromDetail()" style="background:#ffa41c; border:none; flex:1; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">أضف للسلة 🛒</button>
+                            <button onclick="openCheckoutSingle()" style="background:#ffd814; border:1px solid #fcd200; flex:1; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">شراء سريع ⚡</button>
                         </div>
                     </div>
                 </div>
             `;
-            renderProductReviews(p.reviews);
             document.getElementById('home-view').style.display = 'none';
             document.getElementById('product-detail-view').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        window.submitProductReview = async function() {
-            if(!selectedProductForDetail) return;
-            let name = document.getElementById('review-author').value.trim() || 'زبون زائر';
-            let comment = document.getElementById('review-text').value.trim();
-            let stars = document.getElementById('review-stars').value;
-            if(!comment) { alert('أدخل نص التعليق!'); return; }
-
-            let reviewObj = { name, comment, stars, date: new Date().toLocaleDateString('ar-DZ') };
-            try {
-                await updateDoc(doc(db, "products", selectedProductForDetail.id), { reviews: arrayUnion(reviewObj) });
-                alert('شكراً لك! تم إضافة تعليقك بنجاح.');
-                document.getElementById('review-text').value = '';
-                document.getElementById('review-author').value = '';
-                selectedProductForDetail.reviews = selectedProductForDetail.reviews || [];
-                selectedProductForDetail.reviews.push(reviewObj);
-                renderProductReviews(selectedProductForDetail.reviews);
-            } catch(e) { alert('فشل إرسال التعليق.'); }
+        window.selectOffer = (price, el) => {
+            document.querySelectorAll('.offer-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedOfferPrice = price;
+            updateDetailPriceDisplay();
         }
 
-        function renderProductReviews(reviews) {
-            let container = document.getElementById('product-reviews-container');
-            if(!reviews || reviews.length === 0) { container.innerHTML = 'لا توجد تعليقات بعد.'; return; }
-            container.innerHTML = reviews.map(r => `
-                <div style="background:#fff; padding:8px; border-radius:6px; border:1px solid #e2e8f0; margin-bottom:6px; font-size:12px;">
-                    <div style="display:flex; justify-content:space-between; color:#64748b; margin-bottom:2px;">
-                        <span><b>${r.name}</b> (${'⭐'.repeat(r.stars)})</span><span>${r.date || ''}</span>
-                    </div>
-                    <div style="color:#0f1111;">${r.comment}</div>
-                </div>
-            `).join('');
+        window.changeQty = (delta) => {
+            currentQty += delta;
+            if(currentQty < 1) currentQty = 1;
+            document.getElementById('prod-qty-input').value = currentQty;
+            updateDetailPriceDisplay();
         }
 
-        window.addToCartQuick = function(id) {
-            let p = allProducts.find(item => item.id === id);
-            if(!p) return;
-            cartItems.push(p);
+        function updateDetailPriceDisplay() {
+            let total = selectedOfferPrice * currentQty;
+            document.getElementById('display-product-price').innerText = total + ' دج';
+        }
+
+        window.addToCartFromDetail = () => {
+            if(!selectedProduct) return;
+            cartItems.push({ name: selectedProduct.name, price: selectedOfferPrice, qty: currentQty });
             document.getElementById('cart-counter').innerText = cartItems.length;
-            alert(`تمت إضافة (${p.name}) إلى السلة بنجاح! 🛒`);
+            showToast();
         }
 
-        window.addToCartFromDetail = function(id) {
-            if(!selectedProductForDetail) return;
-            cartItems.push(selectedProductForDetail);
-            document.getElementById('cart-counter').innerText = cartItems.length;
-            alert(`تمت إضافة (${selectedProductForDetail.name}) إلى السلة بنجاح! 🛒`);
-        }
-
-        window.openCartDrawer = function() {
-            let container = document.getElementById('cart-items-container');
-            if(cartItems.length === 0) {
-                container.innerHTML = 'عربة التسوق فارغة حالياً.';
-                document.getElementById('cart-total-price').innerText = '0 دج';
-            } else {
-                let total = 0;
-                container.innerHTML = cartItems.map((item, index) => {
-                    total += item.price;
-                    return `
-                        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:8px; border-radius:6px; margin-bottom:6px; font-size:13px;">
-                            <span><b>${item.name}</b> - ${item.price} دج</span>
-                            <button onclick="removeCartItem(${index})" style="background:#b12704; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">حذف</button>
-                        </div>
-                    `;
-                }).join('');
-                document.getElementById('cart-total-price').innerText = total + ' دج';
-            }
+        window.openCartModal = () => {
+            let list = document.getElementById('cart-items-list');
+            if(cartItems.length === 0) { list.innerHTML = 'السلة فارغة.'; return; }
+            list.innerHTML = cartItems.map((i, idx) => `<div style="display:flex; justify-content:space-between; padding:6px; border-bottom:1px solid #eee;"><span>${i.name} (${i.qty}x)</span><b>${i.price * i.qty} دج</b></div>`).join('');
             document.getElementById('cartModal').style.display = 'flex';
         }
 
-        window.removeCartItem = function(index) {
-            cartItems.splice(index, 1);
-            document.getElementById('cart-counter').innerText = cartItems.length;
-            openCartDrawer();
+        window.openCheckoutSingle = () => {
+            if(!selectedProduct) return;
+            document.getElementById('summary-product-name').innerText = selectedProduct.name;
+            document.getElementById('summary-qty').innerText = currentQty;
+            document.getElementById('summary-product-price').innerText = (selectedOfferPrice * currentQty) + ' دج';
+            calculateCODTotal();
+            document.getElementById('checkoutModal').style.display = 'flex';
         }
 
-        window.proceedToCheckoutFromCart = function() {
-            if(cartItems.length === 0) { alert('السلة فارغة!'); return; }
+        window.openCheckoutFromCart = () => {
             document.getElementById('cartModal').style.display = 'none';
-            let totalSum = cartItems.reduce((sum, item) => sum + item.price, 0);
+            let sum = cartItems.reduce((acc, i) => acc + (i.price * i.qty), 0);
+            let totalQty = cartItems.reduce((acc, i) => acc + i.qty, 0);
             document.getElementById('summary-product-name').innerText = cartItems.map(i => i.name).join(' + ');
-            document.getElementById('summary-product-price').innerText = totalSum + ' دج';
-            updateCheckoutTotal();
+            document.getElementById('summary-qty').innerText = totalQty;
+            document.getElementById('summary-product-price').innerText = sum + ' دج';
+            calculateCODTotal();
             document.getElementById('checkoutModal').style.display = 'flex';
         }
 
-        window.openCheckoutForSingle = function(id) {
-            let p = allProducts.find(item => item.id === id);
-            if(!p) return;
-            selectedProductForDetail = p;
-            document.getElementById('summary-product-name').innerText = p.name;
-            document.getElementById('summary-product-price').innerText = p.price + ' دج';
-            updateCheckoutTotal();
-            document.getElementById('checkoutModal').style.display = 'flex';
-        }
-
-        window.updateCheckoutTotal = function() {
-            let productPriceStr = document.getElementById('summary-product-price').innerText;
-            let basePrice = Number(productPriceStr.replace(' دج', '')) || 0;
+        window.calculateCODTotal = () => {
+            let prodPriceStr = document.getElementById('summary-product-price').innerText;
+            let basePrice = Number(prodPriceStr.replace(' دج', '')) || 0;
             let deliveryType = document.getElementById('order-delivery-type').value;
             let shippingFee = deliveryType === 'home' ? 750 : 450;
-            let finalTotal = basePrice + shippingFee;
             document.getElementById('summary-shipping-price').innerText = shippingFee + ' دج';
-            document.getElementById('checkout-final-total').innerText = finalTotal;
+            document.getElementById('checkout-final-total').innerText = basePrice + shippingFee;
         }
 
-        window.submitOrder = async function() {
+        window.submitCODOrder = async () => {
             let fullName = document.getElementById('order-fullname').value.trim();
             let phone = document.getElementById('order-phone').value.trim();
-            let wilayaFull = document.getElementById('order-wilaya').value.split('|')[1];
+            let wilaya = document.getElementById('order-wilaya').value.split('|')[1];
             let commune = document.getElementById('order-commune').value.trim();
-            let deliveryTypeVal = document.getElementById('order-delivery-type').value;
+            let deliveryType = document.getElementById('order-delivery-type').value === 'home' ? 'توصيل للمنزل 🏠' : 'توصيل للمكتب 🏢';
             let finalTotal = Number(document.getElementById('checkout-final-total').innerText);
             let productName = document.getElementById('summary-product-name').innerText;
 
             if(!fullName || !phone || !commune) { alert('أدخل كامل معلومات التوصيل!'); return; }
 
-            let orderData = {
-                fullName, phone, wilaya: wilayaFull, commune,
-                deliveryType: deliveryTypeVal === 'home' ? 'توصيل للمنزل 🏠' : 'توصيل للمكتب 🏢',
-                finalTotal, productName, quantity: cartItems.length > 0 ? cartItems.length : 1,
-                status: 'جديد ⏳', createdAt: new Date()
-            };
-
-            await addDoc(collection(db, "orders"), orderData);
+            await addDoc(collection(db, "orders"), { fullName, phone, wilaya, commune, deliveryType, finalTotal, productName, status: 'جديد ⏳', createdAt: new Date() });
             cartItems = [];
             document.getElementById('cart-counter').innerText = '0';
-
-            document.getElementById('checkout-modal-body').innerHTML = `
-                <div style="text-align: center; padding: 15px 0;">
-                    <div style="font-size: 50px; margin-bottom: 10px;">🎉</div>
-                    <h2 style="color: var(--shopify-accent); margin-bottom: 10px;">تم إرسال طلبك بنجاح!</h2>
-                    <p style="color: #555; font-size: 14px; margin-bottom: 20px;">شكراً لتسوقك معنا، <b>${fullName}</b>. سنتصل بك قريباً لتأكيد الطلب.</p>
-                    <button onclick="location.reload()" style="background: #ffd814; border:none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px;">تسوق من جديد 🛍️</button>
-                    <button onclick="document.getElementById('checkoutModal').style.display='none'" style="background: #64748b; color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;">إغلاق النافذة ❌</button>
-                </div>
-            `;
+            document.getElementById('checkout-modal-body').innerHTML = `<div style="text-align:center; padding:20px;"><h2>🎉 تم إرسال طلبك بنجاح!</h2><p>سنتصل بك قريباً لتأكيد الطلب عبر الدفع عند الاستلام (COD).</p><button onclick="location.reload()" style="background:#ffd814; border:none; padding:10px 20px; font-weight:bold; border-radius:6px; cursor:pointer;">العودة للمتجر</button></div>`;
         }
 
-        window.backToHome = function() {
+        window.backToHome = () => {
             document.getElementById('product-detail-view').style.display = 'none';
             document.getElementById('home-view').style.display = 'block';
-        }
-        window.triggerSearch = function() {
-            let q = document.getElementById('global-search-input').value.toLowerCase();
-            renderGrid(allProducts.filter(p => p.name.toLowerCase().includes(q)));
         }
     </script>
 </body>
