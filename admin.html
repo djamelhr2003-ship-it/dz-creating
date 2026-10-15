@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لوحة التحكم - إدارة الطلبات والشحن المتقدمة</title>
+    <title>لوحة التحكم - إدارة الصلاحيات الفردية والتحليلات</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
@@ -20,20 +20,28 @@
         
         #login-box { text-align: center; margin-top: 50px; max-width: 400px; }
         #admin-content { display: none; }
-        .success { color: green; font-size: 14px; margin-top: 5px; }
         
         .tabs-nav { display: flex; gap: 3px; margin-bottom: 20px; flex-wrap: wrap; background: #e2e8f0; padding: 6px; border-radius: 10px; }
-        .tab-btn { flex: 1; padding: 10px 4px; background: transparent; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #475569; min-width: 75px; transition: all 0.2s; font-size: 11px; text-align: center; }
+        .tab-btn { flex: 1; padding: 10px 4px; background: transparent; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: #475569; min-width: 70px; transition: all 0.2s; font-size: 11px; text-align: center; }
         .tab-btn.active { background: #2c3e50; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        .search-filter-box { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .search-filter-box input, .search-filter-box select { flex: 1; min-width: 200px; padding: 8px; }
+
         .orders-grid-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
         .order-mini-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; gap: 12px; align-items: center; }
         .order-mini-card:hover { transform: translateY(-2px); border-color: #2563eb; background: #f1f5f9; }
+        .order-mini-card.fake-warning { border-color: #ef4444; background: #fef2f2; }
         .order-mini-thumb { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; background: #eee; flex-shrink: 0; }
         .order-mini-card h4 { margin: 0 0 4px 0; color: #1e293b; font-size: 14px; }
         .order-mini-card p { margin: 2px 0; font-size: 12px; color: #64748b; }
+
+        .wilaya-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .wilaya-table th, .wilaya-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        .wilaya-table th { background: #1e293b; color: white; }
+        .wilaya-table tr:hover { background: #f8fafc; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 3000; }
         .modal-card { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: popUp 0.3s ease; position: relative; max-height: 90vh; overflow-y: auto; }
@@ -42,10 +50,10 @@
         .product-row { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
         .review-admin-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: linear-gradient(135deg, #2c3e50, #1e293b); color: white; padding: 15px; border-radius: 10px; text-align: center; }
-        .stat-card h4 { margin: 0 0 8px 0; font-size: 13px; color: #94a3b8; }
-        .stat-card span { font-size: 20px; font-weight: bold; color: #38bdf8; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, #2c3e50, #1e293b); color: white; padding: 20px; border-radius: 10px; text-align: center; }
+        .stat-card h4 { margin: 0 0 8px 0; font-size: 14px; color: #94a3b8; }
+        .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
 
         .image-input-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
         .btn-add-img { background: #3b82f6; color: white; border: none; width: 45px; height: 42px; border-radius: 6px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -56,13 +64,12 @@
 
     <div class="modal-overlay" id="centerModal" style="z-index: 4000;">
         <div class="modal-card" style="text-align: center; max-width: 400px;">
-            <h3 id="modalTitle" style="color: #2563eb; margin-top:0;">إشعار النظام</h3>
+            <h3 id="modalTitle" style="color: #2563eb; margin-top:0;">⚠️ تنبيه نظام الطلبات</h3>
             <p id="modalMessage" style="color: #475569; font-size: 15px; line-height: 1.6;"></p>
-            <button onclick="closeCenterModal()" style="margin-top: 15px; background: #2563eb; width: 100%;">حسناً 👍</button>
+            <button onclick="closeCenterModal()" style="margin-top: 15px; background: #ef4444; width: 100%;">فهمت التحذير 🚨</button>
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الطلب الكاملة مع صورة المنتج -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
             <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب الكاملة</h3>
@@ -91,33 +98,140 @@
         </div>
 
         <div class="container" style="padding: 10px;">
-            <div class="tabs-nav">
-                <button class="tab-btn active" onclick="switchTab('orders-tab', event)">⏳ الجديدة</button>
-                <button class="tab-btn" onclick="switchTab('processing-tab', event)">🔄 المعالجة</button>
-                <button class="tab-btn" onclick="switchTab('shipping-tab', event)">🚚 التوصيل</button>
-                <button class="tab-btn" onclick="switchTab('archive-tab', event)">✅ المسلمة</button>
-                <button class="tab-btn" onclick="switchTab('return-tab', event)">⚠️ الروتور</button>
-                <button class="tab-btn" onclick="switchTab('reviews-tab', event)">💬 التعليقات</button>
-                <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة</button>
-                <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المنتجات</button>
-                <button class="tab-btn" onclick="switchTab('settings-tab', event)">⚙️ الإعدادات</button>
+            <div class="tabs-nav" id="tabsNavContainer">
+                <button class="tab-btn active" id="btn-orders-tab" onclick="switchTab('orders-tab', event)">⏳ الجديدة</button>
+                <button class="tab-btn" id="btn-processing-tab" onclick="switchTab('processing-tab', event)">🔄 المعالجة</button>
+                <button class="tab-btn" id="btn-shipping-tab" onclick="switchTab('shipping-tab', event)">🚚 التوصيل</button>
+                <button class="tab-btn" id="btn-archive-tab" onclick="switchTab('archive-tab', event)">✅ المسلمة</button>
+                <button class="tab-btn" id="btn-return-tab" onclick="switchTab('return-tab', event)">⚠️ الروتور</button>
+                <button class="tab-btn" id="btn-fake-tab" onclick="switchTab('fake-tab', event)" style="background: #ef4444; color: white;">🚨 الوهمية</button>
+                <button class="tab-btn" id="btn-trash-tab" onclick="switchTab('trash-tab', event)" style="background: #64748b; color: white;">🗑️ المهملات</button>
+                <button class="tab-btn" id="btn-wilaya-report-tab" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
+                <button class="tab-btn" id="btn-analytics-tab" onclick="switchTab('analytics-tab', event)">💰 التحليلات والأرباح</button>
+                <button class="tab-btn" id="btn-reviews-tab" onclick="switchTab('reviews-tab', event)">💬 التعليقات</button>
+                <button class="tab-btn" id="btn-staff-tab" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 الفريق والصلاحيات</button>
+                <button class="tab-btn" id="btn-add-product-tab" onclick="switchTab('add-product-tab', event)">➕ إضافة</button>
+                <button class="tab-btn" id="btn-manage-products-tab" onclick="switchTab('manage-products-tab', event)">🏷️ المنتجات</button>
+                <button class="tab-btn" id="btn-settings-tab" onclick="switchTab('settings-tab', event)">⚙️ الإعدادات</button>
             </div>
         </div>
 
         <div id="orders-tab" class="tab-content active">
-            <div class="container"><h2>الطلبات الجديدة (قيد الانتظار) ⏳</h2><div id="orders-list-new" class="orders-grid-compact">جاري التحميل...</div></div>
+            <div class="container">
+                <h2>الطلبات الجديدة (قيد الانتظار) ⏳</h2>
+                <div class="search-filter-box">
+                    <input type="text" id="search-input-new" placeholder="🔍 بحث بالاسم، الهاتف، الولاية..." onkeyup="filterOrdersList('new')">
+                    <input type="date" id="date-filter-new" onchange="filterOrdersList('new')">
+                    <button onclick="resetFilters('new')" class="btn-secondary" style="width:auto; padding:8px 12px;">إلغاء الفلتر</button>
+                </div>
+                <div id="orders-list-new" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
         </div>
+
         <div id="processing-tab" class="tab-content">
-            <div class="container"><h2>الطلبات قيد المعالجة والتجهيز 🔄</h2><div id="orders-list-processing" class="orders-grid-compact">جاري التحميل...</div></div>
+            <div class="container">
+                <h2>الطلبات قيد المعالجة والتجهيز 🔄</h2>
+                <div class="search-filter-box">
+                    <input type="text" id="search-input-processing" placeholder="🔍 بحث بالاسم، الهاتف، الولاية..." onkeyup="filterOrdersList('processing')">
+                    <input type="date" id="date-filter-processing" onchange="filterOrdersList('processing')">
+                    <button onclick="resetFilters('processing')" class="btn-secondary" style="width:auto; padding:8px 12px;">إلغاء الفلتر</button>
+                </div>
+                <div id="orders-list-processing" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
         </div>
+
         <div id="shipping-tab" class="tab-content">
-            <div class="container"><h2>طلبات جاري توصيلها عبر شركاء الشحن 🚚</h2><div id="orders-list-shipping" class="orders-grid-compact">جاري التحميل...</div></div>
+            <div class="container">
+                <h2>طلبات جاري توصيلها عبر شركاء الشحن 🚚</h2>
+                <div class="search-filter-box">
+                    <input type="text" id="search-input-shipping" placeholder="🔍 بحث بالاسم، الهاتف، الولاية..." onkeyup="filterOrdersList('shipping')">
+                    <input type="date" id="date-filter-shipping" onchange="filterOrdersList('shipping')">
+                    <button onclick="resetFilters('shipping')" class="btn-secondary" style="width:auto; padding:8px 12px;">إلغاء الفلتر</button>
+                </div>
+                <div id="orders-list-shipping" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
         </div>
+
         <div id="archive-tab" class="tab-content">
-            <div class="container"><h2>أرشيف الطلبات المسلمة والمؤكدة بنجاح ✅</h2><div id="orders-list-archive" class="orders-grid-compact">جاري التحميل...</div></div>
+            <div class="container">
+                <h2>أرشيف الطلبات المسلمة والمؤكدة بنجاح ✅</h2>
+                <div class="search-filter-box">
+                    <input type="text" id="search-input-archive" placeholder="🔍 بحث بالاسم، الهاتف، الولاية..." onkeyup="filterOrdersList('archive')">
+                    <input type="date" id="date-filter-archive" onchange="filterOrdersList('archive')">
+                    <button onclick="resetFilters('archive')" class="btn-secondary" style="width:auto; padding:8px 12px;">إلغاء الفلتر</button>
+                </div>
+                <div id="orders-list-archive" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
         </div>
+
         <div id="return-tab" class="tab-content">
-            <div class="container"><h2>قائمة المرتجعات (الروتور) ⚠️</h2><div id="orders-list-return" class="orders-grid-compact">جاري التحميل...</div></div>
+            <div class="container">
+                <h2>قائمة المرتجعات (الروتور) ⚠️</h2>
+                <div class="search-filter-box">
+                    <input type="text" id="search-input-return" placeholder="🔍 بحث بالاسم، الهاتف، الولاية..." onkeyup="filterOrdersList('return')">
+                    <input type="date" id="date-filter-return" onchange="filterOrdersList('return')">
+                    <button onclick="resetFilters('return')" class="btn-secondary" style="width:auto; padding:8px 12px;">إلغاء الفلتر</button>
+                </div>
+                <div id="orders-list-return" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
+        </div>
+
+        <div id="fake-tab" class="tab-content">
+            <div class="container" style="border: 2px solid #ef4444;">
+                <h2 style="color: #ef4444;">🚨 الطلبات الوهمية أو المتكررة من نفس الشخص</h2>
+                <div id="orders-list-fake" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
+        </div>
+
+        <div id="trash-tab" class="tab-content">
+            <div class="container" style="border: 2px solid #64748b;">
+                <h2 style="color: #64748b;">🗑️ سلة المهملات (الطلبات المحذوفة)</h2>
+                <div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div>
+            </div>
+        </div>
+
+        <div id="wilaya-report-tab" class="tab-content">
+            <div class="container">
+                <h2>📍 تقرير توزيع الطلبات حسب الولايات وأماكن التوصيل</h2>
+                <div id="wilaya-report-content">جاري تجهيز التقرير...</div>
+            </div>
+        </div>
+
+        <!-- قسم التحليلات والأرباح المتاح للأفراد حسب الصلاحية -->
+        <div id="analytics-tab" class="tab-content">
+            <div class="container">
+                <h2>💰 التحليلات المالية، الأرباح، وخسائر الروتور</h2>
+                <div class="search-filter-box" style="background:#e2e8f0; border-color:#cbd5e1;">
+                    <label style="align-self: center; margin:0;">📅 فلتر التحليلات حسب التاريخ:</label>
+                    <input type="date" id="analytics-date-filter" onchange="filterAnalyticsByDate()" style="max-width:250px;">
+                    <button onclick="resetAnalyticsDate()" class="btn-secondary" style="width:auto; padding:8px 12px;">عرض الكل</button>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #059669, #047857);">
+                        <h4>💵 إجمالي هامش الربح المحقق</h4>
+                        <span id="stat-total-profit">0 دج</span>
+                    </div>
+                    <div class="stat-card">
+                        <h4>🛒 إجمالي سعر الشراء الكلي</h4>
+                        <span id="stat-total-buy-price">0 دج</span>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                        <h4>📦 إجمالي سعر البيع الكلي</h4>
+                        <span id="stat-total-sell-price">0 دج</span>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #dc2626, #991b1b);">
+                        <h4>⚠️ إجمالي خسائر الروتور</h4>
+                        <span id="stat-total-router-loss">0 دج</span>
+                    </div>
+                </div>
+                <div id="daily-profits-report" style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-top:20px;">
+                    <h3>📅 سجل الأرباح اليومية، الشهرية، والسنوية:</h3>
+                    <div id="daily-profits-list" style="font-size:14px; line-height:1.8;">جاري الحساب...</div>
+                </div>
+                <div id="analytics-summary" style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-top:15px; font-size:14px; line-height:1.6;">
+                    جاري تحميل تحليل الأداء...
+                </div>
+            </div>
         </div>
 
         <div id="reviews-tab" class="tab-content">
@@ -127,11 +241,45 @@
             </div>
         </div>
 
+        <!-- تبويب الفريق والصلاحيات لكل فرد عبر مربعات الاختيار -->
+        <div id="staff-tab" class="tab-content">
+            <div class="container" style="border: 2px solid #7c3aed;">
+                <h2 style="color: #7c3aed;">👥 إدارة الأفراد وتحديد الصلاحيات الفردية</h2>
+                <p style="color:#64748b; font-size:13px;">اختر اسم الموظف أو أنشئ حساباً جديداً، ثم ضع علامة صح (✓) على الصلاحيات التي تريد إضافتها لملفه الشخصي:</p>
+                
+                <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:20px;">
+                    <h3>➕ إنشاء أو تعديل ملف موظف</h3>
+                    <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="staff-username" placeholder="مثال: employé1"></div>
+                    <div class="form-group"><label>كلمة المرور:</label><input type="password" id="staff-password" placeholder="كلمة المرور الخاصة به"></div>
+                    
+                    <div style="margin: 15px 0;">
+                        <label><b>حدد الصلاحيات الخاصة بهذا الفرد (علّم بـ ✓):</b></label>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:10px; margin-top:10px;">
+                            <label><input type="checkbox" class="perm-chk" value="orders-tab"> الطلبات (الجديدة، المعالجة، الشحن، الأرشيف، الروتور، الوهمية، المهملات)</label>
+                            <label><input type="checkbox" class="perm-chk" value="wilaya-report-tab"> تقرير الولايات والتوصيل</label>
+                            <label><input type="checkbox" class="perm-chk" value="analytics-tab"> التحليلات والأرباح الكاملة</label>
+                            <label><input type="checkbox" class="perm-chk" value="reviews-tab"> التعليقات والتقييمات</label>
+                            <label><input type="checkbox" class="perm-chk" value="add-product-tab"> إضافة منتجات جديدة</label>
+                            <label><input type="checkbox" class="perm-chk" value="manage-products-tab"> إدارة وتعديل المنتجات</label>
+                        </div>
+                    </div>
+                    <button onclick="saveStaffMember()" class="btn-secondary" style="background:#7c3aed;">حفظ ملف الصلاحيات للفرد 💾</button>
+                </div>
+
+                <h3>قائمة الأفراد والموظفين المسجلين:</h3>
+                <div id="staff-list-container">جاري التحميل...</div>
+            </div>
+        </div>
+
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد للمتجر ➕</h2>
                 <div class="form-group"><label>اسم المنتج:</label><input type="text" id="prod-name"></div>
-                <div class="form-group"><label>السعر الأساسي (دج):</label><input type="number" id="prod-price"></div>
+                <div class="form-group"><label>سعر الشراء (التكلفة الأساسية دج):</label><input type="number" id="prod-buy-price" oninput="calculateMarginPreview()"></div>
+                <div class="form-group"><label>سعر البيع للزبون (دج):</label><input type="number" id="prod-price" oninput="calculateMarginPreview()"></div>
+                <div style="background:#e0f2fe; padding:10px; border-radius:6px; margin-bottom:15px; font-size:14px; color:#0369a1;">
+                    <b>💡 هامش الربح المتوقع للقطعة الواحدة:</b> <span id="margin-preview" style="font-weight:bold; font-size:16px;">0</span> دج
+                </div>
                 <div class="form-group"><label>الكمية في المخزون:</label><input type="number" id="prod-stock"></div>
                 <div class="form-group"><label>الحد الأقصى للطلب:</label><input type="number" id="prod-max-limit" placeholder="99"></div>
                 <div class="form-group"><label>التصنيف:</label><input type="text" id="prod-category-new" placeholder="أدخل التصنيف"></div>
@@ -188,30 +336,36 @@
         const db = getFirestore(app);
 
         let ordersCache = {};
-        let productsImagesMap = {}; // خريطة لتخزين صور المنتجات حسب الاسم
+        let allFetchedOrders = [];
+        let productsMap = {};
 
         window.showAlert = function(title, message) {
-            document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalMessage').innerText = message;
             document.getElementById('centerModal').style.display = 'flex';
         }
 
-        window.closeCenterModal = function() {
-            document.getElementById('centerModal').style.display = 'none';
+        window.closeCenterModal = function() { document.getElementById('centerModal').style.display = 'none'; }
+
+        window.calculateMarginPreview = function() {
+            let buy = Number(document.getElementById('prod-buy-price').value) || 0;
+            let sell = Number(document.getElementById('prod-price').value) || 0;
+            let margin = sell - buy;
+            document.getElementById('margin-preview').innerText = margin;
         }
 
-        // فتح نافذة تفاصيل الطلب مع عرض صورة المنتج الكبيرة
         window.openOrderModal = function(id) {
             const o = ordersCache[id];
             if(!o) return;
 
             let stars = '⭐'.repeat(o.rating || 5);
-            let productImg = productsImagesMap[o.productName] || 'https://via.placeholder.com/150';
+            let productData = productsMap[o.productName] || { img: 'https://via.placeholder.com/150', buyPrice: 0 };
+            let orderDate = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleString('ar-DZ') : 'غير متوفر';
 
             let contentHtml = `
                 <div style="text-align: center; margin-bottom: 15px;">
-                    <img src="${productImg}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1;">
+                    <img src="${productData.img}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1;">
                 </div>
+                <b>📅 تاريخ الطلب:</b> ${orderDate}<br>
                 <b>👤 الزبون:</b> ${o.fullName}<br>
                 <b>📞 الهاتف:</b> ${o.phone}<br>
                 <b>📍 الولاية والبلدية:</b> ${o.wilaya} (${o.commune})<br>
@@ -229,26 +383,34 @@
             let actionsHtml = '';
             const status = o.status || 'جديد ⏳';
 
-            if(status.includes('جديد')) {
-                actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄')" class="btn-warning">بدء المعالجة 🔄</button>`;
-            } else if(status.includes('المعالجة')) {
-                actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚')" class="btn-secondary">إرسال للشحن 🚚</button>`;
-            } else if(status.includes('التوصيل')) {
-                actionsHtml = `
-                    <button onclick="updateOrderStatus('${o.id}', 'مؤكد ومسلم بنجاح ✅')" style="background:#27ae60;">تأكيد التسلم ✅</button>
-                    <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️')" class="btn-danger">تسجيل روتور ⚠️</button>
-                `;
+            if(status.includes('مهملات')) {
+                actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'جديد ⏳')" class="btn-warning">استرجاع الطلب ♻️</button>`;
             } else {
-                actionsHtml = `<span style="color:#64748b; font-weight:bold;">الطلب مكتمل نهائياً</span>`;
+                if(status.includes('جديد')) {
+                    actionsHtml = `
+                        <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄')" class="btn-warning">بدء المعالجة 🔄</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'طلب وهمي 🚨')" class="btn-danger">نقل للوهمي 🚨</button>
+                    `;
+                } else if(status.includes('المعالجة')) {
+                    actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚')" class="btn-secondary">إرسال للشحن 🚚</button>`;
+                } else if(status.includes('التوصيل')) {
+                    actionsHtml = `
+                        <button onclick="updateOrderStatus('${o.id}', 'مؤكد ومسلم بنجاح ✅')" style="background:#27ae60;">تأكيد التسلم ✅</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️')" class="btn-danger">تسجيل روتور ⚠️</button>
+                    `;
+                } else if(status.includes('وهمي')) {
+                    actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'جديد ⏳')" class="btn-warning">إعادة للطلبات الجديدة 🔄</button>`;
+                } else {
+                    actionsHtml = `<span style="color:#64748b; font-weight:bold;">الطلب مكتمل نهائياً</span>`;
+                }
+                actionsHtml += `<button onclick="moveToTrash('${o.id}')" class="btn-danger" style="background:#64748b; margin-right:5px;">حذف 🗑️</button>`;
             }
 
             document.getElementById('orderModalActions').innerHTML = actionsHtml;
             document.getElementById('orderModal').style.display = 'flex';
         }
 
-        window.closeOrderModal = function() {
-            document.getElementById('orderModal').style.display = 'none';
-        }
+        window.closeOrderModal = function() { document.getElementById('orderModal').style.display = 'none'; }
 
         window.addEventListener('DOMContentLoaded', () => {
             const user = sessionStorage.getItem('ecom_logged_user');
@@ -259,17 +421,28 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            if(event && event.currentTarget) event.currentTarget.classList.add('active');
         }
 
         window.checkLogin = async function() {
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-pass').value.trim();
+            
             if(u === "admin" && p === "dzstore2026") {
                 sessionStorage.setItem('ecom_logged_user', 'admin');
+                sessionStorage.setItem('ecom_permissions', JSON.stringify(['all']));
                 initDashboard('admin');
                 return;
             }
+
+            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
+            if(staffList[u] && staffList[u].password === p) {
+                sessionStorage.setItem('ecom_logged_user', u);
+                sessionStorage.setItem('ecom_permissions', JSON.stringify(staffList[u].permissions));
+                initDashboard(u);
+                return;
+            }
+
             showAlert('خطأ في الدخول', 'اسم المستخدم أو كلمة المرور غير صحيحة!');
         }
 
@@ -277,10 +450,105 @@
             document.getElementById('login-box').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
             document.getElementById('welcome-role').innerText = user;
+
+            applyPermissions(user);
+
             await loadProductsMap();
             loadAllOrders();
             loadProducts();
             loadAdminReviews();
+            loadStaffList();
+        }
+
+        // تطبيق صلاحيات الفرد المحددة في ملفه
+        function applyPermissions(user) {
+            let permissions = JSON.parse(sessionStorage.getItem('ecom_permissions')) || [];
+            if(user === 'admin' || permissions.includes('all')) return; // الأدمن يرى كل شيء
+
+            // قائمة التبويبات التابعة لصلاحية الطلبات
+            const orderTabs = ['orders-tab', 'processing-tab', 'shipping-tab', 'archive-tab', 'return-tab', 'fake-tab', 'trash-tab'];
+
+            // إخفاء الأزرار غير الممنوحة في ملف الفرد
+            const allTabsMap = {
+                'orders-tab': ['btn-orders-tab', 'btn-processing-tab', 'btn-shipping-tab', 'btn-archive-tab', 'btn-return-tab', 'btn-fake-tab', 'btn-trash-tab'],
+                'wilaya-report-tab': ['btn-wilaya-report-tab'],
+                'analytics-tab': ['btn-analytics-tab'],
+                'reviews-tab': ['btn-reviews-tab'],
+                'add-product-tab': ['btn-add-product-tab'],
+                'manage-products-tab': ['btn-manage-products-tab']
+            };
+
+            for(let permKey in allTabsMap) {
+                if(!permissions.includes(permKey)) {
+                    allTabsMap[permKey].forEach(btnId => {
+                        let el = document.getElementById(btnId);
+                        if(el) el.style.display = 'none';
+                    });
+                }
+            }
+
+            // فتح أول تبويب متاح للموظف تلقائياً
+            let opened = false;
+            for(let p of permissions) {
+                if(p === 'orders-tab') {
+                    switchTab('orders-tab');
+                    document.getElementById('btn-orders-tab').classList.add('active');
+                    opened = true;
+                    break;
+                } else if(document.getElementById(p)) {
+                    switchTab(p);
+                    document.getElementById(`btn-${p}`).classList.add('active');
+                    opened = true;
+                    break;
+                }
+            }
+        }
+
+        window.saveStaffMember = function() {
+            let u = document.getElementById('staff-username').value.trim();
+            let p = document.getElementById('staff-password').value.trim();
+            if(!u || !p) { showAlert('تنبيه', 'الرجاء إدخال اسم المستخدم وكلمة المرور للموظف!'); return; }
+
+            let selectedPerms = [];
+            document.querySelectorAll('.perm-chk:checked').forEach(chk => {
+                selectedPerms.push(chk.value);
+            });
+
+            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
+            staffList[u] = { password: p, permissions: selectedPerms };
+            localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
+
+            showAlert('نجاح', `تم حفظ صلاحيات الفرد (${u}) في ملفه بنجاح!`);
+            document.getElementById('staff-username').value = '';
+            document.getElementById('staff-password').value = '';
+            document.querySelectorAll('.perm-chk').forEach(c => c.checked = false);
+            loadStaffList();
+        }
+
+        window.loadStaffList = function() {
+            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
+            let container = document.getElementById('staff-list-container');
+            let html = '';
+
+            for(let u in staffList) {
+                html += `
+                    <div style="background:#fff; padding:10px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <b>👤 الفرد / الموظف:</b> ${u} <br>
+                            <span style="font-size:12px; color:#64748b;">الصلاحيات المفعلة بـ (✓): ${staffList[u].permissions.join(', ')}</span>
+                        </div>
+                        <button onclick="deleteStaff('${u}')" class="btn-danger" style="padding:6px 10px; font-size:12px;">حذف 🗑️</button>
+                    </div>
+                `;
+            }
+            container.innerHTML = html !== '' ? html : '<p style="color:#64748b;">لا توجد حسابات أفراد مضافة بعد.</p>';
+        }
+
+        window.deleteStaff = function(u) {
+            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
+            delete staffList[u];
+            localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
+            loadStaffList();
         }
 
         window.logout = function() { sessionStorage.clear(); location.reload(); }
@@ -295,8 +563,9 @@
 
         window.addProduct = async function() {
             const name = document.getElementById('prod-name').value.trim();
-            const price = Number(document.getElementById('prod-price').value);
-            const stock = Number(document.getElementById('prod-stock').value);
+            const buyPrice = Number(document.getElementById('prod-buy-price').value) || 0;
+            const price = Number(document.getElementById('prod-price').value) || 0;
+            const stock = Number(document.getElementById('prod-stock').value) || 0;
             const maxLimit = Number(document.getElementById('prod-max-limit').value) || 99;
             const category = document.getElementById('prod-category-new').value.trim() || 'عام';
             const isSpecialOffer = document.getElementById('prod-is-special').checked;
@@ -308,69 +577,294 @@
 
             if(!name || !price || !stock) { showAlert('تنبيه', 'الرجاء ملء الحقول الرئيسية!'); return; }
 
+            let profitMargin = price - buyPrice;
+
             try {
-                await addDoc(collection(db, "products"), { name, price, stock, maxLimit, category, isSpecialOffer, promoPrice, freeShipping, imageUrls, reviews: [], createdAt: new Date() });
+                await addDoc(collection(db, "products"), { name, buyPrice, price, profitMargin, stock, maxLimit, category, isSpecialOffer, promoPrice, freeShipping, imageUrls, reviews: [], createdAt: new Date() });
                 showAlert('نجاح', `تم إضافة المنتج "${name}" بنجاح!`);
                 document.getElementById('prod-name').value = '';
+                document.getElementById('prod-buy-price').value = '';
                 document.getElementById('prod-price').value = '';
                 document.getElementById('prod-stock').value = '';
+                document.getElementById('margin-preview').innerText = '0';
                 await loadProductsMap();
                 loadProducts();
             } catch(e) { showAlert('خطأ', 'فشل في نشر المنتج.'); }
         }
 
-        // تحميل خريطة صور المنتجات لمطابقتها مع الطلبات
         async function loadProductsMap() {
             try {
                 const snap = await getDocs(collection(db, "products"));
-                productsImagesMap = {};
+                productsMap = {};
                 snap.forEach(d => {
                     const p = d.data();
-                    if(p.imageUrls && p.imageUrls.length > 0) {
-                        productsImagesMap[p.name] = p.imageUrls[0]; // حفظ أول صورة للمنتج
-                    }
+                    productsMap[p.name] = {
+                        img: (p.imageUrls && p.imageUrls.length > 0) ? p.imageUrls[0] : 'https://via.placeholder.com/50',
+                        buyPrice: p.buyPrice || 0,
+                        sellPrice: p.price || 0,
+                        margin: p.profitMargin || ((p.price || 0) - (p.buyPrice || 0))
+                    };
                 });
             } catch(e) { console.error(e); }
+        }
+
+        window.moveToTrash = async function(id) {
+            try {
+                await updateDoc(doc(db, "orders", id), { status: 'في سلة المهملات 🗑️' });
+                closeOrderModal();
+                showAlert('تم الحذف', 'تم نقل الطلب إلى سلة المهملات بنجاح!');
+                loadAllOrders();
+            } catch(e) { showAlert('خطأ', 'فشل حذف الطلب.'); }
         }
 
         async function loadAllOrders() {
             try {
                 const snap = await getDocs(collection(db, "orders"));
-                let newDiv = document.getElementById('orders-list-new');
-                let procDiv = document.getElementById('orders-list-processing');
-                let shipDiv = document.getElementById('orders-list-shipping');
-                let archDiv = document.getElementById('orders-list-archive');
-                let retDiv = document.getElementById('orders-list-return');
-
-                newDiv.innerHTML = procDiv.innerHTML = shipDiv.innerHTML = archDiv.innerHTML = retDiv.innerHTML = '';
+                allFetchedOrders = [];
                 ordersCache = {};
+
+                let phoneCounts = {};
 
                 snap.forEach(d => {
                     const o = { id: d.id, ...d.data() };
                     ordersCache[o.id] = o;
-                    const status = o.status || 'جديد ⏳';
-                    const thumbUrl = productsImagesMap[o.productName] || 'https://via.placeholder.com/50';
+                    allFetchedOrders.push(o);
 
-                    // المستطيل الصغير يظهر فيه اسم الزبون وصورة المنتج المصغرة لربح المساحة
-                    let miniCardHtml = `
-                        <div class="order-mini-card" onclick="openOrderModal('${o.id}')">
-                            <img src="${thumbUrl}" class="order-mini-thumb">
-                            <div>
-                                <h4>👤 ${o.fullName}</h4>
-                                <p><b>الولاية:</b> ${o.wilaya}</p>
-                                <p><b>المنتج:</b> ${o.productName} (x${o.quantity})</p>
-                                <p style="color:#ef4444; font-weight:bold;">${o.finalTotal || 0} دج</p>
-                            </div>
-                        </div>
-                    `;
-
-                    if(status.includes('جديد')) { newDiv.innerHTML += miniCardHtml; }
-                    else if(status.includes('المعالجة')) { procDiv.innerHTML += miniCardHtml; }
-                    else if(status.includes('التوصيل')) { shipDiv.innerHTML += miniCardHtml; }
-                    else if(status.includes('مسلم')) { archDiv.innerHTML += miniCardHtml; }
-                    else if(status.includes('مرتجع')) { retDiv.innerHTML += miniCardHtml; }
+                    if(o.phone && (!o.status || !o.status.includes('مهملات'))) {
+                        phoneCounts[o.phone] = (phoneCounts[o.phone] || 0) + 1;
+                    }
                 });
+
+                let fakeDetected = false;
+                allFetchedOrders.forEach(o => {
+                    if(o.phone && phoneCounts[o.phone] > 1 && (!o.status || o.status.includes('جديد'))) {
+                        o.status = 'طلب وهمي 🚨';
+                        fakeDetected = true;
+                    }
+                });
+
+                if(fakeDetected) {
+                    showAlert('تنبيه أمني 🚨', 'تم رصد طلبات متكررة وتم تحويلها لقسم الطلبات الوهمية!');
+                }
+
+                renderOrdersFiltered(allFetchedOrders);
+                generateWilayaReport(allFetchedOrders);
+                updateAnalyticsData(allFetchedOrders);
             } catch(e) { console.error(e); }
+        }
+
+        function generateWilayaReport(orders) {
+            let wilayaMap = {};
+
+            orders.forEach(o => {
+                let status = o.status || '';
+                if(status.includes('مهملات')) return;
+
+                let w = o.wilaya || 'غير محددة';
+                let isHome = o.deliveryType && o.deliveryType.includes('المنزل');
+
+                if(!wilayaMap[w]) wilayaMap[w] = { home: 0, desk: 0, total: 0 };
+                if(isHome) wilayaMap[w].home++; else wilayaMap[w].desk++;
+                wilayaMap[w].total++;
+            });
+
+            let html = `
+                <table class="wilaya-table">
+                    <thead>
+                        <tr>
+                            <th>الولاية</th>
+                            <th>🏠 توصيل للمنزل</th>
+                            <th>🏢 توصيل للمكتب</th>
+                            <th>📦 إجمالي الطلبات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let hasData = false;
+            for(let w in wilayaMap) {
+                hasData = true;
+                html += `
+                    <tr>
+                        <td><b>${w}</b></td>
+                        <td style="color:#059669; font-weight:bold;">${wilayaMap[w].home} طلب</td>
+                        <td style="color:#2563eb; font-weight:bold;">${wilayaMap[w].desk} طلب</td>
+                        <td><span style="background:#e2e8f0; padding:4px 8px; border-radius:4px; font-weight:bold;">${wilayaMap[w].total}</span></td>
+                    </tr>
+                `;
+            }
+
+            if(!hasData) html += `<tr><td colspan="4" style="text-align:center; color:#64748b;">لا توجد طلبات مسجلة.</td></tr>`;
+            html += `</tbody></table>`;
+            document.getElementById('wilaya-report-content').innerHTML = html;
+        }
+
+        function updateAnalyticsData(orders) {
+            const dateFilterVal = document.getElementById('analytics-date-filter').value;
+
+            let totalBuyPrice = 0;
+            let totalSellPrice = 0;
+            let totalProfitFromArchive = 0;
+            let routerLoss = 0;
+            let dailyProfitsMap = {};
+
+            orders.forEach(o => {
+                let status = o.status || '';
+                if(status.includes('مهملات')) return;
+
+                let orderDateStr = '';
+                let orderMonthYear = '';
+                if(o.createdAt && o.createdAt.seconds) {
+                    let d = new Date(o.createdAt.seconds * 1000);
+                    orderDateStr = d.toISOString().split('T')[0];
+                    orderMonthYear = d.toLocaleDateString('ar-DZ', { year: 'numeric', month: 'long', day: 'numeric' });
+                }
+
+                if(dateFilterVal && orderDateStr !== dateFilterVal) return;
+
+                let pData = productsMap[o.productName] || { buyPrice: 0, margin: 0 };
+                let qty = o.quantity || 1;
+                let itemBuyTotal = pData.buyPrice * qty;
+                let itemSellTotal = (o.finalTotal || 0);
+
+                totalBuyPrice += itemBuyTotal;
+                totalSellPrice += itemSellTotal;
+
+                if(status.includes('مسلم') || status.includes('مؤكد')) {
+                    let itemProfit = pData.margin * qty;
+                    totalProfitFromArchive += itemProfit;
+
+                    if(orderDateStr) {
+                        if(!dailyProfitsMap[orderDateStr]) dailyProfitsMap[orderDateStr] = { label: orderMonthYear, profit: 0, count: 0 };
+                        dailyProfitsMap[orderDateStr].profit += itemProfit;
+                        dailyProfitsMap[orderDateStr].count++;
+                    }
+                }
+
+                if(status.includes('مرتجع') || status.includes('روتور')) {
+                    routerLoss += (o.shippingCost || 600);
+                }
+            });
+
+            document.getElementById('stat-total-profit').innerText = totalProfitFromArchive + ' دج';
+            document.getElementById('stat-total-buy-price').innerText = totalBuyPrice + ' دج';
+            document.getElementById('stat-total-sell-price').innerText = totalSellPrice + ' دج';
+            document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
+
+            let dailyHtml = '';
+            let sortedDates = Object.keys(dailyProfitsMap).sort().reverse();
+            if(sortedDates.length > 0) {
+                sortedDates.forEach(dateKey => {
+                    let item = dailyProfitsMap[dateKey];
+                    dailyHtml += `📅 <b>${item.label} (${dateKey}):</b> تم تحقيق <span style="color:#059669; font-weight:bold;">${item.profit} دج</span> أرباح من (${item.count}) طلبات مكتملة.<br>`;
+                });
+            } else {
+                dailyHtml = 'لا توجد أرباح مسجلة ضمن هذا التاريخ.';
+            }
+            document.getElementById('daily-profits-list').innerHTML = dailyHtml;
+
+            let summaryHtml = `
+                <h3>📊 ملخص الأداء المالي:</h3>
+                <ul>
+                    <li>إجمالي الأرباح الصافية المحققة (من الأرشيف فقط): <b style="color:#059669;">${totalProfitFromArchive} دج</b></li>
+                    <li>إجمالي تكلفة المشتريات (الشراء): <b>${totalBuyPrice} دج</b></li>
+                    <li>إجمالي المبيعات المحتملة/الفعلية: <b>${totalSellPrice} دج</b></li>
+                    <li>إجمالي الخسائر من طلبات الروتور: <b style="color:#dc2626;">${routerLoss} دج</b></li>
+                </ul>
+            `;
+            document.getElementById('analytics-summary').innerHTML = summaryHtml;
+        }
+
+        window.filterAnalyticsByDate = function() { updateAnalyticsData(allFetchedOrders); }
+        window.resetAnalyticsDate = function() {
+            document.getElementById('analytics-date-filter').value = '';
+            updateAnalyticsData(allFetchedOrders);
+        }
+
+        function renderOrdersFiltered(orders) {
+            let newDiv = document.getElementById('orders-list-new');
+            let procDiv = document.getElementById('orders-list-processing');
+            let shipDiv = document.getElementById('orders-list-shipping');
+            let archDiv = document.getElementById('orders-list-archive');
+            let retDiv = document.getElementById('orders-list-return');
+            let fakeDiv = document.getElementById('orders-list-fake');
+            let trashDiv = document.getElementById('orders-list-trash');
+
+            newDiv.innerHTML = procDiv.innerHTML = shipDiv.innerHTML = archDiv.innerHTML = retDiv.innerHTML = fakeDiv.innerHTML = trashDiv.innerHTML = '';
+
+            const txtNew = document.getElementById('search-input-new').value.toLowerCase();
+            const dateNew = document.getElementById('date-filter-new').value;
+
+            const txtProc = document.getElementById('search-input-processing').value.toLowerCase();
+            const dateProc = document.getElementById('date-filter-processing').value;
+
+            const txtShip = document.getElementById('search-input-shipping').value.toLowerCase();
+            const dateShip = document.getElementById('date-filter-shipping').value;
+
+            const txtArch = document.getElementById('search-input-archive').value.toLowerCase();
+            const dateArch = document.getElementById('date-filter-archive').value;
+
+            const txtRet = document.getElementById('search-input-return').value.toLowerCase();
+            const dateRet = document.getElementById('date-filter-return').value;
+
+            orders.forEach(o => {
+                const status = o.status || 'جديد ⏳';
+                const productData = productsMap[o.productName] || { img: 'https://via.placeholder.com/50' };
+                const thumbUrl = productData.img;
+                
+                let orderDateStr = '';
+                if(o.createdAt && o.createdAt.seconds) {
+                    let d = new Date(o.createdAt.seconds * 1000);
+                    orderDateStr = d.toISOString().split('T')[0];
+                }
+
+                let isFake = status.includes('وهمي');
+                let isTrash = status.includes('مهملات');
+                let cardClass = isFake ? 'order-mini-card fake-warning' : 'order-mini-card';
+
+                let miniCardHtml = `
+                    <div class="${cardClass}" onclick="openOrderModal('${o.id}')">
+                        <img src="${thumbUrl}" class="order-mini-thumb">
+                        <div>
+                            <h4>👤 ${o.fullName} ${isFake ? '🚨(وهمي)' : ''}</h4>
+                            <p><b>الهاتف:</b> ${o.phone}</p>
+                            <p><b>الولاية:</b> ${o.wilaya} (${o.deliveryType || 'منزل'})</p>
+                            <p style="color:#ef4444; font-weight:bold;">${o.finalTotal || 0} دج</p>
+                        </div>
+                    </div>
+                `;
+
+                const matchSearch = (term, dateVal) => {
+                    let matchesTxt = `${o.fullName} ${o.phone} ${o.wilaya} ${o.commune} ${o.productName}`.toLowerCase().includes(term);
+                    let matchesDate = !dateVal || orderDateStr === dateVal;
+                    return matchesTxt && matchesDate;
+                };
+
+                if(isTrash) {
+                    trashDiv.innerHTML += miniCardHtml;
+                } else if(isFake) {
+                    fakeDiv.innerHTML += miniCardHtml;
+                } else if(status.includes('جديد') && matchSearch(txtNew, dateNew)) {
+                    newDiv.innerHTML += miniCardHtml;
+                } else if(status.includes('المعالجة') && matchSearch(txtProc, dateProc)) {
+                    procDiv.innerHTML += miniCardHtml;
+                } else if(status.includes('التوصيل') && matchSearch(txtShip, dateShip)) {
+                    shipDiv.innerHTML += miniCardHtml;
+                } else if(status.includes('مسلم') && matchSearch(txtArch, dateArch)) {
+                    archDiv.innerHTML += miniCardHtml;
+                } else if(status.includes('مرتجع') && matchSearch(txtRet, dateRet)) {
+                    retDiv.innerHTML += miniCardHtml;
+                }
+            });
+
+            if(trashDiv.innerHTML === '') trashDiv.innerHTML = '<p style="color:#64748b; text-align:center;">سلة المهملات فارغة.</p>';
+        }
+
+        window.filterOrdersList = function(tabKey) { renderOrdersFiltered(allFetchedOrders); }
+        window.resetFilters = function(tabKey) {
+            document.getElementById(`search-input-${tabKey}`).value = '';
+            document.getElementById(`date-filter-${tabKey}`).value = '';
+            renderOrdersFiltered(allFetchedOrders);
         }
 
         async function loadAdminReviews() {
@@ -397,12 +891,8 @@
                     }
                 });
 
-                if(totalReviewsCount === 0) {
-                    listDiv.innerHTML = '<p style="color:#64748b; text-align:center;">لا توجد تعليقات أو تقييمات مسجلة حتى الآن.</p>';
-                }
-            } catch(e) {
-                listDiv.innerHTML = '<p style="color:red;">خطأ في تحميل التعليقات.</p>';
-            }
+                if(totalReviewsCount === 0) listDiv.innerHTML = '<p style="color:#64748b; text-align:center;">لا توجد تعليقات مسجلة.</p>';
+            } catch(e) { listDiv.innerHTML = '<p style="color:red;">خطأ في تحميل التعليقات.</p>'; }
         }
 
         window.updateOrderStatus = async function(id, newStatus) {
@@ -420,7 +910,8 @@
             list.innerHTML = '';
             snap.forEach(d => {
                 const p = d.data();
-                list.innerHTML += `<div class="product-row"><span><b>${p.name}</b> [${p.price} دج] - المخزون: ${p.stock}</span></div>`;
+                let margin = p.profitMargin || (p.price - p.buyPrice || 0);
+                list.innerHTML += `<div class="product-row"><span><b>${p.name}</b> [شراء: ${p.buyPrice || 0} دج | بيع: ${p.price} دج | ربح القطعة: <b style="color:green;">+${margin} دج</b>] - المخزون: ${p.stock}</span></div>`;
             });
         }
     </script>
