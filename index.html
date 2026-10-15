@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>متجري العالمي - COD DZ</title>
+    <title>متجري العالمي - الفلاتر والأصناف</title>
     <style>
         :root { --primary: #131921; --secondary: #232f3e; --accent: #febd69; --danger: #b12704; --success: #008060; --bg: #eaeded; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #0f1111; }
@@ -15,15 +15,19 @@
         .admin-btn { background: #f59e0b; color: white; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; }
         
         .container { max-width: 1200px; margin: auto; padding: 20px 15px; }
+
+        /* شريط الأصناف والفلتر (Categories & Filter Bar) */
+        .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 20px; white-space: nowrap; }
+        .filter-btn { background: white; border: 1px solid #d5d9d9; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; color: #333; transition: 0.2s; flex-shrink: 0; }
+        .filter-btn.active, .filter-btn:hover { background: var(--secondary); color: white; border-color: var(--secondary); }
+
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
         .product-card { background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #d5d9d9; display: flex; flex-direction: column; cursor: pointer; }
         .product-img { width: 100%; height: 180px; object-fit: contain; background: #fff; }
         .product-body { padding: 12px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; }
         
-        /* إشعار سلة التسوق المصغر (Toast Notification) */
         #toast-notification { position: fixed; bottom: 20px; right: 20px; background: #232f3e; color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 9999; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 
-        /* صفحة تفاصيل المنتج والعروض */
         #product-detail-view { display: none; background: white; padding: 25px; border-radius: 10px; border: 1px solid #d5d9d9; }
         .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media(max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } }
@@ -32,7 +36,6 @@
         .qty-btn { background: #e2e8f0; border: none; width: 35px; height: 35px; font-weight: bold; font-size: 18px; border-radius: 6px; cursor: pointer; }
         .qty-input { width: 50px; text-align: center; font-size: 16px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; }
 
-        /* عروض الأسعار (خط أحمر مشطوب ❌ وصح أخضر ✔️) */
         .offer-card { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; }
         .offer-card.selected { border-color: var(--success); background: #f0fdf4; }
         .old-price { color: #dc2626; text-decoration: line-through; font-size: 15px; margin-left: 8px; font-weight: bold; }
@@ -59,18 +62,26 @@
 
     <div class="container">
         <div id="home-view">
-            <h2 style="margin-top:0;">🔥 أحدث المنتجات والعروض الخاصة</h2>
+            <!-- شريط الفلاتر والأصناف السريع -->
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="filterByCategory('الكل', this)">🔥 الكل</button>
+                <button class="filter-btn" onclick="filterByCategory('ساعات اليد', this)">⌚ ساعات اليد</button>
+                <button class="filter-btn" onclick="filterByCategory('الملابس', this)">👕 الملابس</button>
+                <button class="filter-btn" onclick="filterByCategory('الإلكترونيات', this)">📱 الإلكترونيات</button>
+                <button class="filter-btn" onclick="filterByCategory('الأحذية', this)">👟 الأحذية</button>
+                <button class="filter-btn" onclick="filterByCategory('أكسسوارات', this)">🕶️ أكسسوارات</button>
+            </div>
+
             <div id="store-products-grid" class="products-grid">جاري التحميل...</div>
         </div>
 
-        <!-- صفحة عرض المنتج وتفاصيل العروض وكمية + و - -->
         <div id="product-detail-view">
             <button onclick="backToHome()" style="background:#232f3e; color:white; border:none; padding:8px 14px; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:15px;">← العودة للمتجر</button>
             <div id="detail-content-area"></div>
         </div>
     </div>
 
-    <!-- نافذة إتمام الطلب (COD شركات التوصيل وتكلفة التوصيل منزل/مكتب) -->
+    <!-- نافذة إتمام الطلب (COD) -->
     <div class="modal-overlay" id="checkoutModal">
         <div class="modal-card" id="checkout-modal-body">
             <h3 style="margin-top:0; border-bottom:1px solid #d5d9d9; padding-bottom:8px;">📦 إتمام الطلب والدفع عند الاستلام (COD)</h3>
@@ -98,7 +109,7 @@
                 💵 سعر المنتجات: <b id="summary-product-price">0 دج</b><br>
                 🚚 سعر التوصيل: <b id="summary-shipping-price">750 دج</b><br>
                 <hr style="border:0; border-top:1px solid #cbd5e1; margin:6px 0;">
-                💰 <b>المجموع الإجمالي للدفع عند الاستلام (COD):</b> <span id="checkout-final-total" style="color:var(--danger); font-weight:bold; font-size:18px;">0</span> دج
+                💰 <b>المجموع الإجمالي (COD):</b> <span id="checkout-final-total" style="color:var(--danger); font-weight:bold; font-size:18px;">0</span> دج
             </div>
             <button onclick="submitCODOrder()" style="background:#ffd814; border:1px solid #fcd200; width:100%; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب الآن 🚀</button>
             <button onclick="document.getElementById('checkoutModal').style.display='none'" style="background:#64748b; color:white; border:none; width:100%; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:8px;">إلغاء</button>
@@ -130,16 +141,33 @@
             let snap = await getDocs(collection(db, "products"));
             allProducts = [];
             snap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
+            renderProductsGrid(allProducts);
+        }
+
+        window.filterByCategory = (category, btn) => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            
+            if(category === 'الكل') {
+                renderProductsGrid(allProducts);
+            } else {
+                let filtered = allProducts.filter(p => p.category === category);
+                renderProductsGrid(filtered);
+            }
+        }
+
+        function renderProductsGrid(products) {
             let grid = document.getElementById('store-products-grid');
             grid.innerHTML = '';
-            if(allProducts.length === 0) { grid.innerHTML = '<p>لا توجد منتجات.</p>'; return; }
-            allProducts.forEach(p => {
+            if(products.length === 0) { grid.innerHTML = '<p style="text-align:center; color:#666; grid-column:1/-1;">لا توجد منتجات في هذا الصنف حالياً.</p>'; return; }
+            products.forEach(p => {
                 let img = p.imageUrls?.[0] || 'https://via.placeholder.com/200';
-                grid.innerHTML = `
+                grid.innerHTML += `
                     <div class="product-card" onclick="openProductDetail('${p.id}')">
                         <img src="${img}" class="product-img">
                         <div class="product-body">
-                            <h3 style="margin:0 0 8px 0; font-size:15px;">${p.name}</h3>
+                            <h3 style="margin:0 0 6px 0; font-size:15px;">${p.name}</h3>
+                            <div style="font-size:12px; color:#666; margin-bottom:8px;">📁 ${p.category || 'عام'}</div>
                             <div style="color:var(--danger); font-weight:bold; font-size:17px; margin-bottom:10px;">${p.price} دج</div>
                             <button onclick="event.stopPropagation(); addToCartQuick('${p.id}')" style="background:#ffd814; border:none; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer; width:100%;">أضف للسلة 🛒</button>
                         </div>
@@ -148,7 +176,6 @@
             });
         }
 
-        // إشعار سلة التسوق المصغر Toast
         window.showToast = () => {
             let t = document.getElementById('toast-notification');
             t.style.display = 'block';
@@ -192,10 +219,10 @@
                     <div><img src="${selectedProduct.imageUrls?.[0] || 'https://via.placeholder.com/300'}" style="max-width:100%; height:300px; object-fit:contain; background:#f8fafc; border-radius:8px;"></div>
                     <div>
                         <h2>${selectedProduct.name}</h2>
+                        <div style="font-size:13px; color:#666; margin-bottom:10px;">📁 الصنف: ${selectedProduct.category || 'عام'}</div>
                         <div id="display-product-price" style="font-size:24px; color:var(--danger); font-weight:bold; margin:10px 0;">${selectedOfferPrice} دج</div>
                         ${offersHtml}
                         
-                        <!-- نظام زيادة ونقصان الكمية + و - -->
                         <div class="qty-box">
                             <label style="margin:0;">الكمية:</label>
                             <button class="qty-btn" onclick="changeQty(-1)">-</button>
