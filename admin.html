@@ -59,39 +59,51 @@
         <div class="container" style="padding: 10px;">
             <div class="tabs-nav">
                 <button class="tab-btn active" onclick="switchTab('orders-tab', event)">⏳ الطلبات</button>
-                <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج مع عروض</button>
+                <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج وعروض</button>
                 <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المنتجات</button>
             </div>
         </div>
 
         <div id="orders-tab" class="tab-content active"><div class="container"><h2>إدارة طلبات COD ⏳</h2><div id="orders-list-new" class="orders-grid-compact">جاري التحميل...</div></div></div>
 
-        <!-- تبويب إضافة منتج مع نظام العروض المتعددة -->
+        <!-- تبويب إضافة منتج مع اختيار التصنيف (ساعات، ملابس، إلخ) -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
-                <h2>إضافة منتج مع عروض وتخفيضات (COD) ➕</h2>
+                <h2>إضافة منتج وتصنيفه (مع العروض) ➕</h2>
                 <div class="form-group"><label>اسم المنتج الأساسي:</label><input type="text" id="prod-name"></div>
                 <div class="form-group"><label>سعر الشراء:</label><input type="number" id="prod-buy-price"></div>
                 <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="prod-price"></div>
+                
+                <div class="form-group">
+                    <label>اختر الصنف / القسم:</label>
+                    <select id="prod-category">
+                        <option value="الكل">عام / رئيسي</option>
+                        <option value="ساعات اليد">ساعات اليد ⌚</option>
+                        <option value="الملابس">الملابس 👕</option>
+                        <option value="الإلكترونيات">الإلكترونيات 📱</option>
+                        <option value="الأحذية">الأحذية 👟</option>
+                        <option value="أكسسوارات">أكسسوارات 🕶️</option>
+                    </select>
+                </div>
+
                 <div class="form-group"><label>روابط الصور (فصل بينها بفواصل):</label><textarea id="prod-imgs" style="height:60px;" placeholder="https://..."></textarea></div>
                 <div class="form-group"><label>رابط الفيديو:</label><input type="text" id="prod-video" placeholder="https://..."></div>
                 
                 <hr style="margin:20px 0;">
-                <h3>🔥 قسم العروض والتخفيضات الخاصة</h3>
-                <div class="form-group"><label><input type="checkbox" id="enable-offers"> <b>تفعيل وإظهار العروض للزبائن في واجهة العرض</b></label></div>
+                <h3>🔥 العروض والتخفيضات الخاصة</h3>
+                <div class="form-group"><label><input type="checkbox" id="enable-offers"> <b>تفعيل وإظهار العروض للزبائن</b></label></div>
                 
                 <div id="offers-container">
-                    <!-- نموذج عرض افتراضي أولي -->
                     <div class="offer-row" style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:10px;">
-                        <div class="form-group"><label>عنوان أو وصف العرض (مثال: عرض حزمة 2 قطع):</label><input type="text" class="offer-title" placeholder="عرض خاص..."></div>
-                        <div class="form-group"><label>السعر القديم (يظهر مشطوباً بخط أحمر ❌):</label><input type="number" class="offer-old-price" placeholder="مثال: 3500"></div>
-                        <div class="form-group"><label>سعر العرض الجديد (يظهر بجانبه علامة صح خضراء ✔️):</label><input type="number" class="offer-new-price" placeholder="مثال: 2500"></div>
+                        <div class="form-group"><label>عنوان أو وصف العرض:</label><input type="text" class="offer-title" placeholder="عرض خاص..."></div>
+                        <div class="form-group"><label>السعر القديم (مشطوب بالأحمر ❌):</label><input type="number" class="offer-old-price" placeholder="مثال: 3500"></div>
+                        <div class="form-group"><label>سعر العرض الجديد (صح بالأخضر ✔️):</label><input type="number" class="offer-new-price" placeholder="مثال: 2500"></div>
                     </div>
                 </div>
                 <button type="button" onclick="addOfferField()" class="btn-secondary" style="background:#3b82f6; margin-bottom:15px;">➕ إضافة عرض آخر</button>
 
                 <div class="form-group"><label>الوصف:</label><textarea id="prod-desc"></textarea></div>
-                <button onclick="addProduct()">نشر المنتج والعروض للمتجر 🚀</button>
+                <button onclick="addProduct()">نشر المنتج والتصنيف 🚀</button>
             </div>
         </div>
 
@@ -144,6 +156,7 @@
             let name = document.getElementById('prod-name').value.trim();
             let buyPrice = Number(document.getElementById('prod-buy-price').value) || 0;
             let price = Number(document.getElementById('prod-price').value) || 0;
+            let category = document.getElementById('prod-category').value;
             let videoUrl = document.getElementById('prod-video').value.trim();
             let description = document.getElementById('prod-desc').value.trim();
             let imageUrls = document.getElementById('prod-imgs').value.split(',').map(s => s.trim()).filter(Boolean);
@@ -161,8 +174,8 @@
 
             if(!name || !price) { showAlert('تنبيه', 'أدخل اسم المنتج والسعر!'); return; }
 
-            await addDoc(collection(db, "products"), { name, buyPrice, price, imageUrls, videoUrl, description, enableOffers, offers, createdAt: new Date() });
-            showAlert('نجاح', 'تم نشر المنتج والعروض بنجاح!');
+            await addDoc(collection(db, "products"), { name, buyPrice, price, category, imageUrls, videoUrl, description, enableOffers, offers, createdAt: new Date() });
+            showAlert('نجاح', 'تم نشر المنتج مع التصنيف بنجاح!');
             loadProducts();
         }
 
@@ -172,7 +185,7 @@
             list.innerHTML = '';
             snap.forEach(d => {
                 let p = d.data();
-                list.innerHTML += `<div style="background:#f8fafc; padding:10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between;"><span><b>${p.name}</b> [${p.price} دج]</span><button onclick="deleteDoc(doc(db, 'products', '${d.id}'));loadProducts();" class="btn-danger" style="padding:4px 8px;">حذف</button></div>`;
+                list.innerHTML += `<div style="background:#f8fafc; padding:10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between;"><span><b>${p.name}</b> [${p.category || 'عام'}] - ${p.price} دج</span><button onclick="deleteDoc(doc(db, 'products', '${d.id}'));loadProducts();" class="btn-danger" style="padding:4px 8px;">حذف</button></div>`;
             });
         }
 
