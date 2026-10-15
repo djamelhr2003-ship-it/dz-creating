@@ -50,6 +50,7 @@
 
         .staff-status-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .variant-box-admin { background: #fef9c3; border: 1.5px solid #facc15; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .date-filter-bar { background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
     </style>
 </head>
 <body>
@@ -171,13 +172,90 @@
             </div>
         </div>
 
-        <div id="orders-tab" class="tab-content active"><div class="container"><h2>الطلبات الجديدة ⏳</h2><div id="orders-list-new" class="orders-grid-compact">جاري التحميل...</div></div></div>
-        <div id="fake-orders-tab" class="tab-content"><div class="container" style="border:2px solid #dc2626;"><h2 style="color:#dc2626;">⚠️ الطلبات الوهمية والمكررة</h2><div id="orders-list-fake" class="orders-grid-compact">جاري التحميل...</div></div></div>
-        <div id="processing-tab" class="tab-content"><div class="container"><h2>قيد المعالجة 🔄</h2><div id="orders-list-processing" class="orders-grid-compact">جاري التحميل...</div></div></div>
-        <div id="shipping-tab" class="tab-content"><div class="container"><h2>جاري التوصيل 🚚</h2><div id="orders-list-shipping" class="orders-grid-compact">جاري التحميل...</div></div></div>
-        <div id="archive-tab" class="tab-content"><div class="container"><h2>الأرشيف ✅</h2><div id="orders-list-archive" class="orders-grid-compact">جاري التحميل...</div></div></div>
-        <div id="return-tab" class="tab-content"><div class="container"><h2>الروتور ⚠️</h2><div id="orders-list-return" class="orders-grid-compact">جاري التحميل...</div></div></div>
-        <div id="cancelled-tab" class="tab-content"><div class="container"><h2>الطلبات الملغية ❌</h2><div id="orders-list-cancelled" class="orders-grid-compact">جاري التحميل...</div></div></div>
+        <div id="orders-tab" class="tab-content active">
+            <div class="container">
+                <h2>الطلبات الجديدة ⏳</h2>
+                <div class="date-filter-bar">
+                    <label style="margin:0;">📅 تصفية حسب التاريخ:</label>
+                    <input type="date" id="filter-date-new" onchange="filterOrdersByDate()" style="width:auto; flex:1;">
+                    <button onclick="resetDateFilter('new')" class="btn-secondary" style="padding:6px 12px; font-size:12px;">عرض الكل 🔄</button>
+                </div>
+                <div id="orders-list-new" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
+        </div>
+        
+        <div id="fake-orders-tab" class="tab-content">
+            <div class="container" style="border:2px solid #dc2626;">
+                <h2 style="color:#dc2626;">⚠️ الطلبات الوهمية والمكررة</h2>
+                <div class="date-filter-bar">
+                    <label style="margin:0;">📅 تصفية حسب التاريخ:</label>
+                    <input type="date" id="filter-date-fake" onchange="filterOrdersByDate()" style="width:auto; flex:1;">
+                    <button onclick="resetDateFilter('fake')" class="btn-secondary" style="padding:6px 12px; font-size:12px;">عرض الكل 🔄</button>
+                </div>
+                <div id="orders-list-fake" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
+        </div>
+
+        <div id="processing-tab" class="tab-content">
+            <div class="container">
+                <h2>قيد المعالجة 🔄</h2>
+                <div class="date-filter-bar">
+                    <label style="margin:0;">📅 تصفية حسب التاريخ:</label>
+                    <input type="date" id="filter-date-proc" onchange="filterOrdersByDate()" style="width:auto; flex:1;">
+                    <button onclick="resetDateFilter('proc')" class="btn-secondary" style="padding:6px 12px; font-size:12px;">عرض الكل 🔄</button>
+                </div>
+                <div id="orders-list-processing" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
+        </div>
+
+        <div id="shipping-tab" class="tab-content">
+            <div class="container">
+                <h2>جاري التوصيل 🚚</h2>
+                <div class="date-filter-bar">
+                    <label style="margin:0;">📅 تصفية حسب التاريخ:</label>
+                    <input type="date" id="filter-date-ship" onchange="filterOrdersByDate()" style="width:auto; flex:1;">
+                    <button onclick="resetDateFilter('ship')" class="btn-secondary" style="padding:6px 12px; font-size:12px;">عرض الكل 🔄</button>
+                </div>
+                <div id="orders-list-shipping" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
+        </div>
+
+        <div id="archive-tab" class="tab-content">
+            <div class="container">
+                <h2>الأرشيف ✅</h2>
+                <div class="date-filter-bar">
+                    <label style="margin:0;">📅 تصفية حسب التاريخ:</label>
+                    <input type="date" id="filter-date-arch" onchange="filterOrdersByDate()" style="width:auto; flex:1;">
+                    <button onclick="resetDateFilter('arch')" class="btn-secondary" style="padding:6px 12px; font-size:12px;">عرض الكل 🔄</button>
+                </div>
+                <div id="orders-list-archive" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
+        </div>
+
+        <div id="return-tab" class="tab-content">
+            <div class="container">
+                <h2>الروتور ⚠️</h2>
+                <div class="date-filter-bar">
+                    <label style="margin:0;">📅 تصفية حسب التاريخ:</label>
+                    <input type="date" id="filter-date-ret" onchange="filterOrdersByDate()" style="width:auto; flex:1;">
+                    <button onclick="resetDateFilter('ret')" class="btn-secondary" style="padding:6px 12px; font-size:12px;">عرض الكل 🔄</button>
+                </div>
+                <div id="orders-list-return" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
+        </div>
+
+        <div id="cancelled-tab" class="tab-content">
+            <div class="container">
+                <h2>الطلبات الملغية ❌</h2>
+                <div class="date-filter-bar">
+                    <label style="margin:0;">📅 تصفية حسب التاريخ:</label>
+                    <input type="date" id="filter-date-canc" onchange="filterOrdersByDate()" style="width:auto; flex:1;">
+                    <button onclick="resetDateFilter('canc')" class="btn-secondary" style="padding:6px 12px; font-size:12px;">عرض الكل 🔄</button>
+                </div>
+                <div id="orders-list-cancelled" class="orders-grid-compact">جاري التحميل...</div>
+            </div>
+        </div>
+
         <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ سلة المهملات</h2><div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div></div></div>
 
         <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات</h2><div id="wilaya-report-content">جاري التجهيز...</div></div></div>
@@ -225,7 +303,7 @@
                     
                     <div style="background:white; padding:10px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:12px;">
                         <label style="margin-bottom:8px; color:#1e293b;">الصلاحيات المسموح بها للموظف:</label>
-                        <label style="font-weight:normal; font-size:13px; margin-bottom:5px;"><input type="checkbox" id="perm-process" checked> معالجة وتأكيد الطلبات</label>
+                        <label style="font-weight:normal; font-size:13px; margin-bottom:5px;"><input type="checkbox" id="perm-process" checked> معالجة وتأكيد الطلبات (مثل الأدمن)</label>
                         <label style="font-weight:normal; font-size:13px; margin-bottom:5px;"><input type="checkbox" id="perm-add-prod" checked> إضافة وتعديل المنتجات</label>
                         <label style="font-weight:normal; font-size:13px;"><input type="checkbox" id="perm-delete"> صلاحية الحذف (للمهملات)</label>
                     </div>
@@ -465,6 +543,21 @@
             } catch(e) {}
         }
 
+        window.filterOrdersByDate = function() {
+            renderOrdersFiltered(allFetchedOrders);
+        }
+
+        window.resetDateFilter = function(type) {
+            if(type === 'new') document.getElementById('filter-date-new').value = '';
+            if(type === 'fake') document.getElementById('filter-date-fake').value = '';
+            if(type === 'proc') document.getElementById('filter-date-proc').value = '';
+            if(type === 'ship') document.getElementById('filter-date-ship').value = '';
+            if(type === 'arch') document.getElementById('filter-date-arch').value = '';
+            if(type === 'ret') document.getElementById('filter-date-ret').value = '';
+            if(type === 'canc') document.getElementById('filter-date-canc').value = '';
+            renderOrdersFiltered(allFetchedOrders);
+        }
+
         function renderOrdersFiltered(orders) {
             let newDiv = document.getElementById('orders-list-new');
             let fakeDiv = document.getElementById('orders-list-fake');
@@ -477,11 +570,26 @@
 
             if(newDiv) newDiv.innerHTML = fakeDiv.innerHTML = procDiv.innerHTML = shipDiv.innerHTML = archDiv.innerHTML = retDiv.innerHTML = cancelDiv.innerHTML = trashDiv.innerHTML = '';
 
+            let dateNew = document.getElementById('filter-date-new')?.value || '';
+            let dateFake = document.getElementById('filter-date-fake')?.value || '';
+            let dateProc = document.getElementById('filter-date-proc')?.value || '';
+            let dateShip = document.getElementById('filter-date-ship')?.value || '';
+            let dateArch = document.getElementById('filter-date-arch')?.value || '';
+            let dateRet = document.getElementById('filter-date-ret')?.value || '';
+            let dateCanc = document.getElementById('filter-date-canc')?.value || '';
+
             orders.forEach(o => {
                 const status = o.status || 'جديد ⏳';
                 let pImg = o.imageUrl || productsMap[o.productName]?.img || 'https://via.placeholder.com/50';
                 let isTrash = status.includes('مهملات');
                 let variantText = (o.color || o.size) ? `<br><span style="font-size:10px; color:#2563eb;">اللون: ${o.color || '-'} | المقاس: ${o.size || '-'}</span>` : '';
+
+                let orderDateStr = '';
+                if(o.createdAt?.toDate) {
+                    orderDateStr = o.createdAt.toDate().toISOString().split('T')[0];
+                } else {
+                    orderDateStr = new Date().toISOString().split('T')[0];
+                }
 
                 let deleteButtonHtml = '';
                 if(staffPermissions.del) {
@@ -499,20 +607,31 @@
                             <div style="overflow:hidden;">
                                 <h4 style="margin:0 0 2px 0; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">👤 ${o.fullName}</h4>
                                 <p style="margin:0; font-size:11px; color:#555;">📦 ${o.productName}${variantText}</p>
+                                <p style="margin:0; font-size:10px; color:#64748b;">📅 ${orderDateStr}</p>
                                 <p style="margin:0; color:#ef4444; font-weight:bold; font-size:12px;">${o.finalTotal || 0} دج</p>
                             </div>
                         </div>
                         <div>${deleteButtonHtml}</div>
                     </div>
                 `;
-                if(isTrash) trashDiv.innerHTML += cardHtml;
-                else if(status.includes('جديد')) newDiv.innerHTML += cardHtml;
-                else if(status.includes('وهمي')) fakeDiv.innerHTML += cardHtml;
-                else if(status.includes('المعالجة')) procDiv.innerHTML += cardHtml;
-                else if(status.includes('التوصيل')) shipDiv.innerHTML += cardHtml;
-                else if(status.includes('أرشيف')) archDiv.innerHTML += cardHtml;
-                else if(status.includes('روتور')) retDiv.innerHTML += cardHtml;
-                else if(status.includes('ملغى')) cancelDiv.innerHTML += cardHtml;
+
+                if(isTrash) {
+                    trashDiv.innerHTML += cardHtml;
+                } else if(status.includes('جديد')) {
+                    if(!dateNew || orderDateStr === dateNew) newDiv.innerHTML += cardHtml;
+                } else if(status.includes('وهمي')) {
+                    if(!dateFake || orderDateStr === dateFake) fakeDiv.innerHTML += cardHtml;
+                } else if(status.includes('المعالجة')) {
+                    if(!dateProc || orderDateStr === dateProc) procDiv.innerHTML += cardHtml;
+                } else if(status.includes('التوصيل')) {
+                    if(!dateShip || orderDateStr === dateShip) shipDiv.innerHTML += cardHtml;
+                } else if(status.includes('أرشيف')) {
+                    if(!dateArch || orderDateStr === dateArch) archDiv.innerHTML += cardHtml;
+                } else if(status.includes('روتور')) {
+                    if(!dateRet || orderDateStr === dateRet) retDiv.innerHTML += cardHtml;
+                } else if(status.includes('ملغى')) {
+                    if(!dateCanc || orderDateStr === dateCanc) cancelDiv.innerHTML += cardHtml;
+                }
             });
         }
 
@@ -561,7 +680,6 @@
             let variantDetails = (o.color || o.size) ? `<br><b>🎨 اللون والمقاس:</b> اللون: ${o.color || '-'} | المقاس: ${o.size || '-'}` : '';
             let notesHtml = o.customerNotes ? `<br><b>💬 ملاحظة الزبون:</b> <span style="color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:4px;">${o.customerNotes}</span>` : '<br><b>💬 ملاحظة الزبون:</b> لا توجد ملاحظات';
 
-            // جدول التوقيتات والأوقات لكل حالة سجلت في الطلب
             let timingTable = `
                 <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:10px; margin-top:10px; font-size:12px;">
                     <b style="color:#1e293b;">📅 جدول التوقيت وسجل الحالات:</b><br>
@@ -591,8 +709,6 @@
             `;
 
             let actionsHtml = '';
-            let currentStatus = o.status || '';
-
             if(!staffPermissions.process) {
                 actionsHtml = '<p style="color:red;">ليس لديك صلاحية تعديل حالة الطلبات.</p>';
             } else {
@@ -675,7 +791,7 @@
 
             for(let u in staffList) {
                 let perms = staffList[u].permissions || {};
-                let pText = `معالجة: ${perms.process ? '✅':'❌'} | إضافة منتجات: ${perms.addProd ? '✅':'❌'} | حذف: ${perms.del ? '✅':'❌'}`;
+                let pText = `معالجة وتأكيد: ${perms.process ? '✅':'❌'} | إضافة منتجات: ${perms.addProd ? '✅':'❌'} | حذف: ${perms.del ? '✅':'❌'}`;
                 let deleteStaffBtn = isUserAdmin ? `<button onclick="promptDeleteStaff('${u}')" class="btn-danger" style="padding:4px 10px; font-size:11px;">حذف 🗑️</button>` : '';
 
                 html += `
