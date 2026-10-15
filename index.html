@@ -530,7 +530,6 @@
             let deliveryFee = deliveryType.includes('منزل') ? 600 : 400;
             let finalTotal = subtotal + deliveryFee;
 
-            // حفظ المنتجات التي طلبها الزبون لنتمكن من عرض نافذة تقييمها بعد إتمام الطلب
             let orderedItemsForReview = [...cart];
 
             try {
@@ -552,17 +551,14 @@
 
                 cart = [];
                 document.getElementById('cart-count').innerText = '0';
-
-                // تحويل نافذة السلة فوراً إلى "رسالة النجاح وتقييم المنتجات المطلوبة"
-                showOrderSuccessAndReviewModal(fullName, orderedItemsForReview);
+                showOrderSuccessAndReviewModal(fullName, phone, orderedItemsForReview);
 
             } catch(e) {
                 alert('فشل إرسال الطلب، حاول مرة أخرى.');
             }
         }
 
-        // نافذة النجاح وإظهار خيار التعليق والتقييم بعد إتمام الطلب مباشرة
-        function showOrderSuccessAndReviewModal(clientName, orderedItems) {
+        function showOrderSuccessAndReviewModal(clientName, clientPhone, orderedItems) {
             let cardModalContent = document.getElementById('cart-modal-card-content');
             
             let reviewsHtml = '';
@@ -590,14 +586,24 @@
             cardModalContent.innerHTML = `
                 <div style="text-align:center;">
                     <h2 style="color:#16a34a; margin-top:0;">🎉 تم إرسال طلبك بنجاح يا ${clientName}!</h2>
-                    <p style="color:#475569; font-size:14px; line-height:1.5;">سنتصل بك قريباً عبر الهاتف لتأكيد الطلب. نود معرفة رأيك وتقييمك للمنتجات التي طلبتها:</p>
+                    <p style="color:#475569; font-size:14px; line-height:1.5;">سنتصل بك قريباً للتأكيد. نود معرفة رأيك وتقييمك للمنتجات:</p>
                 </div>
                 ${reviewsHtml}
-                <button onclick="submitPostOrderReviews(${JSON.stringify(orderedItems).replace(/'/g, "&apos;")}, '${clientName}')" style="background:#2563eb; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إرسال التقييمات وإنهاء الطلب 🚀</button>
+                <button onclick='submitPostOrderReviews(${JSON.stringify(orderedItems).replace(/'/g, "&apos;")}, "${clientName}", "${clientPhone}")' style="background:#2563eb; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إرسال التقييم 🚀</button>
             `;
         }
 
-        window.submitPostOrderReviews = function(orderedItems, clientName) {
+        // إرسال التقييمات مع التحقق من عدم تكرار نفس الشخص أكثر من مرة في اليوم
+        window.submitPostOrderReviews = function(orderedItems, clientName, clientPhone) {
+            let todayStr = new Date().toISOString().split('T')[0];
+            let reviewLimitKey = `dz_review_limit_${clientPhone}_${todayStr}`;
+
+            if(localStorage.getItem(reviewLimitKey)) {
+                showThankYouMessage();
+                return;
+            }
+
+            let hasSubmittedAny = false;
             orderedItems.forEach((item, idx) => {
                 let rating = document.getElementById(`success-rating-${idx}`).value;
                 let comment = document.getElementById(`success-comment-${idx}`).value.trim();
@@ -607,11 +613,31 @@
                     let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
                     reviews.push({ name: clientName, rating, comment, date: new Date().toLocaleDateString('ar-DZ') });
                     localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+                    hasSubmittedAny = true;
                 }
             });
 
-            alert('شكراً لك على تقييمك وثقتك بنا! ❤️');
-            document.getElementById('cartModal').style.display = 'none';
+            if(hasSubmittedAny) {
+                localStorage.setItem(reviewLimitKey, 'true');
+            }
+
+            showThankYouMessage();
+        }
+
+        // نافذة الشكر النهائية التي تحتوي على زري "إلغاء" و "التسوق من جديد"
+        function showThankYouMessage() {
+            let cardModalContent = document.getElementById('cart-modal-card-content');
+            cardModalContent.innerHTML = `
+                <div style="text-align:center; padding: 20px 0;">
+                    <h2 style="color:#16a34a; font-size:24px; margin-bottom:10px;">🙏 شكراً على طلبكم!</h2>
+                    <p style="color:#475569; font-size:15px; margin-bottom:25px;">نحن ندرك قيمتكم ونسعد بخدمتكم دائماً.</p>
+                    
+                    <div style="display:flex; gap:10px;">
+                        <button onclick="document.getElementById('cartModal').style.display='none'" style="background:#64748b; color:white; flex:1; padding:12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إلغاء / إغلاق ❌</button>
+                        <button onclick="location.reload()" style="background:#2563eb; color:white; flex:1; padding:12px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">التسوق من جديد 🛍️</button>
+                    </div>
+                </div>
+            `;
         }
 
         function renderReviews(productId) {
@@ -619,7 +645,7 @@
             if(!container) return;
             let reviews = JSON.parse(localStorage.getItem(`dz_reviews_${productId}`)) || [];
             if(reviews.length === 0) {
-                container.innerHTML = '<p style="font-size:12px; color:#64748b;">لا توجد تعليقات بعد لهذا المنتج. ستظهر هنا تقييمات العملاء بعد الطلب!</p>';
+                container.innerHTML = '<p style="font-size:12px; color:#64748b;">لا توجد تعليقات بعد لهذا المنتج.</p>';
                 return;
             }
             let html = '';
