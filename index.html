@@ -35,15 +35,16 @@
         .btn-cart { background: #f59e0b; color: white; border: none; flex: 1; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
         .btn-buy { background: #2563eb; color: white; border: none; flex: 1; padding: 8px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
         
-        .qty-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0; background: #f1f5f9; padding: 6px; border-radius: 6px; }
-        .qty-btn { background: #cbd5e1; border: none; width: 30px; height: 30px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .qty-container { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 0; background: #f1f5f9; padding: 5px; border-radius: 6px; }
+        .qty-btn { background: #cbd5e1; border: none; width: 26px; height: 26px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 14px; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-card { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        
+        /* التبويبات والصفحات الكاملة بدلاً من النوافذ العائمة */
+        .page-view { display: none; background: white; padding: 20px; border-radius: 12px; max-width: 800px; margin: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .page-view.active { display: block; }
+
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; }
-        input, select, textarea { width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 14px; }
 
         .rating-stars { color: #f59e0b; font-size: 18px; margin-bottom: 5px; }
         .review-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: flex-start; }
@@ -53,9 +54,8 @@
         .media-gallery { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 10px; }
         .gallery-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 2px solid #cbd5e1; cursor: pointer; flex-shrink: 0; }
         .gallery-thumb.active { border-color: #2563eb; }
-        .main-media-view { width: 100%; height: 240px; object-fit: contain; border-radius: 8px; background: #000; cursor: zoom-in; margin-bottom: 10px; }
+        .main-media-view { width: 100%; height: 260px; object-fit: contain; border-radius: 8px; background: #000; cursor: zoom-in; margin-bottom: 10px; }
 
-        /* نافذة زوم الصورة مع زر إغلاق (X) صغير وواضح */
         .zoom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 5000; }
         .zoom-modal img { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; }
         .close-zoom-btn { position: absolute; top: 20px; right: 20px; background: #ef4444; color: white; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 5100; }
@@ -66,10 +66,10 @@
     <div class="header">
         <div style="display:flex; align-items:center; gap:10px;">
             <button class="menu-toggle-btn" onclick="toggleDrawer()">☰</button>
-            <h1 onclick="location.reload()" style="cursor:pointer;">🛍️ متجري العالمي (COD)</h1>
+            <h1 onclick="switchPage('home-page')" style="cursor:pointer;">🛍️ متجري العالمي (COD)</h1>
         </div>
         <div class="nav-links">
-            <button class="cart-btn" onclick="openCartModal()">🛒 سلة الشراء (<span id="cart-count">0</span>)</button>
+            <button class="cart-btn" onclick="openCartPage()">🛒 سلة الشراء (<span id="cart-count">0</span>)</button>
         </div>
     </div>
 
@@ -81,68 +81,59 @@
         <button class="drawer-close" onclick="toggleDrawer()">إغلاق ❌</button>
     </div>
 
-    <div class="categories-nav" id="categories-container">
-        <button class="cat-btn active" onclick="filterCategory('الكل', event)">الكل</button>
-        <button class="cat-btn" onclick="filterCategory('ساعات اليد', event)">ساعات اليد ⌚</button>
-        <button class="cat-btn" onclick="filterCategory('الملابس', event)">الملابس 👕</button>
-        <button class="cat-btn" onclick="filterCategory('الإلكترونيات', event)">الإلكترونيات 📱</button>
-        <button class="cat-btn" onclick="filterCategory('الأحذية', event)">الأحذية 👟</button>
-        <button class="cat-btn" onclick="filterCategory('أكسسوارات', event)">أكسسوارات 🕶️</button>
+    <!-- الصفحة الرئيسية (المنتجات) -->
+    <div id="home-page" class="page-view active" style="background:transparent; padding:0; box-shadow:none; max-width:100%;">
+        <div class="categories-nav" id="categories-container">
+            <button class="cat-btn active" onclick="filterCategory('الكل', event)">الكل</button>
+            <button class="cat-btn" onclick="filterCategory('ساعات اليد', event)">ساعات اليد ⌚</button>
+            <button class="cat-btn" onclick="filterCategory('الملابس', event)">الملابس 👕</button>
+            <button class="cat-btn" onclick="filterCategory('الإلكترونيات', event)">الإلكترونيات 📱</button>
+            <button class="cat-btn" onclick="filterCategory('الأحذية', event)">الأحذية 👟</button>
+            <button class="cat-btn" onclick="filterCategory('أكسسوارات', event)">أكسسوارات 🕶️</button>
+        </div>
+
+        <div class="products-grid" id="store-products-grid">
+            <p style="text-align:center; grid-column: 1/-1;">جاري تحميل المنتجات...</p>
+        </div>
     </div>
 
-    <div class="products-grid" id="store-products-grid">
-        <p style="text-align:center; grid-column: 1/-1;">جاري تحميل المنتجات...</p>
+    <!-- صفحة تفاصيل المنتج المستقلة -->
+    <div id="product-details-page" class="page-view">
+        <button onclick="switchPage('home-page')" style="background:#64748b; margin-bottom:15px; padding:6px 12px; font-size:12px;">🔙 العودة للمتجر</button>
+        <div id="product-details-content"></div>
+        
+        <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
+        <h4 style="color:#1e293b; margin-bottom:10px;">⭐ التعليقات والتقييمات:</h4>
+        <div id="reviews-list-container" style="margin-bottom:15px;"></div>
+
+        <div id="review-form-wrapper" style="display:none; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; margin-top:10px;">
+            <h4 style="margin:0 0 8px 0; font-size:13px; color:#1e293b;">أضف تقييمك ورسالتك حول هذا المنتج:</h4>
+            <div class="form-group" style="margin-bottom:8px;"><input type="text" id="review-user-name" placeholder="اسمك الكريم"></div>
+            <div class="form-group" style="margin-bottom:8px;">
+                <select id="review-user-rating">
+                    <option value="5">⭐⭐⭐⭐⭐ (ممتاز)</option>
+                    <option value="4">⭐⭐⭐⭐ (جيد جداً)</option>
+                    <option value="3">⭐⭐⭐ (متوسط)</option>
+                    <option value="2">⭐⭐ (ضعيف)</option>
+                    <option value="1">⭐ (سيء)</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom:8px;"><textarea id="review-user-comment" placeholder="اكتب تعليقك هنا..." style="height:50px;"></textarea></div>
+            <button onclick="submitUserReview()" style="background:#2563eb; color:white; width:100%; padding:8px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:13px;">إرسال التعليق 💬</button>
+        </div>
+        <p id="review-locked-msg" style="font-size:12px; color:#c0392b; text-align:center; margin-top:10px;">⚠️ خانة التعليقات والتقييمات تفتح تلقائياً بعد إتمام أي عملية شراء ناجحة في المتجر.</p>
     </div>
 
-    <!-- نافذة زوم الصورة مع زر إغلاق X دقيق -->
+    <!-- صفحة السلة وإتمام الطلب المستقلة (بوابة COD الكاملة) -->
+    <div id="cart-page" class="page-view">
+        <button onclick="switchPage('home-page')" style="background:#64748b; margin-bottom:15px; padding:6px 12px; font-size:12px;">🛍️ مواصلة التسوق</button>
+        <div id="cart-page-content"></div>
+    </div>
+
+    <!-- نافذة زوم الصور مع زر إغلاق دقيق -->
     <div class="zoom-modal" id="zoomModal">
         <button class="close-zoom-btn" onclick="closeZoomModal()">✕</button>
         <img id="zoomModalImg" src="">
-    </div>
-
-    <div class="modal-overlay" id="productDetailsModal">
-        <div class="modal-card">
-            <div id="modal-product-content"></div>
-            
-            <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
-            <h4 style="color:#1e293b; margin-bottom:10px;">⭐ التعليقات والتقييمات:</h4>
-            <div id="reviews-list-container" style="margin-bottom:15px;"></div>
-
-            <div id="review-form-wrapper" style="display:none; background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; margin-top:10px;">
-                <h4 style="margin:0 0 8px 0; font-size:13px; color:#1e293b;">أضف تقييمك ورسالتك حول هذا المنتج:</h4>
-                <div class="form-group" style="margin-bottom:8px;"><input type="text" id="review-user-name" placeholder="اسمك الكريم"></div>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <select id="review-user-rating">
-                        <option value="5">⭐⭐⭐⭐⭐ (ممتاز)</option>
-                        <option value="4">⭐⭐⭐⭐ (جيد جداً)</option>
-                        <option value="3">⭐⭐⭐ (متوسط)</option>
-                        <option value="2">⭐⭐ (ضعيف)</option>
-                        <option value="1">⭐ (سيء)</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom:8px;"><textarea id="review-user-comment" placeholder="اكتب تعليقك هنا..." style="height:50px;"></textarea></div>
-                <button onclick="submitUserReview()" style="background:#2563eb; color:white; width:100%; padding:8px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; font-size:13px;">إرسال التعليق 💬</button>
-            </div>
-            <p id="review-locked-msg" style="font-size:12px; color:#c0392b; text-align:center; margin-top:10px;">⚠️ خانة التعليقات والتقييمات تفتح تلقائياً بعد إتمام أي عملية شراء ناجحة في المتجر.</p>
-
-            <button onclick="document.getElementById('productDetailsModal').style.display='none'" style="margin-top:15px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إغلاق التبويب ❌</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="cartModal">
-        <div class="modal-card" id="cart-modal-card-content">
-            <h3 style="margin-top:0; color:#1e293b;">🛒 محتويات سلة الشراء</h3>
-            <div id="cart-items-list" style="margin-bottom: 15px; max-height: 250px; overflow-y: auto;"></div>
-            
-            <div style="background:#f1f5f9; padding:10px; border-radius:6px; margin-bottom:15px; font-size:14px; display:flex; justify-content:space-between; align-items:center;">
-                <span>المجموع الجزئي:</span> <b id="cart-subtotal-price" style="color:#1e293b;">0 دج</b>
-            </div>
-
-            <div style="display:flex; gap:10px;">
-                <button onclick="document.getElementById('cartModal').style.display='none'" style="background:#64748b; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">مواصلة التسوق 🛍️</button>
-                <button onclick="proceedToCheckoutForm()" style="background:#16a34a; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إتمام الطلب 🚀</button>
-            </div>
-        </div>
     </div>
 
     <script type="module">
@@ -175,6 +166,12 @@
             }
         }
 
+        window.switchPage = function(pageId) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
         function setupWhatsappSupport() {
             let supportPhone = localStorage.getItem('dz_whatsapp_support') || '213700000000';
             let waLink = document.getElementById('whatsapp-support-link');
@@ -201,7 +198,7 @@
                 const snap = await getDocs(collection(db, "products"));
                 allProducts = [];
                 snap.forEach(d => {
-                    const p = { id: d.id, ...d.data() };
+                    const p = { id: d.id, ...d.data(), frontQty: 1 };
                     if(p.status !== 'مهملات') allProducts.push(p);
                 });
                 renderProducts(allProducts);
@@ -215,6 +212,13 @@
             else renderProducts(allProducts.filter(p => p.category === cat));
         }
 
+        window.changeFrontQty = function(index, delta) {
+            if(allProducts[index]) {
+                allProducts[index].frontQty = Math.max(1, (allProducts[index].frontQty || 1) + delta);
+                renderProducts(allProducts);
+            }
+        }
+
         function renderProducts(products) {
             let grid = document.getElementById('store-products-grid');
             if(products.length === 0) {
@@ -222,24 +226,32 @@
                 return;
             }
             grid.innerHTML = '';
-            products.forEach(p => {
+            products.forEach((p, idx) => {
                 let img = p.imageUrls?.[0] || 'https://via.placeholder.com/200';
                 let stockVal = p.stock !== undefined ? p.stock : 10;
                 let existingCartItem = cart.find(item => item.id === p.id);
-                let cartQtyText = existingCartItem ? ` (في السلة: ${existingCartItem.quantity})` : '';
+                let cartBadge = existingCartItem ? ` <span style="color:#2563eb; font-size:11px;">(في السلة: ${existingCartItem.quantity})</span>` : '';
 
                 grid.innerHTML += `
                     <div class="product-card">
                         <div>
-                            <img src="${img}" class="product-img" onclick='openProductDetails(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
-                            <h3 class="product-title" onclick='openProductDetails(${JSON.stringify(p).replace(/'/g, "&apos;")})'>${p.name}</h3>
+                            <img src="${img}" class="product-img" onclick='openProductDetailsPage(${JSON.stringify(p).replace(/'/g, "&apos;")})'>
+                            <h3 class="product-title" onclick='openProductDetailsPage(${JSON.stringify(p).replace(/'/g, "&apos;")})'>${p.name} ${cartBadge}</h3>
                             <p class="product-price">${p.price} دج</p>
                         </div>
                         <div>
-                            <p style="font-size:11px; color:${stockVal > 0 ? 'green':'red'}; margin-bottom:6px;">${stockVal > 0 ? '📦 متوفر' : '❌ نفذت الكمية'}</p>
+                            <p style="font-size:11px; color:${stockVal > 0 ? 'green':'red'}; margin-bottom:4px;">${stockVal > 0 ? '📦 متوفر' : '❌ نفذت الكمية'}</p>
+                            
+                            <div class="qty-container">
+                                <span style="font-size:12px;">العدد:</span>
+                                <button class="qty-btn" onclick="changeFrontQty(${idx}, -1)">-</button>
+                                <b style="font-size:14px;">${p.frontQty || 1}</b>
+                                <button class="qty-btn" onclick="changeFrontQty(${idx}, 1)">+</button>
+                            </div>
+
                             <div class="btn-group">
-                                <button onclick='addToCartDirect(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-cart" ${stockVal <= 0 ? 'disabled':''}>أضف للسلة 🛒${cartQtyText}</button>
-                                <button onclick='buyNowDirect(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-buy" ${stockVal <= 0 ? 'disabled':''}>اطلب الآن ⚡</button>
+                                <button onclick='addToCartDirectFromHome(${JSON.stringify(p).replace(/'/g, "&apos;")}, ${p.frontQty || 1})' class="btn-cart" ${stockVal <= 0 ? 'disabled':''}>أضف للسلة 🛒</button>
+                                <button onclick='buyNowDirect(${JSON.stringify(p).replace(/'/g, "&apos;")}, ${p.frontQty || 1})' class="btn-buy" ${stockVal <= 0 ? 'disabled':''}>اطلب الآن ⚡</button>
                             </div>
                         </div>
                     </div>
@@ -247,7 +259,7 @@
             });
         }
 
-        window.openProductDetails = function(product) {
+        window.openProductDetailsPage = function(product) {
             currentOpenedProduct = product;
             currentSelectedPrice = product.price;
             currentQty = 1;
@@ -310,10 +322,10 @@
                 </div>
             `;
 
-            document.getElementById('modal-product-content').innerHTML = contentHtml;
+            document.getElementById('product-details-content').innerHTML = contentHtml;
             renderReviews(product.id);
             checkUserHasOrdered();
-            document.getElementById('productDetailsModal').style.display = 'flex';
+            switchPage('product-details-page');
         }
 
         window.setMainMedia = function(url, thumbEl) {
@@ -366,22 +378,22 @@
             document.getElementById('modal-total-price').innerText = total + ' دج';
         }
 
-        window.addToCartDirect = function(product) {
+        window.addToCartDirectFromHome = function(product, qty) {
             let existing = cart.find(item => item.id === product.id);
             if(existing) {
-                existing.quantity += 1;
+                existing.quantity += qty;
             } else {
-                cart.push({ id: product.id, productName: product.name, price: product.price, quantity: 1, color: '', size: '', imageUrl: product.imageUrls?.[0] || '' });
+                cart.push({ id: product.id, productName: product.name, price: product.price, quantity: qty, color: '', size: '', imageUrl: product.imageUrls?.[0] || '' });
             }
             document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
             renderProducts(allProducts);
-            showPostAddModal();
+            openCartPage();
         }
 
-        window.buyNowDirect = function(product) {
-            cart = [{ id: product.id, productName: product.name, price: product.price, quantity: 1, color: '', size: '', imageUrl: product.imageUrls?.[0] || '' }];
-            document.getElementById('cart-count').innerText = 1;
-            openCartModal();
+        window.buyNowDirect = function(product, qty) {
+            cart = [{ id: product.id, productName: product.name, price: product.price, quantity: qty, color: '', size: '', imageUrl: product.imageUrls?.[0] || '' }];
+            document.getElementById('cart-count').innerText = qty;
+            openCartPage();
         }
 
         window.addCurrentToCartFromModal = function() {
@@ -390,9 +402,8 @@
             }
             cart.push({ id: currentOpenedProduct.id, productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty, color: selectedColor, size: selectedSize, imageUrl: currentOpenedProduct.imageUrls?.[0] || '' });
             document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
-            document.getElementById('productDetailsModal').style.display = 'none';
             renderProducts(allProducts);
-            showPostAddModal();
+            openCartPage();
         }
 
         window.buyCurrentNowModal = function() {
@@ -401,36 +412,20 @@
             }
             cart = [{ id: currentOpenedProduct.id, productName: currentOpenedProduct.name, price: currentSelectedPrice, quantity: currentQty, color: selectedColor, size: selectedSize, imageUrl: currentOpenedProduct.imageUrls?.[0] || '' }];
             document.getElementById('cart-count').innerText = currentQty;
-            document.getElementById('productDetailsModal').style.display = 'none';
-            openCartModal();
+            openCartPage();
         }
 
-        function showPostAddModal() {
-            let cardModalContent = document.getElementById('cart-modal-card-content');
-            cardModalContent.innerHTML = `
-                <div style="text-align:center; padding:15px;">
-                    <h3 style="color:#2563eb; margin-top:0;">🛒 تمت الإضافة إلى السلة بنجاح!</h3>
-                    <p style="font-size:14px; color:#555; margin-bottom:20px;">ماذا ترغب أن تفعل الآن؟</p>
-                    <div style="display:flex; gap:10px;">
-                        <button onclick="document.getElementById('cartModal').style.display='none'" style="background:#64748b; flex:1; padding:12px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">بقاء للتسوق 🛍️</button>
-                        <button onclick="openCartModal()" style="background:#16a34a; flex:1; padding:12px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إكمال الطلب في السلة 🚀</button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('cartModal').style.display = 'flex';
-        }
-
-        window.openCartModal = function() {
+        window.openCartPage = function() {
             if(cart.length === 0) {
                 alert('سلة الشراء فارغة حالياً!');
                 return;
             }
-            renderCartModalContent();
-            document.getElementById('cartModal').style.display = 'flex';
+            renderCartPageContent();
+            switchPage('cart-page');
         }
 
-        function renderCartModalContent() {
-            let container = document.getElementById('cart-items-list');
+        function renderCartPageContent() {
+            let container = document.getElementById('cart-page-content');
             let subtotal = 0;
             let html = '';
             cart.forEach((item, index) => {
@@ -457,8 +452,8 @@
                     <span>المجموع الجزئي:</span> <b id="cart-subtotal-price" style="color:#1e293b;">${subtotal} دج</b>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button onclick="document.getElementById('cartModal').style.display='none'" style="background:#64748b; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">مواصلة التسوق 🛍️</button>
-                    <button onclick="proceedToCheckoutForm()" style="background:#16a34a; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إتمام الطلب 🚀</button>
+                    <button onclick="switchPage('home-page')" style="background:#64748b; flex:1; padding:12px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">مواصلة التسوق 🛍️</button>
+                    <button onclick="proceedToCheckoutForm()" style="background:#16a34a; flex:1; padding:12px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إتمام الطلب (COD) 🚀</button>
                 </div>
             `;
         }
@@ -468,16 +463,17 @@
             document.getElementById('cart-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
             renderProducts(allProducts);
             if(cart.length === 0) {
-                document.getElementById('cartModal').style.display = 'none';
+                switchPage('home-page');
             } else {
-                renderCartModalContent();
+                renderCartPageContent();
             }
         }
 
+        // بوابة إتمام الطلب (COD) مع كل الولايات الـ 58 بالترقيم الكامل
         window.proceedToCheckoutForm = function() {
-            let cardModalContent = document.getElementById('cart-modal-card-content');
-            cardModalContent.innerHTML = `
-                <h3 style="margin-top:0; color:#1e293b;">🛒 إتمام الطلب (الدفع عند الاستلام)</h3>
+            let container = document.getElementById('cart-page-content');
+            container.innerHTML = `
+                <h3 style="margin-top:0; color:#1e293b;">🛒 إتمام الطلب (الدفع عند الاستلام COD)</h3>
                 <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="order-fullname" placeholder="أدخل اسمك الكامل"></div>
                 <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone" placeholder="07xxxxxxxx"></div>
                 <div class="form-group">
@@ -558,7 +554,7 @@
                 </div>
 
                 <button onclick="submitCartOrder()" style="background:#16a34a; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب نهائياً 🚀</button>
-                <button onclick="document.getElementById('cartModal').style.display='none'" style="margin-top:8px; width:100%; background:#ef4444; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إلغاء الطلب / خروج ❌</button>
+                <button onclick="openCartPage()" style="margin-top:8px; width:100%; background:#ef4444; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إلغاء الطلب / العودة للسلة ❌</button>
             `;
             calcCheckoutTotal();
         }
@@ -616,14 +612,14 @@
                 document.getElementById('cart-count').innerText = '0';
                 renderProducts(allProducts);
                 
-                let cardModalContent = document.getElementById('cart-modal-card-content');
-                cardModalContent.innerHTML = `
+                let container = document.getElementById('cart-page-content');
+                container.innerHTML = `
                     <div style="text-align:center; padding:15px;">
                         <h3 style="color:#16a34a; margin-top:0;">🎉 تم إرسال طلبك بنجاح!</h3>
                         <p style="font-size:13px; color:#555; line-height:1.5;">سنتصل بك قريباً لتأكيد طلبك. شكراً لتسوقك معنا.</p>
                         <div style="display:flex; gap:10px; margin-top:20px;">
                             <button onclick="cancelMyLastOrder()" style="background:#ef4444; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إلغاء هذا الطلب ❌</button>
-                            <button onclick="document.getElementById('cartModal').style.display='none'; location.reload();" style="background:#2563eb; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">موافق / خروج ✅</button>
+                            <button onclick="switchPage('home-page')" style="background:#2563eb; flex:1; padding:10px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">موافق / العودة للمتجر ✅</button>
                         </div>
                     </div>
                 `;
@@ -639,8 +635,7 @@
                 try {
                     await updateDoc(doc(db, "orders", lastCreatedOrderId), { status: 'ملغى ❌' });
                     alert('تم إلغاء طلبك بنجاح.');
-                    document.getElementById('cartModal').style.display = 'none';
-                    location.reload();
+                    switchPage('home-page');
                 } catch(e) {
                     alert('حدث خطأ أثناء الإلغاء.');
                 }
