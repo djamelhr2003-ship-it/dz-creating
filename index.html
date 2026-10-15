@@ -62,7 +62,7 @@
     <div class="header">
         <h1 onclick="location.reload()">🛍️ متجري العالمي (COD)</h1>
         <div class="nav-links">
-            <div class="live-visitors-badge">🟢 الزوار الآن: <span id="live-visitors-count">1</span></div>
+            <div class="live-visitors-badge">🟢 الزوار الآن: <span id="live-visitors-count">3</span></div>
             <button class="cart-btn" onclick="openCartModal()">🛒 سلة الشراء (<span id="cart-count">0</span>)</button>
             <a href="admin.html" class="admin-link">⚙️ لوحة التحكم</a>
         </div>
@@ -208,11 +208,9 @@
             fetchStoreProducts();
         });
 
-        // نظام تتبع الزوار (يومي، أسبوعي، شهري، ولحظي)
         function trackVisitor() {
             let today = new Date().toISOString().split('T')[0];
             let visitors = JSON.parse(localStorage.getItem('dz_store_visitors')) || { days: {}, weeks: {}, months: {} };
-            
             let weekKey = getWeekKey(new Date());
             let monthKey = today.substring(0, 7);
 
@@ -228,10 +226,6 @@
                 visitors.months[monthKey]++;
                 localStorage.setItem('dz_store_visitors', JSON.stringify(visitors));
             }
-
-            // الزوار المتواجدون الآن (وهمي حي يتذبذب واقعياً)
-            let liveCount = Math.floor(Math.random() * 5) + 3;
-            document.getElementById('live-visitors-count').innerText = liveCount;
         }
 
         function getWeekKey(d) {
@@ -298,7 +292,6 @@
             currentSelectedPrice = product.price;
             currentQty = 1;
 
-            // تسجيل عدد مشاهدات المنتج لتحليل الأكثر مشاهدة
             let viewsMap = JSON.parse(localStorage.getItem('dz_product_views')) || {};
             viewsMap[product.name] = (viewsMap[product.name] || 0) + 1;
             localStorage.setItem('dz_product_views', JSON.stringify(viewsMap));
@@ -603,7 +596,6 @@
 
         function showOrderSuccessAndReviewModal(clientName, clientPhone, orderedItems) {
             let cardModalContent = document.getElementById('cart-modal-card-content');
-            
             let reviewsHtml = '';
             orderedItems.forEach((item, idx) => {
                 reviewsHtml += `
