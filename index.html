@@ -8,7 +8,9 @@
         body { font-family: Tahoma, sans-serif; background: #f8fafc; margin: 0; padding: 15px; color: #333; }
         .header { background: #232f3e; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header h1 { margin: 0; font-size: 18px; }
-        .admin-link { background: #374151; color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; }
+        .nav-links { display: flex; gap: 10px; align-items: center; }
+        .admin-link, .cart-btn { background: #374151; color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; border: none; }
+        .cart-btn { background: #d97706; }
         
         .categories-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
         .cat-btn { background: #e2e8f0; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; white-space: nowrap; color: #475569; font-size: 13px; }
@@ -20,10 +22,9 @@
         .product-title { font-size: 15px; font-weight: bold; margin: 8px 0 4px 0; color: #1e293b; }
         .product-price { color: #e11d48; font-weight: bold; font-size: 16px; margin-bottom: 10px; }
         
-        .btn-buy { background: #2563eb; color: white; border: none; width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-buy { background: #2563eb; color: white; border: none; width: 100%; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 5px; }
         .btn-buy:hover { background: #1d4ed8; }
 
-        /* تنسيق نافذة الشراء والعروض الذهبية */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 2000; }
         .modal-card { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         
@@ -31,7 +32,6 @@
         label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; }
         input, select, textarea { width: 100%; padding: 9px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 14px; }
 
-        /* العروض الذهبية المصفرة في نافذة الشراء */
         .gold-offer-box {
             background: linear-gradient(135deg, #fef9c3, #fef08a);
             border: 2px solid #eab308;
@@ -42,9 +42,7 @@
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .gold-offer-box:hover { box-shadow: 0 3px 10px rgba(234, 179, 8, 0.3); }
         .crossed-old-price {
             position: relative;
             color: #64748b;
@@ -59,7 +57,7 @@
             left: 0;
             width: 100%;
             height: 2px;
-            background-color: #ef4444; /* خط أحمر كبير مشطوب */
+            background-color: #ef4444;
             transform: translateY(-50%);
         }
         .new-offer-price { color: #16a34a; font-weight: bold; font-size: 15px; }
@@ -68,11 +66,13 @@
 <body>
 
     <div class="header">
-        <h1>🛍️ متجري العالمي</h1>
-        <a href="admin.html" class="admin-link">⚙️ لوحة التحكم</a>
+        <h1>🛍️ متجري العالمي (COD)</h1>
+        <div class="nav-links">
+            <button class="cart-btn" onclick="openCartModal()">🛒 سلة الشراء (<span id="cart-count">0</span>)</button>
+            <a href="admin.html" class="admin-link">⚙️ لوحة التحكم</a>
+        </div>
     </div>
 
-    <!-- أزرار التصنيفات -->
     <div class="categories-nav" id="categories-container">
         <button class="cat-btn active" onclick="filterCategory('الكل', event)">الكل</button>
         <button class="cat-btn" onclick="filterCategory('ساعات اليد', event)">ساعات اليد ⌚</button>
@@ -82,38 +82,36 @@
         <button class="cat-btn" onclick="filterCategory('أكسسوارات', event)">أكسسوارات 🕶️</button>
     </div>
 
-    <!-- قائمة المنتجات -->
     <div class="products-grid" id="store-products-grid">
         <p style="text-align:center; grid-column: 1/-1;">جاري تحميل المنتجات...</p>
     </div>
 
-    <!-- نافذة إتمام الطلب واختيار العروض -->
-    <div class="modal-overlay" id="checkoutModal">
+    <!-- نافذة تفاصيل المنتج والعروض الذهبية -->
+    <div class="modal-overlay" id="productModal">
         <div class="modal-card">
-            <h3 style="margin-top:0; color:#1e293b;">🛒 إتمام الطلب الشريع</h3>
-            <div id="checkout-product-info" style="margin-bottom: 12px; font-size: 14px;"></div>
-            
-            <!-- حاوية المستطيلات الذهبية المصفرة للعروض -->
+            <h3 id="modal-prod-name" style="margin-top:0; color:#1e293b;"></h3>
+            <div id="modal-prod-price" style="color:#e11d48; font-weight:bold; font-size:18px; margin-bottom:10px;"></div>
             <div id="product-offers-container" style="margin-bottom: 12px;"></div>
-
             <div class="form-group">
                 <label>الكمية:</label>
-                <input type="number" id="order-quantity" value="1" min="1" onchange="calculateTotal()">
+                <input type="number" id="modal-quantity" value="1" min="1">
             </div>
+            <button onclick="addToCartFromModal()" style="background:#2563eb; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">إضافة إلى سلة الشراء 🛒</button>
+            <button onclick="document.getElementById('productModal').style.display='none'" style="margin-top:8px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إلغاء ❌</button>
+        </div>
+    </div>
 
-            <div class="form-group">
-                <label>الاسم الكامل:</label>
-                <input type="text" id="order-fullname" placeholder="أدخل اسمك الكامل">
-            </div>
+    <!-- نافذة سلة الشراء وإتمام الطلب -->
+    <div class="modal-overlay" id="cartModal">
+        <div class="modal-card">
+            <h3 style="margin-top:0; color:#1e293b;">🛒 سلة الشراء وإتمام الطلب (COD)</h3>
+            <div id="cart-items-list" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
 
-            <div class="form-group">
-                <label>رقم الهاتف:</label>
-                <input type="tel" id="order-phone" placeholder="07xxxxxxxx">
-            </div>
-
+            <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="order-fullname" placeholder="أدخل اسمك الكامل"></div>
+            <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="order-phone" placeholder="07xxxxxxxx"></div>
             <div class="form-group">
                 <label>الولاية:</label>
-                <select id="order-wilaya" onchange="updateDeliveryFees()">
+                <select id="order-wilaya" onchange="calculateCartTotal()">
                     <option value="الشلف">02 - الشلف</option>
                     <option value="الجزائر">16 - الجزائر العاصمة</option>
                     <option value="وهران">31 - وهران</option>
@@ -123,30 +121,24 @@
                     <option value="أخرى">ولاية أخرى</option>
                 </select>
             </div>
-
-            <div class="form-group">
-                <label>البلدية / العنوان:</label>
-                <input type="text" id="order-commune" placeholder="اسم البليدة أو العنوان بالتفصيل">
-            </div>
-
+            <div class="form-group"><label>البلدية / العنوان:</label><input type="text" id="order-commune" placeholder="اسم البلدية أو العنوان بالتفصيل"></div>
             <div class="form-group">
                 <label>نوع التوصيل:</label>
-                <select id="order-delivery-type" onchange="calculateTotal()">
+                <select id="order-delivery-type" onchange="calculateCartTotal()">
                     <option value="توصيل للمنزل 🏠">توصيل للمنزل 🏠</option>
                     <option value="توصيل للمكتب 🏢">توصيل للمكتب (ستوب ديسك) 🏢</option>
                 </select>
             </div>
 
             <div style="background:#f1f5f9; padding:10px; border-radius:6px; margin-bottom:15px; font-size:14px;">
-                <span>💰 السعر الإجمالي النهائي:</span> <b id="display-final-total" style="color:#e11d48; font-size:18px;">0 دج</b>
+                <span>💰 المجموع الكلي النهائي (COD):</span> <b id="cart-final-total" style="color:#e11d48; font-size:18px;">0 دج</b>
             </div>
 
-            <button onclick="submitOrder()" style="background:#16a34a; width:100%; padding:12px; font-size:15px;">تأكيد وإرسال الطلب 🚀</button>
-            <button onclick="closeCheckoutModal()" class="btn-secondary" style="margin-top:8px; width:100%; background:#64748b; padding:10px;">إلغاء ❌</button>
+            <button onclick="submitCartOrder()" style="background:#16a34a; width:100%; padding:12px; font-size:15px; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">تأكيد وإرسال الطلب نهائياً 🚀</button>
+            <button onclick="document.getElementById('cartModal').style.display='none'" style="margin-top:8px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إغلاق ❌</button>
         </div>
     </div>
 
-    <!-- جافاسكريبت لربط المتجر بـ Firebase وتفعيل العروض الذهبية -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -155,7 +147,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let allProducts = [], selectedProduct = null, currentActivePrice = 0;
+        let allProducts = [], cart = [], currentSelectedProduct = null, currentSelectedPrice = 0;
 
         async function fetchStoreProducts() {
             try {
@@ -188,7 +180,7 @@
             products.forEach(p => {
                 let img = p.imageUrls?.[0] || 'https://via.placeholder.com/200';
                 let stockVal = p.stock !== undefined ? p.stock : 10;
-                grid.innerHTML = `
+                grid.innerHTML += `
                     <div class="product-card">
                         <div>
                             <img src="${img}" class="product-img">
@@ -197,42 +189,38 @@
                         </div>
                         <div>
                             <p style="font-size:12px; color:${stockVal > 0 ? 'green':'red'}; margin-bottom:8px;">${stockVal > 0 ? '📦 متوفر في المخزون' : '❌ نفذت الكمية'}</p>
-                            <button onclick='openCheckoutModal(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-buy" ${stockVal <= 0 ? 'disabled style="background:#cbd5e1;cursor:not-allowed;"':''}>اطلب الآن 🛒</button>
+                            <button onclick='openProductModal(${JSON.stringify(p).replace(/'/g, "&apos;")})' class="btn-buy" ${stockVal <= 0 ? 'disabled style="background:#cbd5e1;cursor:not-allowed;"':''}>شراء / سلة 🛒</button>
                         </div>
                     </div>
-                ` + grid.innerHTML;
+                `;
             });
         }
 
-        window.openCheckoutModal = function(product) {
-            selectedProduct = product;
-            currentActivePrice = product.price;
+        window.openProductModal = function(product) {
+            currentSelectedProduct = product;
+            currentSelectedPrice = product.price;
 
-            document.getElementById('checkout-product-info').innerHTML = `<b>المنتج:</b> ${product.name} | السعر الأساسي: <b>${product.price} دج</b>`;
-            document.getElementById('order-quantity').value = 1;
+            document.getElementById('modal-prod-name').innerText = product.name;
+            document.getElementById('modal-prod-price').innerText = product.price + ' دج';
+            document.getElementById('modal-quantity').value = 1;
 
-            // توليد العروض الذهبية المصفرة في نافذة الشراء
             let offersContainer = document.getElementById('product-offers-container');
             if(product.enableOffers && product.offers && product.offers.length > 0) {
                 let html = '<h4 style="margin:5px 0; color:#b45309; font-size:13px;">🔥 اختر أحد العروض الذهبية المتاحة:</h4>';
-                
-                // السعر الأساسي العادي
                 html += `
                     <label class="gold-offer-box">
                         <div style="display:flex; align-items:center; gap:8px;">
-                            <input type="radio" name="selectedOffer" value="base" checked onchange="updateSelectedPrice(${product.price})">
+                            <input type="radio" name="selectedOffer" value="base" checked onchange="currentSelectedPrice=${product.price}">
                             <span style="font-size:13px;"><b>السعر العادي الأساسي</b></span>
                         </div>
                         <span class="new-offer-price">${product.price} دج</span>
                     </label>
                 `;
-
-                // العروض المضافة
                 product.offers.forEach((offer, i) => {
                     html += `
                         <label class="gold-offer-box">
                             <div style="display:flex; align-items:center; gap:8px;">
-                                <input type="radio" name="selectedOffer" value="${i}" onchange="updateSelectedPrice(${offer.newPrice})">
+                                <input type="radio" name="selectedOffer" value="${i}" onchange="currentSelectedPrice=${offer.newPrice}">
                                 <span style="font-size:13px;"><b>${offer.title}</b> ✔️</span>
                             </div>
                             <div>
@@ -247,59 +235,100 @@
                 offersContainer.innerHTML = '';
             }
 
-            calculateTotal();
-            document.getElementById('checkoutModal').style.display = 'flex';
+            document.getElementById('productModal').style.display = 'flex';
         }
 
-        window.updateSelectedPrice = function(price) {
-            currentActivePrice = price;
-            calculateTotal();
+        window.addToCartFromModal = function() {
+            let qty = Number(document.getElementById('modal-quantity').value) || 1;
+            cart.push({
+                productName: currentSelectedProduct.name,
+                price: currentSelectedPrice,
+                quantity: qty
+            });
+            document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('productModal').style.display = 'none';
+            alert('تمت إضافة المنتج إلى السلة بنجاح! 🛒');
         }
 
-        window.calculateTotal = function() {
-            let qty = Number(document.getElementById('order-quantity').value) || 1;
+        window.openCartModal = function() {
+            if(cart.length === 0) {
+                alert('سلة الشراء فارغة حالياً!');
+                return;
+            }
+            renderCartItems();
+            calculateCartTotal();
+            document.getElementById('cartModal').style.display = 'flex';
+        }
+
+        function renderCartItems() {
+            let container = document.getElementById('cart-items-list');
+            let html = '';
+            cart.forEach((item, index) => {
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:8px; border-radius:6px; margin-bottom:5px; font-size:13px;">
+                        <span><b>${item.productName}</b> (×${item.quantity}) - ${item.price * item.quantity} دج</span>
+                        <button onclick="removeFromCart(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">حذف</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        window.removeFromCart = function(index) {
+            cart.splice(index, 1);
+            document.getElementById('cart-count').innerText = cart.length;
+            if(cart.length === 0) {
+                document.getElementById('cartModal').style.display = 'none';
+            } else {
+                renderCartItems();
+                calculateCartTotal();
+            }
+        }
+
+        window.calculateCartTotal = function() {
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             let deliveryType = document.getElementById('order-delivery-type').value;
-            let deliveryFee = deliveryType.includes('منزل') ? 600 : 400; // تكلفة التوصيل التقريبية
-            let total = (currentActivePrice * qty) + deliveryFee;
-            document.getElementById('display-final-total').innerText = total + ' دج';
+            let deliveryFee = deliveryType.includes('منزل') ? 600 : 400;
+            let total = subtotal + deliveryFee;
+            document.getElementById('cart-final-total').innerText = total + ' دج';
         }
 
-        window.closeCheckoutModal = function() {
-            document.getElementById('checkoutModal').style.display = 'none';
-        }
-
-        window.submitOrder = async function() {
+        window.submitCartOrder = async function() {
             let fullName = document.getElementById('order-fullname').value.trim();
             let phone = document.getElementById('order-phone').value.trim();
             let wilaya = document.getElementById('order-wilaya').value;
             let commune = document.getElementById('order-commune').value.trim();
-            let quantity = Number(document.getElementById('order-quantity').value) || 1;
             let deliveryType = document.getElementById('order-delivery-type').value;
 
             if(!fullName || !phone || !commune) {
-                alert('الرجاء تعبئة جميع حقول الاسم، الهاتف، والعنوان!');
+                alert('الرجاء تعبئة الاسم، رقم الهاتف، والعنوان!');
                 return;
             }
 
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             let deliveryFee = deliveryType.includes('منزل') ? 600 : 400;
-            let finalTotal = (currentActivePrice * quantity) + deliveryFee;
+            let finalTotal = subtotal + deliveryFee;
 
             try {
-                await addDoc(collection(db, "orders"), {
-                    productName: selectedProduct.name,
-                    unitPrice: currentActivePrice,
-                    quantity,
-                    fullName,
-                    phone,
-                    wilaya,
-                    commune,
-                    deliveryType,
-                    finalTotal,
-                    status: 'جديد ⏳',
-                    createdAt: new Date()
-                });
-                alert('🎉 تم إرسال طلبك بنجاح! سنتصل بك قريباً للتأكيد.');
-                closeCheckoutModal();
+                for(let item of cart) {
+                    await addDoc(collection(db, "orders"), {
+                        productName: item.productName,
+                        unitPrice: item.price,
+                        quantity: item.quantity,
+                        fullName,
+                        phone,
+                        wilaya,
+                        commune,
+                        deliveryType,
+                        finalTotal,
+                        status: 'جديد ⏳',
+                        createdAt: new Date()
+                    });
+                }
+                alert('🎉 تم إرسال طلبك بنجاح عبر نظام COD! سنتصل بك قريباً للتأكيد.');
+                cart = [];
+                document.getElementById('cart-count').innerText = '0';
+                document.getElementById('cartModal').style.display = 'none';
             } catch(e) {
                 alert('فشل إرسال الطلب، حاول مرة أخرى.');
             }
