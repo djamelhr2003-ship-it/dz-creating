@@ -53,7 +53,7 @@
         .new-offer-price { color: #16a34a; font-weight: bold; font-size: 15px; }
 
         .rating-stars { color: #f59e0b; font-size: 18px; margin-bottom: 5px; }
-        .review-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; }
+        .review-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 13px; display: flex; justify-content: space-between; align-items: flex-start; }
     </style>
 </head>
 <body>
@@ -91,7 +91,7 @@
             <div class="products-grid" id="related-products-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));"></div>
 
             <hr style="margin:20px 0; border:0; border-top:1px solid #e2e8f0;">
-            <h4 style="color:#1e293b; margin-bottom:10px;">⭐ التقييمات والتعليقات السابقة:</h4>
+            <h4 style="color:#1e293b; margin-bottom:10px;">⭐ التقييمات والتعليقات:</h4>
             <div id="reviews-list-container" style="margin-bottom:15px;"></div>
 
             <button onclick="document.getElementById('productDetailsModal').style.display='none'" style="margin-top:15px; width:100%; background:#64748b; padding:10px; color:white; border:none; border-radius:6px; cursor:pointer;">إغلاق التبويب ❌</button>
@@ -593,7 +593,6 @@
             `;
         }
 
-        // إرسال التقييمات مع التحقق من عدم تكرار نفس الشخص أكثر من مرة في اليوم
         window.submitPostOrderReviews = function(orderedItems, clientName, clientPhone) {
             let todayStr = new Date().toISOString().split('T')[0];
             let reviewLimitKey = `dz_review_limit_${clientPhone}_${todayStr}`;
@@ -611,7 +610,7 @@
                 if(comment && item.id) {
                     let reviewsKey = `dz_reviews_${item.id}`;
                     let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
-                    reviews.push({ name: clientName, rating, comment, date: new Date().toLocaleDateString('ar-DZ') });
+                    reviews.push({ name: clientName, rating, comment, date: new Date().toLocaleDateString('ar-DZ'), hidden: false });
                     localStorage.setItem(reviewsKey, JSON.stringify(reviews));
                     hasSubmittedAny = true;
                 }
@@ -624,7 +623,6 @@
             showThankYouMessage();
         }
 
-        // نافذة الشكر النهائية التي تحتوي على زري "إلغاء" و "التسوق من جديد"
         function showThankYouMessage() {
             let cardModalContent = document.getElementById('cart-modal-card-content');
             cardModalContent.innerHTML = `
@@ -640,29 +638,48 @@
             `;
         }
 
-        function renderReviews(productId) {
+        // عرض التعليقات غير المخفية مع زر الحذف
+        window.renderReviews = function(productId) {
             let container = document.getElementById('reviews-list-container');
             if(!container) return;
-            let reviews = JSON.parse(localStorage.getItem(`dz_reviews_${productId}`)) || [];
-            if(reviews.length === 0) {
-                container.innerHTML = '<p style="font-size:12px; color:#64748b;">لا توجد تعليقات بعد لهذا المنتج.</p>';
+            let reviewsKey = `dz_reviews_${productId}`;
+            let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+            
+            // فلترة التعليقات لاستثناء المخفية عن الزبون
+            let visibleReviews = reviews.filter(r => !r.hidden);
+
+            if(visibleReviews.length === 0) {
+                container.innerHTML = '<p style="font-size:12px; color:#64748b;">لا توجد تعليقات ظاهرة بعد لهذا المنتج.</p>';
                 return;
             }
             let html = '';
-            reviews.forEach(r => {
+            reviews.forEach((r, originalIndex) => {
+                if(r.hidden) return; // لا تعرض التعليق المخفي للزبون
                 let stars = '⭐'.repeat(Number(r.rating));
                 html += `
                     <div class="review-box">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
-                            <b>👤 ${r.name}</b>
-                            <span style="font-size:11px; color:#64748b;">${r.date}</span>
+                        <div>
+                            <div style="display:flex; justify-content:space-between; margin-bottom:3px; gap:15px;">
+                                <b>👤 ${r.name}</b>
+                                <span style="font-size:11px; color:#64748b;">${r.date}</span>
+                            </div>
+                            <div class="rating-stars" style="font-size:13px;">${stars}</div>
+                            <p style="margin:0; color:#333;">${r.comment}</p>
                         </div>
-                        <div class="rating-stars" style="font-size:13px;">${stars}</div>
-                        <p style="margin:0; color:#333;">${r.comment}</p>
+                        <button onclick="deleteProductReview('${productId}', ${originalIndex})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; font-size:11px; cursor:pointer;">حذف 🗑️</button>
                     </div>
                 `;
             });
             container.innerHTML = html;
+        }
+
+        window.deleteProductReview = function(productId, index) {
+            let reviewsKey = `dz_reviews_${productId}`;
+            let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+            reviews.splice(index, 1);
+            localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+            renderReviews(productId);
+            alert('تم حذف التعليق بنجاح!');
         }
     </script>
 </body>
