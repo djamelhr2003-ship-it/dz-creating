@@ -3,32 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>متجري العالمي - الأصناف والفلاتر</title>
+    <title>متجري العالمي - الأصناف والفلاتر والـ COD</title>
     <style>
         :root { --primary: #131921; --secondary: #232f3e; --accent: #febd69; --danger: #b12704; --success: #008060; --bg: #eaeded; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 0; color: #0f1111; }
-        header { background: var(--primary); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        header { background: var(--primary); color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .logo { font-size: 20px; font-weight: bold; cursor: pointer; color: white; }
         .logo span { color: var(--accent); }
         .header-actions { display: flex; gap: 10px; align-items: center; }
         .cart-btn { background: var(--success); color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .admin-btn { background: #f59e0b; color: white; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; }
+        .admin-btn { background: #f59e0b; color: white; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 13px; display: inline-block; text-align: center; }
         
         .container { max-width: 1200px; margin: auto; padding: 20px 15px; }
 
-        /* شريط الأصناف والفلتر (Categories & Filter Bar) */
+        /* شريط الأصناف والفلتر */
         .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 20px; white-space: nowrap; }
         .filter-btn { background: white; border: 1px solid #d5d9d9; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; color: #333; transition: 0.2s; flex-shrink: 0; }
         .filter-btn.active, .filter-btn:hover { background: var(--secondary); color: white; border-color: var(--secondary); }
 
         .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; }
-        .product-card { background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #d5d9d9; display: flex; flex-direction: column; cursor: pointer; }
+        .product-card { background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid #d5d9d9; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.2s; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .product-img { width: 100%; height: 180px; object-fit: contain; background: #fff; }
         .product-body { padding: 12px; display: flex; flex-direction: column; justify-content: space-between; flex: 1; }
         
+        /* إشعار سلة التسوق المصغر */
         #toast-notification { position: fixed; bottom: 20px; right: 20px; background: #232f3e; color: white; padding: 12px 20px; border-radius: 8px; display: none; z-index: 9999; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
 
-        #product-detail-view { display: none; background: white; padding: 25px; border-radius: 10px; border: 1px solid #d5d9d9; }
+        #product-detail-view { display: none; background: white; padding: 25px; border-radius: 10px; border: 1px solid #d5d9d9; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media(max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } }
         
@@ -42,10 +44,10 @@
         .new-price { color: var(--success); font-size: 18px; font-weight: bold; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 4000; padding: 15px; box-sizing: border-box; }
-        .modal-card { background: white; padding: 20px; border-radius: 10px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal-card { background: white; padding: 20px; border-radius: 10px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .form-group { margin-bottom: 12px; }
         label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #d5d9d9; border-radius: 6px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #d5d9d9; border-radius: 6px; box-sizing: border-box; outline: none; }
     </style>
 </head>
 <body>
@@ -62,7 +64,7 @@
 
     <div class="container">
         <div id="home-view">
-            <!-- شريط الفلاتر والأصناف السريع -->
+            <!-- شريط الفلاتر والأصناف -->
             <div class="filter-bar">
                 <button class="filter-btn active" onclick="filterByCategory('الكل', this)">🔥 الكل</button>
                 <button class="filter-btn" onclick="filterByCategory('ساعات اليد', this)">⌚ ساعات اليد</button>
@@ -81,7 +83,7 @@
         </div>
     </div>
 
-    <!-- نافذة إتمام الطلب (COD) -->
+    <!-- نافذة إتمام الطلب والدفع عند الاستلام (COD) -->
     <div class="modal-overlay" id="checkoutModal">
         <div class="modal-card" id="checkout-modal-body">
             <h3 style="margin-top:0; border-bottom:1px solid #d5d9d9; padding-bottom:8px;">📦 إتمام الطلب والدفع عند الاستلام (COD)</h3>
@@ -131,6 +133,7 @@
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDdJY7mI1DON...", authDomain: "creater-ecom.firebaseapp.com", projectId: "creater-ecom", storageBucket: "creater-ecom.appspot.com", messagingSenderId: "893449950593", appId: "1:893449950593:web:..." };
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         let allProducts = [], selectedProduct = null, selectedOfferPrice = 0, currentQty = 1, cartItems = [];
@@ -138,10 +141,21 @@
         window.addEventListener('DOMContentLoaded', () => { loadProducts(); });
 
         async function loadProducts() {
-            let snap = await getDocs(collection(db, "products"));
-            allProducts = [];
-            snap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
-            renderProductsGrid(allProducts);
+            let grid = document.getElementById('store-products-grid');
+            try {
+                let snap = await getDocs(collection(db, "products"));
+                allProducts = [];
+                snap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
+                
+                if(allProducts.length === 0) {
+                    grid.innerHTML = '<p style="text-align:center; color:#666; grid-column:1/-1; padding:20px;">لا توجد منتجات حالياً. يرجى إضافتها من لوحة التحكم 🔐</p>';
+                    return;
+                }
+                renderProductsGrid(allProducts);
+            } catch(e) {
+                console.error(e);
+                grid.innerHTML = '<p style="text-align:center; color:red; grid-column:1/-1;">خطأ في الاتصال بقاعدة البيانات.</p>';
+            }
         }
 
         window.filterByCategory = (category, btn) => {
