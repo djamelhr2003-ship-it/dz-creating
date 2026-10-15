@@ -57,11 +57,25 @@
 </head>
 <body>
 
-    <div class="modal-overlay" id="centerModal" style="z-index: 4000;">
-        <div class="modal-card" style="text-align: center; max-width: 400px;">
+    <!-- نافذة التنبيهات والرسائل المركزية (تظهر للموظف في وسط الشاشة) -->
+    <div class="modal-overlay" id="centerModal" style="z-index: 5000;">
+        <div class="modal-card" style="text-align: center; max-width: 400px; border: 2px solid #2563eb;">
             <h3 id="modalTitle" style="color: #2563eb; margin-top:0;">⚠️ تنبيه النظام</h3>
             <p id="modalMessage" style="color: #475569; font-size: 15px; line-height: 1.6;"></p>
-            <button onclick="closeCenterModal()" style="margin-top: 15px; background: #ef4444; width: 100%;">فهمت 🚨</button>
+            <button onclick="closeCenterModal()" style="margin-top: 15px; background: #2563eb; width: 100%;">فهمت واستلمت الرسالة ✅</button>
+        </div>
+    </div>
+
+    <!-- نافذة إدخال كلمة السر للحذف النهائي الآمن -->
+    <div class="modal-overlay" id="deletePassModal" style="z-index: 4500;">
+        <div class="modal-card" style="max-width: 400px;">
+            <h3 style="color: #c0392b; margin-top:0;">🔒 تأكيد الحذف النهائي</h3>
+            <p style="font-size: 13px; color: #555;">أدخل كلمة المرور الخاصة بك لتأكيد الحذف النهائي وللأبد:</p>
+            <div class="form-group">
+                <input type="password" id="confirm-delete-pass" placeholder="كلمة المرور..." autocomplete="new-password">
+            </div>
+            <button onclick="executePermanentDelete()" class="btn-danger" style="width: 100%; margin-bottom: 8px;">تأكيد الحذف نهائياً 🗑️</button>
+            <button onclick="document.getElementById('deletePassModal').style.display='none'" class="btn-secondary" style="width: 100%; background: #64748b;">إلغاء</button>
         </div>
     </div>
 
@@ -82,7 +96,7 @@
         </div>
     </div>
 
-    <!-- شاشة تسجيل الدخول (مع تعطيل الحفظ التلقائي للاسم وكلمة المرور) -->
+    <!-- شاشة تسجيل الدخول -->
     <div id="login-box" class="container">
         <h2>تسجيل دخول لوحة التحكم 🔐</h2>
         <div class="form-group" style="text-align: right;">
@@ -145,10 +159,10 @@
         
         <div id="trash-tab" class="tab-content">
             <div class="container">
-                <h2 style="color: #64748b;">🗑️ سلة المهملات (الحذف النهائي واللأبدي)</h2>
+                <h2 style="color: #64748b;">🗑️ سلة المهملات (الحذف النهائي واللأبدي بكلمة سر)</h2>
                 <div style="display:flex; justify-content:space-between; background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:15px;">
                     <label><input type="checkbox" id="select-all-trash" onclick="toggleSelectAllTrash(this)"> <b>تحديد الكل</b></label>
-                    <button onclick="deletePermanentlySelected()" class="btn-danger" style="padding:6px 12px; font-size:12px;">حذف نهائي وللأبد 🗑️</button>
+                    <button onclick="promptPermanentDelete()" class="btn-danger" style="padding:6px 12px; font-size:12px;">حذف نهائي وللأبد 🗑️</button>
                 </div>
                 <div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div>
             </div>
@@ -175,11 +189,26 @@
             </div>
         </div>
 
+        <!-- تبويب طاقم العمل مع ميزة إرسال رسالة فورية تظهر في وسط شاشة الموظف -->
         <div id="staff-tab" class="tab-content">
             <div class="container" style="border: 2px solid #7c3aed;">
-                <h2 style="color: #7c3aed;">👥 طاقم العمل وحالة الاتصال</h2>
+                <h2 style="color: #7c3aed;">👥 طاقم العمل وإرسال الرسائل الفورية</h2>
+                
+                <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #7c3aed; margin-bottom:20px;">
+                    <h3 style="margin-top:0; color:#7c3aed;">💬 إرسال تنبيه أو رسالة فورية لموظف</h3>
+                    <div class="form-group">
+                        <label>اختر الموظف المستهدف:</label>
+                        <select id="msg-target-staff"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>نص الرسالة:</label>
+                        <textarea id="msg-staff-content" placeholder="اكتب التعليمات أو الرسالة هنا لتظهر للموظف فوراً..." style="height:70px;"></textarea>
+                    </div>
+                    <button onclick="sendStaffMessage()" class="btn-secondary" style="background:#7c3aed; width:100%;">إرسال الرسالة الآن 🚀</button>
+                </div>
+
                 <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:20px;">
-                    <h3>➕ إضافة موظف جديد</h3>
+                    <h3 style="margin-top:0;">➕ إضافة موظف جديد</h3>
                     <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="staff-username" placeholder="اسم المستخدم" autocomplete="off"></div>
                     <div class="form-group"><label>كلمة المرور:</label><input type="password" id="staff-password" placeholder="كلمة المرور" autocomplete="new-password"></div>
                     <button onclick="saveStaffMember()" class="btn-secondary" style="background:#7c3aed;">حفظ ملف الموظف 💾</button>
@@ -252,9 +281,11 @@
         }
 
         window.showAlert = function(title, message) {
+            document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalMessage').innerText = message;
             document.getElementById('centerModal').style.display = 'flex';
         }
+        window.closeCenterManager = function() { document.getElementById('centerModal').style.display = 'none'; }
         window.closeCenterModal = function() { document.getElementById('centerModal').style.display = 'none'; }
 
         window.checkLogin = function() {
@@ -266,11 +297,23 @@
 
             if(u === currentAdminUser && p === currentAdminPass) {
                 sessionStorage.setItem('ecom_logged_user', u);
+                sessionStorage.setItem('ecom_is_admin', 'true');
                 recordActivity(u, 'تسجيل الدخول إلى لوحة التحكم');
                 initDashboard(u);
-            } else {
-                document.getElementById('login-error').innerText = 'خطأ في اسم المستخدم أو كلمة المرور!';
+                return;
             }
+
+            // فحص حسابات طاقم العمل
+            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
+            if(staffList[u] && staffList[u].password === p) {
+                sessionStorage.setItem('ecom_logged_user', u);
+                sessionStorage.setItem('ecom_is_admin', 'false');
+                recordActivity(u, 'تسجيل الدخول كموظف');
+                initDashboard(u);
+                return;
+            }
+
+            document.getElementById('login-error').innerText = 'خطأ في اسم المستخدم أو كلمة المرور!';
         }
 
         function recordActivity(user, action) {
@@ -284,8 +327,22 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             let user = sessionStorage.getItem('ecom_logged_user');
-            if(user) initDashboard(user);
+            if(user) {
+                initDashboard(user);
+                startMessagePolling(user);
+            }
         });
+
+        // التحقق الدوري من وجود رسائل جديدة مخصصة لهذا المستخدم لتظهر في وسط الشاشة فوراً
+        function startMessagePolling(user) {
+            setInterval(() => {
+                let pendingMsg = localStorage.getItem(`dz_msg_${user}`);
+                if(pendingMsg) {
+                    localStorage.removeItem(`dz_msg_${user}`);
+                    showAlert('📩 رسالة جديدة من الإدارة', pendingMsg);
+                }
+            }, 3000);
+        }
 
         async function initDashboard(user) {
             document.getElementById('login-box').style.display = 'none';
@@ -296,6 +353,7 @@
             loadProducts();
             loadAdminReviews();
             loadStaffList();
+            startMessagePolling(user);
         }
 
         window.switchTab = function(tabId, event) {
@@ -344,17 +402,20 @@
         window.loadStaffList = function() {
             let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
             let container = document.getElementById('staff-list-container');
-            let currentAdmin = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
+            let selectDropdown = document.getElementById('msg-target-staff');
             
+            let currentAdmin = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
             let adminLast = localStorage.getItem(`dz_last_active_${currentAdmin}`);
             let isAdminOnline = adminLast && (Date.now() - Number(adminLast) < 300000);
 
             let html = `
-                <div class="staff-status-card" onclick="openStaffPortal('${currentAdmin}', 'أدمن رئيسي')">
+                <div class="staff-status-card">
                     <div><b>👑 الأدمن (${currentAdmin}):</b> <span class="status-dot ${isAdminOnline ? 'online' : 'offline'}"></span> <span style="font-size:12px;">(${isAdminOnline ? 'متصل الآن' : 'غير متصل'})</span></div>
-                    <button class="btn-secondary" style="padding:4px 8px; font-size:12px;">سجل النشاط 📋</button>
+                    <button class="btn-secondary" onclick="openStaffPortal('${currentAdmin}', 'أدمن رئيسي')" style="padding:4px 8px; font-size:12px;">سجل النشاط 📋</button>
                 </div>
             `;
+
+            let dropdownHtml = `<option value="${currentAdmin}">${currentAdmin} (الأدمن الرئيسي)</option>`;
 
             for(let u in staffList) {
                 let lastActive = localStorage.getItem(`dz_last_active_${u}`);
@@ -363,16 +424,28 @@
                 let statusText = isOnline ? 'متصل الآن' : 'غير متصل';
 
                 html += `
-                    <div class="staff-status-card" onclick="openStaffPortal('${u}', 'موظف')">
+                    <div class="staff-status-card">
                         <div><b>👤 موظف:</b> ${u} <span class="status-dot ${dotClass}"></span> <span style="font-size:12px; color:#64748b;">(${statusText})</span></div>
                         <div style="display:flex; gap:5px;">
-                            <button class="btn-secondary" style="padding:4px 8px; font-size:12px;">السجل 📋</button>
-                            <button onclick="event.stopPropagation(); deleteStaff('${u}')" class="btn-danger" style="padding:4px 8px; font-size:12px;">حذف 🗑️</button>
+                            <button class="btn-secondary" onclick="openStaffPortal('${u}', 'موظف')" style="padding:4px 8px; font-size:12px;">السجل 📋</button>
+                            <button onclick="deleteStaff('${u}')" class="btn-danger" style="padding:4px 8px; font-size:12px;">حذف 🗑️</button>
                         </div>
                     </div>
                 `;
+                dropdownHtml += `<option value="${u}">${u} (موظف)</option>`;
             }
             container.innerHTML = html;
+            selectDropdown.innerHTML = dropdownHtml;
+        }
+
+        window.sendStaffMessage = function() {
+            let target = document.getElementById('msg-target-staff').value;
+            let msgText = document.getElementById('msg-staff-content').value.trim();
+            if(!msgText) { showAlert('تنبيه', 'أدخل نص الرسالة أولاً!'); return; }
+            
+            localStorage.setItem(`dz_msg_${target}`, msgText);
+            showAlert('نجاح الإرسال', `تم إرسال الرسالة بنجاح إلى (${target}) وستظهر له في وسط الشاشة فوراً!`);
+            document.getElementById('msg-staff-content').value = '';
         }
 
         window.deleteStaff = function(u) {
@@ -598,16 +671,32 @@
             document.querySelectorAll('.trash-checkbox').forEach(c => c.checked = master.checked);
         }
 
-        window.deletePermanentlySelected = async function() {
+        // فتح نافذة إدخال كلمة السر الخاصة بالحذف النهائي الآمن
+        window.promptPermanentDelete = function() {
             let checked = document.querySelectorAll('.trash-checkbox:checked');
-            if(checked.length === 0) { showAlert('تنبيه', 'حدد عنصراً واحداً على الأقل!'); return; }
-            if(confirm(`⚠️ هل أنت متأكد من الحذف النهائي واللأبدي لـ (${checked.length}) عناصر؟ لن تظهر مجدداً أبداً.`)) {
-                let promises = [];
-                checked.forEach(c => promises.push(deleteDoc(doc(db, "orders", c.getAttribute('data-id')))));
-                await Promise.all(promises);
-                loadAllOrders();
-                showAlert('تم الحذف', 'تم حذف العناصر نهائياً وللأبد من النظام.');
+            if(checked.length === 0) { showAlert('تنبيه', 'حدد عنصراً واحداً على الأقل من سلة المهملات!'); return; }
+            document.getElementById('confirm-delete-pass').value = '';
+            document.getElementById('deletePassModal').style.display = 'flex';
+        }
+
+        // تنفيذ الحذف النهائي بعد مطابقة كلمة السر الخاصة بالأدمن
+        window.executePermanentDelete = async function() {
+            let enteredPass = document.getElementById('confirm-delete-pass').value.trim();
+            let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
+
+            if(enteredPass !== currentAdminPass) {
+                alert('كلمة المرور غير صحيحة! تم إلغاء الحذف حمايةً للبيانات.');
+                return;
             }
+
+            let checked = document.querySelectorAll('.trash-checkbox:checked');
+            let promises = [];
+            checked.forEach(c => promises.push(deleteDoc(doc(db, "orders", c.getAttribute('data-id')))));
+            await Promise.all(promises);
+            
+            document.getElementById('deletePassModal').style.display = 'none';
+            loadAllOrders();
+            showAlert('تم الحذف بنجاح', 'تم حذف العناصر نهائياً وللأبد من النظام.');
         }
 
         function generateWilayaReport(orders) {
