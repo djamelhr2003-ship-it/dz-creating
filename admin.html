@@ -49,8 +49,6 @@
         .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
 
         .staff-status-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .permissions-box { background: #f1f5f9; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px; text-align: right; }
-        .permissions-box label { display: inline-block; margin-left: 15px; font-weight: normal; font-size: 13px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -66,10 +64,10 @@
     <!-- نافذة إدخال كلمة المرور للأدمن للحذف -->
     <div class="modal-overlay" id="passwordModal" style="z-index: 6000;">
         <div class="modal-card" style="max-width: 380px; text-align: center;">
-            <h3 style="color: #c0392b; margin-top:0;">🔒 تأكيد الحذف بكلمة المرور</h3>
-            <p style="font-size: 13px; color: #555;">أدخل كلمة مرور الأدمن لتأكيد الحذف ونقل العنصر لسلة المهملات:</p>
+            <h3 style="color: #c0392b; margin-top:0;" id="passwordModalTitle">🔒 تأكيد الحذف بكلمة المرور</h3>
+            <p style="font-size: 13px; color: #555;">أدخل كلمة مرور الأدمن لتأكيد العملية:</p>
             <div class="form-group"><input type="password" id="admin-action-pass" autocomplete="new-password"></div>
-            <button onclick="confirmAdminAction()" class="btn-danger" style="width: 100%; margin-bottom: 8px;">تأكيد الحذف 🗑️</button>
+            <button onclick="confirmAdminAction()" class="btn-danger" style="width: 100%; margin-bottom: 8px;">تأكيد 🗑️</button>
             <button onclick="document.getElementById('passwordModal').style.display='none'" class="btn-secondary" style="width: 100%; background: #64748b;">إلغاء</button>
         </div>
     </div>
@@ -162,7 +160,7 @@
         <div id="archive-tab" class="tab-content"><div class="container"><h2>الأرشيف ✅</h2><div id="orders-list-archive" class="orders-grid-compact">جاري التحميل...</div></div></div>
         <div id="return-tab" class="tab-content"><div class="container"><h2>الروتور ⚠️</h2><div id="orders-list-return" class="orders-grid-compact">جاري التحميل...</div></div></div>
         <div id="cancelled-tab" class="tab-content"><div class="container"><h2>الطلبات الملغية ❌</h2><div id="orders-list-cancelled" class="orders-grid-compact">جاري التحميل...</div></div></div>
-        <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ سلة المهملات</h2><div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div></div></div>
+        <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ سلة المهملات (تحذف تلقائياً بعد 48 ساعة)</h2><div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div></div></div>
 
         <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات</h2><div id="wilaya-report-content">جاري التجهيز...</div></div></div>
         
@@ -230,7 +228,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyDdJY7mI1DON...", authDomain: "creater-ecom.firebaseapp.com", projectId: "creater-ecom", storageBucket: "creater-ecom.appspot.com", messagingSenderId: "893449950593", appId: "1:893449950593:web:..." };
         const app = initializeApp(firebaseConfig);
@@ -290,7 +288,7 @@
             document.getElementById('setting-admin-pass').value = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
 
             await loadProductsMap();
-            loadAllOrders();
+            await loadAllOrders();
             loadProducts();
             loadStaffList();
         }
@@ -349,6 +347,7 @@
             pendingActionType = 'delete_staff';
             pendingActionId = username;
             document.getElementById('admin-action-pass').value = '';
+            document.getElementById('passwordModalTitle').innerText = '🔒 تأكيد الحذف بكلمة المرور';
             document.getElementById('passwordModal').style.display = 'flex';
         }
 
@@ -451,6 +450,7 @@
             pendingActionType = 'delete_product';
             pendingActionId = id;
             document.getElementById('admin-action-pass').value = '';
+            document.getElementById('passwordModalTitle').innerText = '🔒 تأكيد الحذف بكلمة المرور';
             document.getElementById('passwordModal').style.display = 'flex';
         }
 
@@ -459,11 +459,25 @@
                 const snap = await getDocs(collection(db, "orders"));
                 allFetchedOrders = [];
                 ordersCache = {};
-                snap.forEach(d => {
+                let now = new Date().getTime();
+
+                for(let d of snap.docs) {
                     const o = { id: d.id, ...d.data() };
+                    
+                    // فحص الحذف التلقائي بعد 48 ساعة من وجوده في سلة المهملات
+                    if(o.status && o.status.includes('مهملات') && o.trashTime) {
+                        let trashTimeMs = new Date(o.trashTime).getTime();
+                        let hoursInTrash = (now - trashTimeMs) / (1000 * 60 * 60);
+                        if(hoursInTrash >= 48) {
+                            await deleteDoc(doc(db, "orders", d.id)); // حذف نهائي تلقائي
+                            continue;
+                        }
+                    }
+
                     ordersCache[o.id] = o;
                     allFetchedOrders.push(o);
-                });
+                }
+
                 renderOrdersFiltered(allFetchedOrders);
                 generateWilayaDetailedReport(allFetchedOrders);
                 updateAnalyticsData(allFetchedOrders);
@@ -497,7 +511,12 @@
                             </div>
                         </div>
                         <div>
-                            ${isTrash ? `<button onclick="restoreOrder('${o.id}')" style="background:#10b981; padding:6px 10px; font-size:11px; margin-bottom:4px; display:block;">استعادة ♻️</button>` : `<button onclick="promptDeleteOrder('${o.id}', '${status}')" class="btn-danger" style="padding:6px 10px; font-size:11px;">حذف 🗑️</button>`}
+                            ${isTrash ? `
+                                <button onclick="restoreOrder('${o.id}')" style="background:#10b981; padding:5px 8px; font-size:11px; margin-bottom:4px; display:block; width:100%;">استعادة ♻️</button>
+                                <button onclick="promptPermanentDelete('${o.id}')" class="btn-danger" style="padding:5px 8px; font-size:11px; width:100%;">حذف نهائي ❌</button>
+                            ` : `
+                                <button onclick="promptDeleteOrder('${o.id}', '${status}')" class="btn-danger" style="padding:6px 10px; font-size:11px;">حذف 🗑️</button>
+                            `}
                         </div>
                     </div>
                 `;
@@ -517,6 +536,15 @@
             pendingActionId = id;
             pendingOriginalStatus = currentStatus;
             document.getElementById('admin-action-pass').value = '';
+            document.getElementById('passwordModalTitle').innerText = '🔒 تأكيد النقل للمهملات';
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        window.promptPermanentDelete = function(id) {
+            pendingActionType = 'permanent_delete_order';
+            pendingActionId = id;
+            document.getElementById('admin-action-pass').value = '';
+            document.getElementById('passwordModalTitle').innerText = '❌ تأكيد الحذف النهائي الأبدي';
             document.getElementById('passwordModal').style.display = 'flex';
         }
 
@@ -532,8 +560,13 @@
             document.getElementById('passwordModal').style.display = 'none';
 
             if(pendingActionType === 'delete_order') {
-                await updateDoc(doc(db, "orders", pendingActionId), { status: `مهملات | ${pendingOriginalStatus}` });
+                let trashTimestamp = new Date().toISOString();
+                await updateDoc(doc(db, "orders", pendingActionId), { status: `مهملات | ${pendingOriginalStatus}`, trashTime: trashTimestamp });
                 showAlert('نجاح', 'تم نقل الطلب إلى سلة المهملات بنجاح!');
+                loadAllOrders();
+            } else if(pendingActionType === 'permanent_delete_order') {
+                await deleteDoc(doc(db, "orders", pendingActionId));
+                showAlert('نجاح', 'تم حذف الطلب نهائياً ولن يظهر مرة أخرى!');
                 loadAllOrders();
             } else if(pendingActionType === 'delete_staff') {
                 let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
@@ -542,7 +575,8 @@
                 showAlert('نجاح', 'تم حذف الموظف بنجاح!');
                 loadStaffList();
             } else if(pendingActionType === 'delete_product') {
-                await updateDoc(doc(db, "products", pendingActionId), { status: 'مهملات' });
+                let trashTimestamp = new Date().toISOString();
+                await updateDoc(doc(db, "products", pendingActionId), { status: 'مهملات', trashTime: trashTimestamp });
                 loadProducts();
                 showAlert('نجاح', 'تم نقل المنتج لسلة المهملات!');
             }
@@ -552,7 +586,7 @@
             let o = ordersCache[id];
             if(!o) return;
             let originalStatus = o.status.split('|')[1]?.trim() || 'جديد ⏳';
-            await updateDoc(doc(db, "orders", id), { status: originalStatus });
+            await updateDoc(doc(db, "orders", id), { status: originalStatus, trashTime: null });
             showAlert('نجاح', 'تمت استعادة الطلب إلى مكانه الأصلي ♻️!');
             loadAllOrders();
         }
@@ -568,7 +602,8 @@
                 - وقت المعالجة: ${o.timeProcessing || 'لم يبدأ بعد'}<br>
                 - وقت التوصيل: ${o.timeShipping || 'لم يبدأ بعد'}<br>
                 - وقت الأرشيف/التسليم النهائي: ${o.timeArchive || 'لم يتم التسليم بعد'}<br>
-                - وقت الإلغاء/الروتور: ${o.timeCancelled || 'نشط'}<br>
+                - وقت الروتور: ${o.timeReturn || 'غير متوفر'}<br>
+                - وقت الإلغاء: ${o.timeCancelled || 'نشط'}<br>
             `;
 
             document.getElementById('orderDetailsContent').innerHTML = `
@@ -587,7 +622,7 @@
                 <button onclick="updateOrderStatusWithTime('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', true)" style="background:#2563eb;">نقل للمعالجة (خصم المخزون) 🔄</button>
                 <button onclick="updateOrderStatusWithTime('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
                 <button onclick="updateOrderStatusWithTime('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم (أرشيف) ✅</button>
-                <button onclick="updateOrderStatusWithTime('${o.id}', 'مرتجع (روتور) ⚠️', 'timeCancelled')" style="background:#b45309;">روتور ⚠️</button>
+                <button onclick="updateOrderStatusWithTime('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
                 <button onclick="updateOrderStatusWithTime('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">إلغاء الطلب ❌</button>
             `;
             document.getElementById('orderModalActions').innerHTML = actionsHtml;
@@ -600,7 +635,6 @@
             let currentTime = new Date().toLocaleString('ar-DZ');
             let updatePayload = { status: newStatus, [timeField]: currentTime };
 
-            // خصم المخزون تلقائياً عند الضغط على زر المعالجة بناءً على كمية الطلب
             if(isProcessing) {
                 let o = ordersCache[id];
                 if(o && o.productName) {
