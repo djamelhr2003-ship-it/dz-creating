@@ -86,7 +86,7 @@
         <p style="text-align:center; grid-column: 1/-1;">جاري تحميل المنتجات...</p>
     </div>
 
-    <!-- نافذة تفاصيل المنتج والعروض الذهبية -->
+    <!-- نافذة المنتج والعروض الذهبية -->
     <div class="modal-overlay" id="productModal">
         <div class="modal-card">
             <h3 id="modal-prod-name" style="margin-top:0; color:#1e293b;"></h3>
@@ -101,7 +101,7 @@
         </div>
     </div>
 
-    <!-- نافذة سلة الشراء وإتمام الطلب -->
+    <!-- نافذة السلة والطلب -->
     <div class="modal-overlay" id="cartModal">
         <div class="modal-card">
             <h3 style="margin-top:0; color:#1e293b;">🛒 سلة الشراء وإتمام الطلب (COD)</h3>
@@ -148,6 +148,13 @@
         const db = getFirestore(app);
 
         let allProducts = [], cart = [], currentSelectedProduct = null, currentSelectedPrice = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            let savedName = localStorage.getItem('dz_user_name');
+            let savedPhone = localStorage.getItem('dz_user_phone');
+            if(savedName) document.getElementById('order-fullname').value = savedName;
+            if(savedPhone) document.getElementById('order-phone').value = savedPhone;
+        });
 
         async function fetchStoreProducts() {
             try {
@@ -304,6 +311,9 @@
                 alert('الرجاء تعبئة الاسم، رقم الهاتف، والعنوان!');
                 return;
             }
+
+            localStorage.setItem('dz_user_name', fullName);
+            localStorage.setItem('dz_user_phone', phone);
 
             let subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             let deliveryFee = deliveryType.includes('منزل') ? 600 : 400;
