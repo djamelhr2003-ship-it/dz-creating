@@ -49,6 +49,7 @@
         .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
 
         .staff-status-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .offer-box-admin { background: #fef9c3; border: 1.5px solid #facc15; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -61,7 +62,7 @@
         </div>
     </div>
 
-    <!-- نافذة إدخال كلمة المرور للأدمن للحذف -->
+    <!-- نافذة إدخال كلمة المرور للأدمن -->
     <div class="modal-overlay" id="passwordModal" style="z-index: 6000;">
         <div class="modal-card" style="max-width: 380px; text-align: center;">
             <h3 style="color: #c0392b; margin-top:0;" id="passwordModalTitle">🔒 تأكيد الحذف بكلمة المرور</h3>
@@ -75,11 +76,11 @@
     <!-- نافذة تعديل المنتج -->
     <div class="modal-overlay" id="editProductModal" style="z-index: 5500;">
         <div class="modal-card">
-            <h3 style="margin-top:0; color:#2563eb;">✏️ تعديل تفاصيل المنتج والمخزون</h3>
+            <h3 style="margin-top:0; color:#2563eb;">✏️ تعديل تفاصيل المنتج والمخزون والعروض</h3>
             <input type="hidden" id="edit-prod-id">
             <div class="form-group"><label>اسم المنتج:</label><input type="text" id="edit-prod-name"></div>
             <div class="form-group"><label>سعر الشراء:</label><input type="number" id="edit-prod-buy-price"></div>
-            <div class="form-group"><label>سعر البيع (دج):</label><input type="number" id="edit-prod-price"></div>
+            <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="edit-prod-price"></div>
             <div class="form-group"><label>كمية المخزون:</label><input type="number" id="edit-prod-stock"></div>
             <div class="form-group">
                 <label>اختر الصنف:</label>
@@ -92,18 +93,22 @@
                     <option value="أكسسوارات">أكسسوارات 🕶️</option>
                 </select>
             </div>
-            <div class="form-group"><label>روابط الصور:</label><textarea id="edit-prod-imgs" style="height:50px;"></textarea></div>
-            <div class="form-group"><label>رابط الفيديو:</label><input type="text" id="edit-prod-video"></div>
-            <div class="form-group"><label>الوصف:</label><textarea id="edit-prod-desc" style="height:60px;"></textarea></div>
+            <div class="form-group"><label>روابط الصور:</label><textarea id="edit-prod-imgs" style="height:40px;"></textarea></div>
+            
+            <hr style="margin:15px 0;">
+            <div class="form-group"><label><input type="checkbox" id="edit-enable-offers"> <b>تفعيل العروض الذهبية للمنتج</b></label></div>
+            <div id="edit-offers-container"></div>
+            <button type="button" onclick="addEditOfferField()" class="btn-secondary" style="background:#d97706; margin-bottom:15px; font-size:12px;">➕ إضافة عرض ذهبي آخر</button>
+
             <button onclick="saveProductEdits()" style="background:#2563eb; width:100%; margin-bottom:8px;">حفظ التعديلات 💾</button>
             <button onclick="document.getElementById('editProductModal').style.display='none'" class="btn-secondary" style="width:100%; background:#64748b;">إلغاء</button>
         </div>
     </div>
 
-    <!-- نافذة تفاصيل وإدارة الطلب والأوقات -->
+    <!-- نافذة تفاصيل الطلب -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
-            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب وتتبع الأوقات</h3>
+            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب والأوقات</h3>
             <div id="orderDetailsContent" style="font-size: 14px; line-height: 1.8; color: #1e293b; margin-bottom: 20px;"></div>
             <div id="orderModalActions" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;"></div>
             <button onclick="closeOrderModal()" class="btn-secondary" style="margin-top: 15px; width: 100%; background: #64748b;">إغلاق النافذة ❌</button>
@@ -160,7 +165,7 @@
         <div id="archive-tab" class="tab-content"><div class="container"><h2>الأرشيف ✅</h2><div id="orders-list-archive" class="orders-grid-compact">جاري التحميل...</div></div></div>
         <div id="return-tab" class="tab-content"><div class="container"><h2>الروتور ⚠️</h2><div id="orders-list-return" class="orders-grid-compact">جاري التحميل...</div></div></div>
         <div id="cancelled-tab" class="tab-content"><div class="container"><h2>الطلبات الملغية ❌</h2><div id="orders-list-cancelled" class="orders-grid-compact">جاري التحميل...</div></div></div>
-        <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ سلة المهملات (تحذف تلقائياً بعد 48 ساعة)</h2><div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div></div></div>
+        <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ سلة المهملات</h2><div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div></div></div>
 
         <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات</h2><div id="wilaya-report-content">جاري التجهيز...</div></div></div>
         
@@ -198,12 +203,13 @@
             </div>
         </div>
 
+        <!-- إضافة منتج مع العروض الذهبية -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
-                <h2>إضافة منتج وتحديد كمية المخزون ➕</h2>
+                <h2>إضافة منتج مع العروض الذهبية ➕</h2>
                 <div class="form-group"><label>اسم المنتج:</label><input type="text" id="prod-name"></div>
                 <div class="form-group"><label>سعر الشراء:</label><input type="number" id="prod-buy-price"></div>
-                <div class="form-group"><label>سعر البيع (دج):</label><input type="number" id="prod-price"></div>
+                <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="prod-price"></div>
                 <div class="form-group"><label>كمية المخزون:</label><input type="number" id="prod-stock" value="10"></div>
                 <div class="form-group">
                     <label>اختر الصنف:</label>
@@ -216,9 +222,15 @@
                         <option value="أكسسوارات">أكسسوارات 🕶️</option>
                     </select>
                 </div>
-                <div class="form-group"><label>روابط الصور:</label><textarea id="prod-imgs" style="height:50px;"></textarea></div>
+                <div class="form-group"><label>روابط الصور:</label><textarea id="prod-imgs" style="height:40px;"></textarea></div>
                 <div class="form-group"><label>رابط الفيديو:</label><input type="text" id="prod-video"></div>
                 <div class="form-group"><label>الوصف:</label><textarea id="prod-desc"></textarea></div>
+                
+                <hr style="margin:20px 0;">
+                <div class="form-group"><label><input type="checkbox" id="enable-offers"> <b>تفعيل العروض (مستطيلات ذهبية مصفرة 🔥)</b></label></div>
+                <div id="offers-container"></div>
+                <button type="button" onclick="addOfferField()" class="btn-secondary" style="background:#d97706; margin-bottom:15px; font-size:12px;">➕ إضافة عرض آخر</button>
+
                 <button onclick="addProduct()">نشر المنتج للمتجر 🚀</button>
             </div>
         </div>
@@ -275,7 +287,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             let user = sessionStorage.getItem('ecom_logged_user');
             if(user) {
-                let isAdmin = sessionStorage.getItem('ecom_is_admin') === 'true';
+                let isAdmin = sessionStorage.getItem('ecom_is_admin'] === 'true';
                 initDashboard(user, isAdmin);
             }
         });
@@ -351,6 +363,32 @@
             document.getElementById('passwordModal').style.display = 'flex';
         }
 
+        window.addOfferField = function(title = '', oldPrice = '', newPrice = '') {
+            let container = document.getElementById('offers-container');
+            let div = document.createElement('div');
+            div.className = 'offer-box-admin';
+            div.innerHTML = `
+                <div class="form-group"><label>وصف العرض:</label><input type="text" class="offer-title" value="${title}" placeholder="مثال: اشتري 2 واحصل على 1 هدية"></div>
+                <div class="form-group"><label>السعر القديم:</label><input type="number" class="offer-old-price" value="${oldPrice}"></div>
+                <div class="form-group"><label>السعر الجديد للعرض:</label><input type="number" class="offer-new-price" value="${newPrice}"></div>
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف هذا العرض ❌</button>
+            `;
+            container.appendChild(div);
+        }
+
+        window.addEditOfferField = function(title = '', oldPrice = '', newPrice = '') {
+            let container = document.getElementById('edit-offers-container');
+            let div = document.createElement('div');
+            div.className = 'offer-box-admin';
+            div.innerHTML = `
+                <div class="form-group"><label>وصف العرض:</label><input type="text" class="edit-offer-title" value="${title}"></div>
+                <div class="form-group"><label>السعر القديم:</label><input type="number" class="edit-offer-old-price" value="${oldPrice}"></div>
+                <div class="form-group"><label>السعر الجديد للعرض:</label><input type="number" class="edit-offer-new-price" value="${newPrice}"></div>
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف هذا العرض ❌</button>
+            `;
+            container.appendChild(div);
+        }
+
         async function loadProductsMap() {
             try {
                 const snap = await getDocs(collection(db, "products"));
@@ -374,17 +412,30 @@
             let description = document.getElementById('prod-desc').value.trim();
             let imgsRaw = document.getElementById('prod-imgs').value.trim();
             let imageUrls = imgsRaw ? imgsRaw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : [];
+            
+            let enableOffers = document.getElementById('enable-offers').checked;
+            let offers = [];
+            if(enableOffers) {
+                document.querySelectorAll('#offers-container .offer-box-admin').forEach(box => {
+                    let title = box.querySelector('.offer-title').value.trim();
+                    let oldPrice = Number(box.querySelector('.offer-old-price').value) || 0;
+                    let newPrice = Number(box.querySelector('.offer-new-price').value) || 0;
+                    if(title && newPrice) offers.push({ title, oldPrice, newPrice });
+                });
+            }
 
             if(!name || !price) { showAlert('تنبيه', 'أدخل اسم المنتج وسعر البيع!'); return; }
 
             await addDoc(collection(db, "products"), {
                 name, buyPrice, price, stock, profitMargin: price - buyPrice, category, description,
-                imageUrls, videoUrl, createdAt: new Date()
+                imageUrls, videoUrl, enableOffers, offers, createdAt: new Date()
             });
-            showAlert('نجاح', 'تم نشر المنتج بنجاح!');
+            showAlert('نجاح', 'تم نشر المنتج مع العروض بنجاح!');
             document.getElementById('prod-name').value = '';
             document.getElementById('prod-buy-price').value = '';
             document.getElementById('prod-price').value = '';
+            document.getElementById('offers-container').innerHTML = '';
+            document.getElementById('enable-offers').checked = false;
             loadProducts();
             loadProductsMap();
         }
@@ -419,8 +470,15 @@
             document.getElementById('edit-prod-stock').value = p.stock !== undefined ? p.stock : 10;
             document.getElementById('edit-prod-category').value = p.category || 'الكل';
             document.getElementById('edit-prod-imgs').value = (p.imageUrls || []).join(', ');
-            document.getElementById('edit-prod-video').value = p.videoUrl || '';
-            document.getElementById('edit-prod-desc').value = p.description || '';
+            
+            let enableOffers = p.enableOffers || false;
+            document.getElementById('edit-enable-offers').checked = enableOffers;
+            let container = document.getElementById('edit-offers-container');
+            container.innerHTML = '';
+            if(enableOffers && p.offers) {
+                p.offers.forEach(o => addEditOfferField(o.title, o.oldPrice, o.newPrice));
+            }
+
             document.getElementById('editProductModal').style.display = 'flex';
         }
 
@@ -431,17 +489,26 @@
             let price = Number(document.getElementById('edit-prod-price').value) || 0;
             let stock = Number(document.getElementById('edit-prod-stock').value) || 0;
             let category = document.getElementById('edit-prod-category').value;
-            let videoUrl = document.getElementById('edit-prod-video').value.trim();
-            let description = document.getElementById('edit-prod-desc').value.trim();
             let imgsRaw = document.getElementById('edit-prod-imgs').value.trim();
             let imageUrls = imgsRaw ? imgsRaw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean) : [];
 
+            let enableOffers = document.getElementById('edit-enable-offers').checked;
+            let offers = [];
+            if(enableOffers) {
+                document.querySelectorAll('#edit-offers-container .offer-box-admin').forEach(box => {
+                    let title = box.querySelector('.edit-offer-title').value.trim();
+                    let oldPrice = Number(box.querySelector('.edit-offer-old-price').value) || 0;
+                    let newPrice = Number(box.querySelector('.edit-offer-new-price').value) || 0;
+                    if(title && newPrice) offers.push({ title, oldPrice, newPrice });
+                });
+            }
+
             await updateDoc(doc(db, "products", id), {
-                name, buyPrice, price, stock, profitMargin: price - buyPrice, category, videoUrl, description, imageUrls
+                name, buyPrice, price, stock, profitMargin: price - buyPrice, category, imageUrls, enableOffers, offers
             });
 
             document.getElementById('editProductModal').style.display = 'none';
-            showAlert('نجاح', 'تم تحديث تعديلات المنتج بنجاح 💾!');
+            showAlert('نجاح', 'تم تحديث تفاصيل المنتج والعروض بنجاح 💾!');
             loadProducts();
             loadProductsMap();
         }
@@ -463,24 +530,17 @@
 
                 for(let d of snap.docs) {
                     const o = { id: d.id, ...d.data() };
-                    
-                    // فحص الحذف التلقائي بعد 48 ساعة من وجوده في سلة المهملات
                     if(o.status && o.status.includes('مهملات') && o.trashTime) {
                         let trashTimeMs = new Date(o.trashTime).getTime();
-                        let hoursInTrash = (now - trashTimeMs) / (1000 * 60 * 60);
-                        if(hoursInTrash >= 48) {
-                            await deleteDoc(doc(db, "orders", d.id)); // حذف نهائي تلقائي
+                        if((now - trashTimeMs) / (1000 * 60 * 60) >= 48) {
+                            await deleteDoc(doc(db, "orders", d.id));
                             continue;
                         }
                     }
-
                     ordersCache[o.id] = o;
                     allFetchedOrders.push(o);
                 }
-
                 renderOrdersFiltered(allFetchedOrders);
-                generateWilayaDetailedReport(allFetchedOrders);
-                updateAnalyticsData(allFetchedOrders);
             } catch(e) {}
         }
 
@@ -511,16 +571,10 @@
                             </div>
                         </div>
                         <div>
-                            ${isTrash ? `
-                                <button onclick="restoreOrder('${o.id}')" style="background:#10b981; padding:5px 8px; font-size:11px; margin-bottom:4px; display:block; width:100%;">استعادة ♻️</button>
-                                <button onclick="promptPermanentDelete('${o.id}')" class="btn-danger" style="padding:5px 8px; font-size:11px; width:100%;">حذف نهائي ❌</button>
-                            ` : `
-                                <button onclick="promptDeleteOrder('${o.id}', '${status}')" class="btn-danger" style="padding:6px 10px; font-size:11px;">حذف 🗑️</button>
-                            `}
+                            ${isTrash ? `<button onclick="restoreOrder('${o.id}')" style="background:#10b981; padding:5px 8px; font-size:11px; margin-bottom:4px; display:block; width:100%;">استعادة ♻️</button><button onclick="promptPermanentDelete('${o.id}')" class="btn-danger" style="padding:5px 8px; font-size:11px; width:100%;">حذف ❌</button>` : `<button onclick="promptDeleteOrder('${o.id}', '${status}')" class="btn-danger" style="padding:6px 10px; font-size:11px;">حذف 🗑️</button>`}
                         </div>
                     </div>
                 `;
-
                 if(isTrash) trashDiv.innerHTML += cardHtml;
                 else if(status.includes('جديد')) newDiv.innerHTML += cardHtml;
                 else if(status.includes('المعالجة')) procDiv.innerHTML += cardHtml;
@@ -529,174 +583,6 @@
                 else if(status.includes('روتور')) retDiv.innerHTML += cardHtml;
                 else if(status.includes('ملغى')) cancelDiv.innerHTML += cardHtml;
             });
-        }
-
-        window.promptDeleteOrder = function(id, currentStatus) {
-            pendingActionType = 'delete_order';
-            pendingActionId = id;
-            pendingOriginalStatus = currentStatus;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModalTitle').innerText = '🔒 تأكيد النقل للمهملات';
-            document.getElementById('passwordModal').style.display = 'flex';
-        }
-
-        window.promptPermanentDelete = function(id) {
-            pendingActionType = 'permanent_delete_order';
-            pendingActionId = id;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModalTitle').innerText = '❌ تأكيد الحذف النهائي الأبدي';
-            document.getElementById('passwordModal').style.display = 'flex';
-        }
-
-        window.confirmAdminAction = async function() {
-            let enteredPass = document.getElementById('admin-action-pass').value.trim();
-            let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
-
-            if(enteredPass !== currentAdminPass) {
-                alert('كلمة المرور غير صحيحة!');
-                return;
-            }
-
-            document.getElementById('passwordModal').style.display = 'none';
-
-            if(pendingActionType === 'delete_order') {
-                let trashTimestamp = new Date().toISOString();
-                await updateDoc(doc(db, "orders", pendingActionId), { status: `مهملات | ${pendingOriginalStatus}`, trashTime: trashTimestamp });
-                showAlert('نجاح', 'تم نقل الطلب إلى سلة المهملات بنجاح!');
-                loadAllOrders();
-            } else if(pendingActionType === 'permanent_delete_order') {
-                await deleteDoc(doc(db, "orders", pendingActionId));
-                showAlert('نجاح', 'تم حذف الطلب نهائياً ولن يظهر مرة أخرى!');
-                loadAllOrders();
-            } else if(pendingActionType === 'delete_staff') {
-                let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-                delete staffList[pendingActionId];
-                localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
-                showAlert('نجاح', 'تم حذف الموظف بنجاح!');
-                loadStaffList();
-            } else if(pendingActionType === 'delete_product') {
-                let trashTimestamp = new Date().toISOString();
-                await updateDoc(doc(db, "products", pendingActionId), { status: 'مهملات', trashTime: trashTimestamp });
-                loadProducts();
-                showAlert('نجاح', 'تم نقل المنتج لسلة المهملات!');
-            }
-        }
-
-        window.restoreOrder = async function(id) {
-            let o = ordersCache[id];
-            if(!o) return;
-            let originalStatus = o.status.split('|')[1]?.trim() || 'جديد ⏳';
-            await updateDoc(doc(db, "orders", id), { status: originalStatus, trashTime: null });
-            showAlert('نجاح', 'تمت استعادة الطلب إلى مكانه الأصلي ♻️!');
-            loadAllOrders();
-        }
-
-        window.openOrderModal = function(id) {
-            const o = ordersCache[id];
-            if(!o) return;
-
-            let timesHtml = `
-                <hr style="border:0; border-top:1px solid #cbd5e1; margin:10px 0;">
-                <b>⏱️ سجل الأوقات والمراحل:</b><br>
-                - وقت إنشاء الطلب: ${o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString('ar-DZ') : 'غير متوفر'}<br>
-                - وقت المعالجة: ${o.timeProcessing || 'لم يبدأ بعد'}<br>
-                - وقت التوصيل: ${o.timeShipping || 'لم يبدأ بعد'}<br>
-                - وقت الأرشيف/التسليم النهائي: ${o.timeArchive || 'لم يتم التسليم بعد'}<br>
-                - وقت الروتور: ${o.timeReturn || 'غير متوفر'}<br>
-                - وقت الإلغاء: ${o.timeCancelled || 'نشط'}<br>
-            `;
-
-            document.getElementById('orderDetailsContent').innerHTML = `
-                <b>👤 الزبون:</b> ${o.fullName}<br>
-                <b>📞 الهاتف:</b> ${o.phone}<br>
-                <b>📍 الولاية والبلدية:</b> ${o.wilaya} (${o.commune})<br>
-                <b>📦 الطلب:</b> ${o.productName}<br>
-                <b>🔢 الكمية:</b> ${o.quantity || 1}<br>
-                <b>🚚 نوع التوصيل:</b> ${o.deliveryType}<br>
-                <b>💰 المجموع الكلي (COD):</b> <span style="color:red; font-weight:bold;">${o.finalTotal} دج</span><br>
-                <b>📌 الحالة الحالية:</b> <b>${o.status}</b>
-                ${timesHtml}
-            `;
-
-            let actionsHtml = `
-                <button onclick="updateOrderStatusWithTime('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', true)" style="background:#2563eb;">نقل للمعالجة (خصم المخزون) 🔄</button>
-                <button onclick="updateOrderStatusWithTime('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
-                <button onclick="updateOrderStatusWithTime('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم (أرشيف) ✅</button>
-                <button onclick="updateOrderStatusWithTime('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
-                <button onclick="updateOrderStatusWithTime('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">إلغاء الطلب ❌</button>
-            `;
-            document.getElementById('orderModalActions').innerHTML = actionsHtml;
-            document.getElementById('orderModal').style.display = 'flex';
-        }
-
-        window.closeOrderModal = function() { document.getElementById('orderModal').style.display = 'none'; }
-        
-        window.updateOrderStatusWithTime = async function(id, newStatus, timeField, isProcessing = false) {
-            let currentTime = new Date().toLocaleString('ar-DZ');
-            let updatePayload = { status: newStatus, [timeField]: currentTime };
-
-            if(isProcessing) {
-                let o = ordersCache[id];
-                if(o && o.productName) {
-                    let pRef = productsMap[o.productName];
-                    if(pRef && pRef.id) {
-                        let pDocSnap = await getDoc(doc(db, "products", pRef.id));
-                        if(pDocSnap.exists()) {
-                            let currentStock = pDocSnap.data().stock !== undefined ? pDocSnap.data().stock : 10;
-                            let orderedQty = o.quantity || 1;
-                            let newStock = currentStock - orderedQty;
-                            if(newStock < 0) newStock = 0;
-                            await updateDoc(doc(db, "products", pRef.id), { stock: newStock });
-                            if(newStock <= 5) {
-                                alert(`⚠️ تحذير: انخفض مخزون المنتج (${o.productName}) ليصبح المتبقي ${newStock} قطع فقط!`);
-                            }
-                        }
-                    }
-                }
-            }
-
-            await updateDoc(doc(db, "orders", id), updatePayload);
-            closeOrderModal();
-            loadAllOrders();
-            loadProductsMap();
-            loadProducts();
-        }
-
-        function generateWilayaDetailedReport(orders) {
-            let wilayaMap = {};
-            orders.forEach(o => {
-                if(o.status && o.status.includes('مهملات')) return;
-                let w = o.wilaya || 'غير محددة';
-                if(!wilayaMap[w]) wilayaMap[w] = { home: 0, desk: 0, total: 0 };
-                if(o.deliveryType && o.deliveryType.includes('منزل')) wilayaMap[w].home++;
-                else wilayaMap[w].desk++;
-                wilayaMap[w].total++;
-            });
-            let html = `<table class="wilaya-table"><thead><tr><th>الولاية</th><th>🏠 للمنزل</th><th>🏢 للمكتب</th><th>📊 المجموع</th></tr></thead><tbody>`;
-            for(let w in wilayaMap) {
-                html += `<tr><td><b>${w}</b></td><td>${wilayaMap[w].home}</td><td>${wilayaMap[w].desk}</td><td><b>${wilayaMap[w].total}</b></td></tr>`;
-            }
-            html += `</tbody></table>`;
-            let reportEl = document.getElementById('wilaya-report-content');
-            if(reportEl) reportEl.innerHTML = html;
-        }
-
-        function updateAnalyticsData(orders) {
-            let totalProfit = 0, totalBuy = 0, totalSell = 0, routerLoss = 0;
-            orders.forEach(o => {
-                if(o.status && o.status.includes('مهملات') || o.status?.includes('ملغى')) return;
-                totalSell += (o.finalTotal || 0);
-                let pData = productsMap[o.productName] || { buyPrice: 0, margin: 0 };
-                totalBuy += (pData.buyPrice * (o.quantity || 1));
-                if(o.status && o.status.includes('أرشيف')) totalProfit += (pData.margin * (o.quantity || 1));
-                if(o.status && o.status.includes('روتور')) routerLoss += 600;
-            });
-            if(document.getElementById('stat-total-profit')) {
-                document.getElementById('stat-total-profit').innerText = totalProfit + ' دج';
-                document.getElementById('stat-total-buy-price').innerText = totalBuy + ' دج';
-                document.getElementById('stat-total-sell-price').innerText = totalSell + ' دج';
-                document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
-            }
         }
     </script>
 </body>
