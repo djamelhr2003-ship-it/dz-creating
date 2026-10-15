@@ -36,9 +36,9 @@
         .order-mini-card:hover { border-color: #2563eb; background: #f1f5f9; }
         .order-mini-thumb { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; background: #eee; flex-shrink: 0; }
         
-        .wilaya-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
-        .wilaya-table th, .wilaya-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-        .wilaya-table th { background: #1e293b; color: white; }
+        .wilaya-table, .daily-report-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
+        .wilaya-table th, .wilaya-table td, .daily-report-table th, .daily-report-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        .wilaya-table th, .daily-report-table th { background: #1e293b; color: white; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 3000; }
         .modal-card { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 550px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
@@ -169,19 +169,38 @@
 
         <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات</h2><div id="wilaya-report-content">جاري التجهيز...</div></div></div>
         
+        <!-- قسم التحليلات المطور مع اختيار التواريخ وتحليل الأداء اليومي المستقل -->
         <div id="analytics-tab" class="tab-content">
             <div class="container">
-                <h2>💰 التحليلات المالية والأرباح</h2>
+                <h2>💰 التحليلات المالية والأرباح حسب التواريخ</h2>
+                
+                <!-- نافذة اختيار التواريخ -->
+                <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:20px; display:flex; gap:15px; flex-wrap:wrap; align-items:flex-end;">
+                    <div style="flex:1; min-width:200px;">
+                        <label>من تاريخ:</label>
+                        <input type="date" id="filter-date-from" onchange="updateAnalyticsData(allFetchedOrders)">
+                    </div>
+                    <div style="flex:1; min-width:200px;">
+                        <label>إلى تاريخ:</label>
+                        <input type="date" id="filter-date-to" onchange="updateAnalyticsData(allFetchedOrders)">
+                    </div>
+                    <div>
+                        <button onclick="resetDateFilter()" style="background:#64748b; padding:10px 15px;">إلغاء الفلترة 🔄</button>
+                    </div>
+                </div>
+
                 <div class="stats-grid">
                     <div class="stat-card" style="background: linear-gradient(135deg, #059669, #047857);"><h4>إجمالي الربح</h4><span id="stat-total-profit">0 دج</span></div>
                     <div class="stat-card"><h4>إجمالي الشراء</h4><span id="stat-total-buy-price">0 دج</span></div>
                     <div class="stat-card" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"><h4>إجمالي البيع</h4><span id="stat-total-sell-price">0 دج</span></div>
                     <div class="stat-card" style="background: linear-gradient(135deg, #dc2626, #991b1b);"><h4>خسائر الروتور</h4><span id="stat-total-router-loss">0 دج</span></div>
                 </div>
+
+                <h3 style="margin-top:30px; color:#1e293b; text-align:right;">📅 التحليل اليومي لكل يوم على حدة:</h3>
+                <div id="daily-analytics-container">جاري توليد التقرير اليومي...</div>
             </div>
         </div>
 
-        <!-- قسم طاقم العمل مع تفاصيل الأداء والطلبات والتواريخ -->
         <div id="staff-tab" class="tab-content">
             <div class="container" style="border: 2px solid #7c3aed;">
                 <h2 style="color: #7c3aed;">👥 إدارة الأفراد وطاقم العمل وأداء كل شخص</h2>
@@ -333,7 +352,7 @@
             let p = document.getElementById('staff-password').value.trim();
             if(!u || !p) { alert('أدخل البيانات!'); return; }
             let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            staffList[u] = { password: p, createdAt: new Date().toLocaleString('ar-DZ') };
+            staffList[u] = { password: p, createdAt: new Date().toLocaleDateString('ar-DZ') };
             localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
             showAlert('نجاح', `تم حفظ الموظف (${u}) بنجاح!`);
             document.getElementById('staff-username').value = '';
@@ -341,7 +360,6 @@
             loadStaffList();
         }
 
-        // دالة عرض بيانات كل شخص من طاقم العمل (الأوقات، التواريخ، والطلبات المنجزة)
         window.loadStaffList = function() {
             let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
             let container = document.getElementById('staff-list-container');
@@ -770,21 +788,89 @@
             if(reportEl) reportEl.innerHTML = html;
         }
 
-        function updateAnalyticsData(orders) {
+        window.resetDateFilter = function() {
+            document.getElementById('filter-date-from').value = '';
+            document.getElementById('filter-date-to').value = '';
+            updateAnalyticsData(allFetchedOrders);
+        }
+
+        // حساب التحليلات مع تصفية التواريخ وإظهار التقرير اليومي المنفصل لكل يوم
+        window.updateAnalyticsData = function(orders) {
+            let dateFrom = document.getElementById('filter-date-from')?.value;
+            let dateTo = document.getElementById('filter-date-to')?.value;
+
             let totalProfit = 0, totalBuy = 0, totalSell = 0, routerLoss = 0;
+            let dailyMap = {};
+
             orders.forEach(o => {
-                if(o.status && o.status.includes('مهملات') || o.status?.includes('ملغى')) return;
-                totalSell += (o.finalTotal || 0);
+                if(o.status && (o.status.includes('مهملات') || o.status.includes('ملغى'))) return;
+
+                let orderDateObj = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
+                let orderDateStr = orderDateObj.toISOString().split('T')[0]; // YYYY-MM-DD
+
+                // فلترة التواريخ إن وجدت
+                if(dateFrom && orderDateStr < dateFrom) return;
+                if(dateTo && orderDateStr > dateTo) return;
+
+                let sellPrice = (o.finalTotal || 0);
+                totalSell += sellPrice;
+
                 let pData = productsMap[o.productName] || { buyPrice: 0, margin: 0 };
-                totalBuy += (pData.buyPrice * (o.quantity || 1));
-                if(o.status && o.status.includes('أرشيف')) totalProfit += (pData.margin * (o.quantity || 1));
-                if(o.status && o.status.includes('روتور')) routerLoss += 600;
+                let buyPriceTotal = (pData.buyPrice * (o.quantity || 1));
+                totalBuy += buyPriceTotal;
+
+                let profit = 0;
+                if(o.status && o.status.includes('أرشيف')) {
+                    profit = (pData.margin * (o.quantity || 1));
+                    totalProfit += profit;
+                }
+
+                let routerFee = 0;
+                if(o.status && o.status.includes('روتور')) {
+                    routerFee = 600;
+                    routerLoss += 600;
+                }
+
+                // التجميع اليومي المستقل لكل يوم
+                if(!dailyMap[orderDateStr]) {
+                    dailyMap[orderDateStr] = { ordersCount: 0, sell: 0, profit: 0, routerLoss: 0 };
+                }
+                dailyMap[orderDateStr].ordersCount++;
+                dailyMap[orderDateStr].sell += sellPrice;
+                dailyMap[orderDateStr].profit += profit;
+                dailyMap[orderDateStr].routerLoss += routerFee;
             });
+
             if(document.getElementById('stat-total-profit')) {
                 document.getElementById('stat-total-profit').innerText = totalProfit + ' دج';
                 document.getElementById('stat-total-buy-price').innerText = totalBuy + ' دج';
                 document.getElementById('stat-total-sell-price').innerText = totalSell + ' دج';
                 document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
+            }
+
+            // توليد جدول التحليل اليومي لكل يوم على حدة
+            let dailyContainer = document.getElementById('daily-analytics-container');
+            if(dailyContainer) {
+                let sortedDays = Object.keys(dailyMap).sort().reverse();
+                if(sortedDays.length === 0) {
+                    dailyContainer.innerHTML = '<p style="font-size:13px; color:#64748b;">لا توجد بيانات مطابقة في هذا النطاق الزمني.</p>';
+                    return;
+                }
+                let tableHtml = `<table class="daily-report-table"><thead><tr><th>📅 اليوم / التاريخ</th><th>📦 عدد الطلبات</th><th>💰 إجمالي المبيعات</th><th>📈 الأرباح المؤكدة</th><th>⚠️ خسائر الروتور</th></tr></thead><tbody>`;
+                sortedDays.forEach(day => {
+                    let d = dailyMap[day];
+                    tableHtml += `
+                        <tr>
+                            <td><b>${day}</b></td>
+                            <td>${d.ordersCount} طلب</td>
+                            <td>${d.sell} دج</td>
+                            <td style="color:green; font-weight:bold;">${d.profit} دج</td>
+                            <td style="color:red;">${d.routerLoss} دج</td>
+                        </tr>
+                    `;
+                });
+                tableHtml += `</tbody></table>`;
+                dailyContainer.innerHTML = tableHtml;
             }
         }
     </script>
