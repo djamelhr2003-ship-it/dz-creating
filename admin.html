@@ -115,10 +115,10 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الطلب مع ملاحظات الزبون -->
+    <!-- نافذة تفاصيل الطلب مع جدول التوقيت والملاحظات -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
-            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب والصورة وملاحظات الزبون</h3>
+            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب، جدول التوقيت وملاحظات الزبون</h3>
             <div id="orderDetailsContent" style="font-size: 14px; line-height: 1.8; color: #1e293b; margin-bottom: 20px;"></div>
             <div id="orderModalActions" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;"></div>
             <button onclick="closeOrderModal()" class="btn-secondary" style="margin-top: 15px; width: 100%; background: #64748b;">إغلاق النافذة ❌</button>
@@ -561,6 +561,21 @@
             let variantDetails = (o.color || o.size) ? `<br><b>🎨 اللون والمقاس:</b> اللون: ${o.color || '-'} | المقاس: ${o.size || '-'}` : '';
             let notesHtml = o.customerNotes ? `<br><b>💬 ملاحظة الزبون:</b> <span style="color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:4px;">${o.customerNotes}</span>` : '<br><b>💬 ملاحظة الزبون:</b> لا توجد ملاحظات';
 
+            // جدول التوقيتات والأوقات لكل حالة سجلت في الطلب
+            let timingTable = `
+                <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:10px; margin-top:10px; font-size:12px;">
+                    <b style="color:#1e293b;">📅 جدول التوقيت وسجل الحالات:</b><br>
+                    - وقت الإنشاء/الطلب: ${o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString('ar-DZ') : 'غير متوفر'}<br>
+                    ${o.timeProcessing ? `- وقت الانتقال للمعالجة: ${o.timeProcessing}<br>` : ''}
+                    ${o.timeShipping ? `- وقت الانتقال للتوصيل: ${o.timeShipping}<br>` : ''}
+                    ${o.timeArchive ? `- وقت تأكيد التسليم (الأرشيف): ${o.timeArchive}<br>` : ''}
+                    ${o.timeReturn ? `- وقت تسجيل الروتور: ${o.timeReturn}<br>` : ''}
+                    ${o.timeCancelled ? `- وقت الإلغاء: ${o.timeCancelled}<br>` : ''}
+                    ${o.timeFake ? `- وقت التصنيف كـ وهمي: ${o.timeFake}<br>` : ''}
+                    ${o.processedBy ? `👤 آخر تعديل بواسطة: <b>${o.processedBy}</b>` : ''}
+                </div>
+            `;
+
             document.getElementById('orderDetailsContent').innerHTML = `
                 ${imgHtml}
                 <b>👤 الزبون:</b> ${o.fullName}<br>
@@ -572,6 +587,7 @@
                 ${notesHtml}<br>
                 <b>💰 المجموع الكلي:</b> <span style="color:red; font-weight:bold;">${o.finalTotal} دج</span><br>
                 <b>📌 الحالة الحالية:</b> <b>${o.status}</b>
+                ${timingTable}
             `;
 
             let actionsHtml = '';
@@ -580,32 +596,14 @@
             if(!staffPermissions.process) {
                 actionsHtml = '<p style="color:red;">ليس لديك صلاحية تعديل حالة الطلبات.</p>';
             } else {
-                if(currentStatus.includes('جديد')) {
-                    actionsHtml = `
-                        <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', true)" style="background:#2563eb;">نقل للمعالجة 🔄</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'وهمي ⚠️', 'timeFake')" style="background:#dc2626;">وهمي ⚠️</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'وهمي ⚠️', 'timeFake')" class="btn-danger">ملغى (للوهمية) ❌</button>
-                    `;
-                } else if(currentStatus.includes('المعالجة')) {
-                    actionsHtml = `
-                        <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
-                    `;
-                } else if(currentStatus.includes('التوصيل')) {
-                    actionsHtml = `
-                        <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم (أرشيف) ✅</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">ملغى ❌</button>
-                    `;
-                } else {
-                    actionsHtml = `
-                        <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', false)" style="background:#2563eb;">نقل للمعالجة 🔄</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم ✅</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'وهمي ⚠️', 'timeFake')" style="background:#dc2626;">وهمي ⚠️</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">ملغى ❌</button>
-                    `;
-                }
+                actionsHtml = `
+                    <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', true)" style="background:#2563eb;">نقل للمعالجة 🔄</button>
+                    <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
+                    <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم (أرشيف) ✅</button>
+                    <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
+                    <button onclick="updateOrderStatus('${o.id}', 'وهمي ⚠️', 'timeFake')" style="background:#dc2626;">وهمي ⚠️</button>
+                    <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">إلغاء الطلب ❌</button>
+                `;
             }
 
             document.getElementById('orderModalActions').innerHTML = actionsHtml;
