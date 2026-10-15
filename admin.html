@@ -52,6 +52,7 @@
         .staff-status-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .status-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-left: 6px; }
         .online { background: #10b981; box-shadow: 0 0 8px #10b981; }
+        .offline { background: #ef4444; }
     </style>
 </head>
 <body>
@@ -74,7 +75,7 @@
         </div>
     </div>
 
-    <!-- بوابة طاقم العمل وتفاصيل النشاط -->
+    <!-- بوابة طاقم العمل والسجلات الحقيقية -->
     <div class="modal-overlay" id="staffPortalModal">
         <div class="modal-card" style="max-width: 650px;">
             <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; color:#7c3aed;">🚪 بوابة نشاط الموظف</h3>
@@ -167,12 +168,18 @@
             </div>
         </div>
 
-        <div id="reviews-tab" class="tab-content"><div class="container"><h2>💬 التعليقات</h2><div id="admin-reviews-list">جاري التحميل...</div></div></div>
+        <!-- تبويب التعليقات مع إمكانية الحذف والإبقاء -->
+        <div id="reviews-tab" class="tab-content">
+            <div class="container">
+                <h2>💬 إدارة تقييمات وتعليقات الزبائن</h2>
+                <div id="admin-reviews-list">جاري التحميل...</div>
+            </div>
+        </div>
 
-        <!-- تبويب طاقم العمل -->
+        <!-- تبويب طاقم العمل وإدارة الأفراد -->
         <div id="staff-tab" class="tab-content">
             <div class="container" style="border: 2px solid #7c3aed;">
-                <h2 style="color: #7c3aed;">👥 طاقم العمل وإضافة الأفراد</h2>
+                <h2 style="color: #7c3aed;">👥 طاقم العمل وحالة الاتصال</h2>
                 <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:20px;">
                     <h3>➕ إضافة موظف جديد</h3>
                     <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="staff-username" placeholder="اسم المستخدم"></div>
@@ -192,10 +199,7 @@
                 <div class="form-group"><label>سعر البيع (دج):</label><input type="number" id="prod-price"></div>
                 <div class="form-group"><label>التصنيف:</label>
                     <select id="prod-category">
-                        <option value="ملابس">ملابس</option>
-                        <option value="أحذية">أحذية</option>
-                        <option value="إلكترونيات">إلكترونيات</option>
-                        <option value="عام">عام</option>
+                        <option value="ملابس">ملابس</option><option value="أحذية">أحذية</option><option value="إلكترونيات">إلكترونيات</option><option value="عام">عام</option>
                     </select>
                 </div>
                 <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #cbd5e1; margin-bottom:15px;">
@@ -211,19 +215,26 @@
 
         <div id="manage-products-tab" class="tab-content"><div class="container"><h2>🏷️ إدارة المنتجات</h2><div id="products-list">جاري التحميل...</div></div></div>
 
-        <!-- تبويب الإعدادات (تغيير اسم المتجر) -->
+        <!-- تبويب الإعدادات (تغيير اسم المتجر وتغيير اسمك وكلمة سرك) -->
         <div id="settings-tab" class="tab-content">
             <div class="container" style="max-width:500px;">
                 <h2>⚙️ إعدادات المتجر العامة</h2>
                 <div class="form-group"><label>اسم المتجر الجديد:</label><input type="text" id="setting-store-name" placeholder="اكتب اسم متجرك هنا..."></div>
-                <button onclick="saveStoreSettings()" style="width:100%;">حفظ اسم المتجر الجديد 💾</button>
+                <button onclick="saveStoreSettings()" style="width:100%; margin-bottom:20px;">حفظ اسم المتجر الجديد 💾</button>
+
+                <hr style="border:0; border-top:1px solid #cbd5e1; margin:20px 0;">
+
+                <h3>🔐 تغيير بيانات الدخول الخاصة بك (الأدمن)</h3>
+                <div class="form-group"><label>اسم المستخدم الجديد:</label><input type="text" id="new-admin-user" placeholder="djamel hr"></div>
+                <div class="form-group"><label>كلمة المرور الجديدة:</label><input type="password" id="new-admin-pass" placeholder="Djamel2003"></div>
+                <button onclick="updateAdminCredentials()" style="background:#2563eb; width:100%;">حفظ بيانات الدخول الجديدة 💾</button>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDdJY7mI1DON...", 
@@ -253,12 +264,26 @@
         window.checkLogin = function() {
             let u = document.getElementById('login-username').value.trim();
             let p = document.getElementById('login-pass').value.trim();
-            if(u === "djamel hr" && p === "Djamel2003") {
+            
+            let currentAdminUser = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
+            let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
+
+            if(u === currentAdminUser && p === currentAdminPass) {
                 sessionStorage.setItem('ecom_logged_user', u);
+                recordActivity(u, 'تسجيل الدخول إلى لوحة التحكم');
                 initDashboard(u);
             } else {
                 document.getElementById('login-error').innerText = 'خطأ في اسم المستخدم أو كلمة المرور!';
             }
+        }
+
+        function recordActivity(user, action) {
+            let logsKey = `dz_logs_${user}`;
+            let logs = JSON.parse(localStorage.getItem(logsKey)) || [];
+            logs.unshift(`[${new Date().toLocaleTimeString('ar-DZ')}] ${action}`);
+            if(logs.length > 20) logs.pop();
+            localStorage.setItem(logsKey, JSON.stringify(logs));
+            localStorage.setItem(`dz_last_active_${user}`, Date.now());
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -284,13 +309,27 @@
             if(event && event.currentTarget) event.currentTarget.classList.add('active');
         }
 
-        window.logout = function() { sessionStorage.clear(); location.reload(); }
+        window.logout = function() {
+            let user = sessionStorage.getItem('ecom_logged_user');
+            if(user) recordActivity(user, 'تسجيل الخروج');
+            sessionStorage.clear();
+            location.reload();
+        }
 
         window.saveStoreSettings = function() {
             let newName = document.getElementById('setting-store-name').value.trim();
             if(!newName) return;
             localStorage.setItem('dz_store_name', newName);
             showAlert('نجاح', 'تم تحديث اسم المتجر بنجاح!');
+        }
+
+        window.updateAdminCredentials = function() {
+            let u = document.getElementById('new-admin-user').value.trim();
+            let p = document.getElementById('new-admin-pass').value.trim();
+            if(!u || !p) { showAlert('تنبيه', 'أدخل اسم المستخدم وكلمة المرور الجديدة!'); return; }
+            localStorage.setItem('dz_custom_admin_user', u);
+            localStorage.setItem('dz_custom_admin_pass', p);
+            showAlert('نجاح', 'تم تحديث بيانات الدخول الخاصة بك بنجاح!');
         }
 
         window.saveStaffMember = function() {
@@ -309,17 +348,31 @@
         window.loadStaffList = function() {
             let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
             let container = document.getElementById('staff-list-container');
+            let currentAdmin = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
+            
+            let adminLast = localStorage.getItem(`dz_last_active_${currentAdmin}`);
+            let isAdminOnline = adminLast && (Date.now() - Number(adminLast) < 300000);
+
             let html = `
-                <div class="staff-status-card" onclick="openStaffPortal('djamel hr')">
-                    <div><b>👑 الأدمن:</b> djamel hr <span class="status-dot online"></span> (متصل الآن)</div>
-                    <button class="btn-secondary" style="padding:4px 8px; font-size:12px;">بوابة النشاط 🔍</button>
+                <div class="staff-status-card" onclick="openStaffPortal('${currentAdmin}', 'أدمن رئيسي')">
+                    <div><b>👑 الأدمن (${currentAdmin}):</b> <span class="status-dot ${isAdminOnline ? 'online' : 'offline'}"></span> <span style="font-size:12px;">(${isAdminOnline ? 'متصل الآن' : 'غير متصل'})</span></div>
+                    <button class="btn-secondary" style="padding:4px 8px; font-size:12px;">سجل النشاط 📋</button>
                 </div>
             `;
+
             for(let u in staffList) {
+                let lastActive = localStorage.getItem(`dz_last_active_${u}`);
+                let isOnline = lastActive && (Date.now() - Number(lastActive) < 300000);
+                let dotClass = isOnline ? 'online' : 'offline';
+                let statusText = isOnline ? 'متصل الآن' : 'غير متصل';
+
                 html += `
-                    <div class="staff-status-card">
-                        <div><b>👤 موظف:</b> ${u} <span class="status-dot online"></span></div>
-                        <button onclick="deleteStaff('${u}')" class="btn-danger" style="padding:4px 8px; font-size:12px;">حذف 🗑️</button>
+                    <div class="staff-status-card" onclick="openStaffPortal('${u}', 'موظف')">
+                        <div><b>👤 موظف:</b> ${u} <span class="status-dot ${dotClass}"></span> <span style="font-size:12px; color:#64748b;">(${statusText})</span></div>
+                        <div style="display:flex; gap:5px;">
+                            <button class="btn-secondary" style="padding:4px 8px; font-size:12px;">السجل 📋</button>
+                            <button onclick="event.stopPropagation(); deleteStaff('${u}')" class="btn-danger" style="padding:4px 8px; font-size:12px;">حذف 🗑️</button>
+                        </div>
                     </div>
                 `;
             }
@@ -333,11 +386,16 @@
             loadStaffList();
         }
 
-        window.openStaffPortal = function(user) {
+        window.openStaffPortal = function(user, role) {
+            let logs = JSON.parse(localStorage.getItem(`dz_logs_${user}`)) || ['لا توجد نشاطات مسجلة بعد.'];
+            let logsHtml = logs.map(l => `<li style="margin-bottom:5px; font-size:13px; color:#334155;">${l}</li>`).join('');
+
             document.getElementById('staffPortalContent').innerHTML = `
-                <p><b>👤 اسم المستخدم:</b> ${user}</p>
-                <p><b>🟢 الحالة:</b> متصل الآن</p>
-                <p><b>🕒 تواريخ تسجيل الدخول والعمل:</b> مسجلة ونشطة.</p>
+                <p><b>👤 اسم المستخدم:</b> ${user} (${role})</p>
+                <h4 style="margin:10px 0 5px 0; color:#2563eb;">📋 سجل النشاطات والعمليات:</h4>
+                <ul style="background:#f1f5f9; padding:15px; border-radius:6px; max-height:150px; overflow-y:auto; margin:0; list-style-type:square;">
+                    ${logsHtml}
+                </ul>
             `;
             document.getElementById('staffPortalModal').style.display = 'flex';
         }
@@ -368,9 +426,7 @@
             try {
                 await addDoc(collection(db, "products"), {
                     name, buyPrice, price, profitMargin: price - buyPrice, category, description,
-                    imageUrls: img ? [img] : [],
-                    variants: { colors: colorsArr, sizes: sizesArr },
-                    reviews: [], createdAt: new Date()
+                    imageUrls: img ? [img] : [], variants: { colors: colorsArr, sizes: sizesArr }, reviews: [], createdAt: new Date()
                 });
                 showAlert('نجاح', 'تم نشر المنتج وتوابعه بنجاح!');
                 document.getElementById('prod-name').value = '';
@@ -462,7 +518,6 @@
             });
         }
 
-        // المربع الصغير يكبر عند النقر ويعرض تفاصيل الطلب الكاملة مع الأزرار
         window.openOrderModal = function(id) {
             const o = ordersCache[id];
             if(!o) return;
@@ -558,14 +613,41 @@
             document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
         }
 
-        async function loadAdminReviews() {
+        // تحميل وعرض التعليقات مع إمكانية الحذف والإبقاء
+        window.loadAdminReviews = async function() {
             const listDiv = document.getElementById('admin-reviews-list');
             const snap = await getDocs(collection(db, "products"));
             listDiv.innerHTML = '';
             snap.forEach(d => {
                 const data = d.data();
-                if(data.reviews) data.reviews.forEach(r => { listDiv.innerHTML += `<div style="background:#f8fafc; padding:10px; border-radius:6px; margin-bottom:8px;"><b>${data.name}</b> - ${r.name}: ${r.comment}</div>`; });
+                if(data.reviews && data.reviews.length > 0) {
+                    data.reviews.forEach((r, index) => {
+                        listDiv.innerHTML += `
+                            <div style="background:#f8fafc; padding:10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; font-size:13px; border:1px solid #cbd5e1;">
+                                <div>
+                                    <b>المنتج:</b> ${data.name} <br>
+                                    <b>الكاتب (${r.name}):</b> ${r.comment} (${'⭐'.repeat(r.stars)})
+                                </div>
+                                <button onclick="deleteProductReview('${d.id}', ${index})" class="btn-danger" style="padding:4px 8px; font-size:12px;">حذف التعليق 🗑️</button>
+                            </div>
+                        `;
+                    });
+                }
             });
+        }
+
+        window.deleteProductReview = async function(productId, reviewIndex) {
+            if(confirm("هل تريد حذف هذا التعليق نهائياً؟")) {
+                const prodRef = doc(db, "products", productId);
+                let prodSnap = await getDoc(prodRef);
+                if(prodSnap.exists()) {
+                    let reviews = prodSnap.data().reviews || [];
+                    reviews.splice(reviewIndex, 1);
+                    await updateDoc(prodRef, { reviews });
+                    showAlert('نجاح', 'تم حذف التعليق بنجاح!');
+                    loadAdminReviews();
+                }
+            }
         }
     </script>
 </body>
