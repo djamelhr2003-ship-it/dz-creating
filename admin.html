@@ -59,17 +59,17 @@
         <div class="container" style="padding: 10px;">
             <div class="tabs-nav">
                 <button class="tab-btn active" onclick="switchTab('orders-tab', event)">⏳ الطلبات</button>
-                <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج وعروض</button>
+                <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج مع أصناف وعروض</button>
                 <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المنتجات</button>
             </div>
         </div>
 
         <div id="orders-tab" class="tab-content active"><div class="container"><h2>إدارة طلبات COD ⏳</h2><div id="orders-list-new" class="orders-grid-compact">جاري التحميل...</div></div></div>
 
-        <!-- تبويب إضافة منتج مع اختيار التصنيف (ساعات، ملابس، إلخ) -->
+        <!-- تبويب إضافة منتج مع التصنيفات والعروض -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
-                <h2>إضافة منتج وتصنيفه (مع العروض) ➕</h2>
+                <h2>إضافة منتج وتصنيفه مع العروض ➕</h2>
                 <div class="form-group"><label>اسم المنتج الأساسي:</label><input type="text" id="prod-name"></div>
                 <div class="form-group"><label>سعر الشراء:</label><input type="number" id="prod-buy-price"></div>
                 <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="prod-price"></div>
@@ -90,7 +90,7 @@
                 <div class="form-group"><label>رابط الفيديو:</label><input type="text" id="prod-video" placeholder="https://..."></div>
                 
                 <hr style="margin:20px 0;">
-                <h3>🔥 العروض والتخفيضات الخاصة</h3>
+                <h3>🔥 قسم العروض والتخفيضات الخاصة</h3>
                 <div class="form-group"><label><input type="checkbox" id="enable-offers"> <b>تفعيل وإظهار العروض للزبائن</b></label></div>
                 
                 <div id="offers-container">
@@ -107,7 +107,7 @@
             </div>
         </div>
 
-        <div id="manage-products-tab" class="tab-content"><div class="container"><h2>🏷️ المنتجات</h2><div id="products-list">جاري التحميل...</div></div></div>
+        <div id="manage-products-tab" class="tab-content"><div class="container"><h2>🏷️ إدارة وتعديل المنتجات</h2><div id="products-list">جاري التحميل...</div></div></div>
     </div>
 
     <script type="module">
@@ -175,7 +175,7 @@
             if(!name || !price) { showAlert('تنبيه', 'أدخل اسم المنتج والسعر!'); return; }
 
             await addDoc(collection(db, "products"), { name, buyPrice, price, category, imageUrls, videoUrl, description, enableOffers, offers, createdAt: new Date() });
-            showAlert('نجاح', 'تم نشر المنتج مع التصنيف بنجاح!');
+            showAlert('نجاح', 'تم نشر المنتج والتصنيف بنجاح!');
             loadProducts();
         }
 
