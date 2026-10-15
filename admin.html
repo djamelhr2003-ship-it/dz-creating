@@ -53,11 +53,13 @@
         .status-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-left: 6px; }
         .online { background: #10b981; box-shadow: 0 0 8px #10b981; }
         .offline { background: #ef4444; }
+        
+        .permissions-box { background: #f1f5f9; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px; text-align: right; }
+        .permissions-box label { display: inline-block; margin-left: 15px; font-weight: normal; font-size: 13px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- نافذة التنبيهات والرسائل المركزية (تظهر للموظف في وسط الشاشة) -->
     <div class="modal-overlay" id="centerModal" style="z-index: 5000;">
         <div class="modal-card" style="text-align: center; max-width: 400px; border: 2px solid #2563eb;">
             <h3 id="modalTitle" style="color: #2563eb; margin-top:0;">⚠️ تنبيه النظام</h3>
@@ -66,14 +68,11 @@
         </div>
     </div>
 
-    <!-- نافذة إدخال كلمة السر للحذف النهائي الآمن -->
     <div class="modal-overlay" id="deletePassModal" style="z-index: 4500;">
         <div class="modal-card" style="max-width: 400px;">
             <h3 style="color: #c0392b; margin-top:0;">🔒 تأكيد الحذف النهائي</h3>
             <p style="font-size: 13px; color: #555;">أدخل كلمة المرور الخاصة بك لتأكيد الحذف النهائي وللأبد:</p>
-            <div class="form-group">
-                <input type="password" id="confirm-delete-pass" placeholder="كلمة المرور..." autocomplete="new-password">
-            </div>
+            <div class="form-group"><input type="password" id="confirm-delete-pass" placeholder="كلمة المرور..." autocomplete="new-password"></div>
             <button onclick="executePermanentDelete()" class="btn-danger" style="width: 100%; margin-bottom: 8px;">تأكيد الحذف نهائياً 🗑️</button>
             <button onclick="document.getElementById('deletePassModal').style.display='none'" class="btn-secondary" style="width: 100%; background: #64748b;">إلغاء</button>
         </div>
@@ -99,10 +98,7 @@
     <!-- شاشة تسجيل الدخول -->
     <div id="login-box" class="container">
         <h2>تسجيل دخول لوحة التحكم 🔐</h2>
-        <div class="form-group" style="text-align: right;">
-            <label>اسم المستخدم:</label>
-            <input type="text" id="login-username" placeholder="djamel hr" autocomplete="off" autocapitalize="off">
-        </div>
+        <div class="form-group" style="text-align: right;"><label>اسم المستخدم:</label><input type="text" id="login-username" placeholder="djamel hr" autocomplete="off" autocapitalize="off"></div>
         <div class="form-group" style="text-align: right;">
             <label>كلمة المرور:</label>
             <div class="password-container">
@@ -126,21 +122,21 @@
         </div>
 
         <div class="container" style="padding: 10px;">
-            <div class="tabs-nav">
-                <button class="tab-btn active" onclick="switchTab('orders-tab', event)">⏳ الجديدة</button>
-                <button class="tab-btn" onclick="switchTab('processing-tab', event)">🔄 المعالجة</button>
-                <button class="tab-btn" onclick="switchTab('shipping-tab', event)">🚚 التوصيل</button>
-                <button class="tab-btn" onclick="switchTab('archive-tab', event)">✅ الأرشيف</button>
-                <button class="tab-btn" onclick="switchTab('return-tab', event)">⚠️ الروتور</button>
-                <button class="tab-btn" onclick="switchTab('fake-tab', event)" style="background: #ef4444; color: white;">🚨 الوهمية</button>
-                <button class="tab-btn" onclick="switchTab('trash-tab', event)" style="background: #64748b; color: white;">🗑️ المهملات</button>
-                <button class="tab-btn" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
-                <button class="tab-btn" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
-                <button class="tab-btn" onclick="switchTab('reviews-tab', event)">💬 التعليقات</button>
-                <button class="tab-btn" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 طاقم العمل</button>
-                <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج</button>
-                <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المنتجات</button>
-                <button class="tab-btn" onclick="switchTab('settings-tab', event)">⚙️ الإعدادات</button>
+            <div class="tabs-nav" id="main-tabs-nav">
+                <button class="tab-btn active" id="nav-orders-tab" onclick="switchTab('orders-tab', event)">⏳ الجديدة</button>
+                <button class="tab-btn" id="nav-processing-tab" onclick="switchTab('processing-tab', event)">🔄 المعالجة</button>
+                <button class="tab-btn" id="nav-shipping-tab" onclick="switchTab('shipping-tab', event)">🚚 التوصيل</button>
+                <button class="tab-btn" id="nav-archive-tab" onclick="switchTab('archive-tab', event)">✅ الأرشيف</button>
+                <button class="tab-btn" id="nav-return-tab" onclick="switchTab('return-tab', event)">⚠️ الروتور</button>
+                <button class="tab-btn" id="nav-fake-tab" onclick="switchTab('fake-tab', event)" style="background: #ef4444; color: white;">🚨 الوهمية</button>
+                <button class="tab-btn" id="nav-trash-tab" onclick="switchTab('trash-tab', event)" style="background: #64748b; color: white;">🗑️ المهملات</button>
+                <button class="tab-btn" id="nav-wilaya-report-tab" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
+                <button class="tab-btn" id="nav-analytics-tab" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
+                <button class="tab-btn" id="nav-reviews-tab" onclick="switchTab('reviews-tab', event)">💬 التعليقات</button>
+                <button class="tab-btn" id="nav-staff-tab" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 طاقم العمل</button>
+                <button class="tab-btn" id="nav-add-product-tab" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج</button>
+                <button class="tab-btn" id="nav-manage-products-tab" onclick="switchTab('manage-products-tab', event)">🏷️ المنتجات</button>
+                <button class="tab-btn" id="nav-settings-tab" onclick="switchTab('settings-tab', event)">⚙️ الإعدادات</button>
             </div>
         </div>
 
@@ -189,29 +185,37 @@
             </div>
         </div>
 
-        <!-- تبويب طاقم العمل مع ميزة إرسال رسالة فورية تظهر في وسط شاشة الموظف -->
+        <!-- تبويب طاقم العمل مع تحديد الصلاحيات بعلامة صح ✔️ -->
         <div id="staff-tab" class="tab-content">
             <div class="container" style="border: 2px solid #7c3aed;">
-                <h2 style="color: #7c3aed;">👥 طاقم العمل وإرسال الرسائل الفورية</h2>
+                <h2 style="color: #7c3aed;">👥 طاقم العمل وإدارة الصلاحيات</h2>
                 
                 <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #7c3aed; margin-bottom:20px;">
                     <h3 style="margin-top:0; color:#7c3aed;">💬 إرسال تنبيه أو رسالة فورية لموظف</h3>
-                    <div class="form-group">
-                        <label>اختر الموظف المستهدف:</label>
-                        <select id="msg-target-staff"></select>
-                    </div>
-                    <div class="form-group">
-                        <label>نص الرسالة:</label>
-                        <textarea id="msg-staff-content" placeholder="اكتب التعليمات أو الرسالة هنا لتظهر للموظف فوراً..." style="height:70px;"></textarea>
-                    </div>
+                    <div class="form-group"><label>اختر الموظف المستهدف:</label><select id="msg-target-staff"></select></div>
+                    <div class="form-group"><label>نص الرسالة:</label><textarea id="msg-staff-content" placeholder="اكتب التعليمات هنا..." style="height:60px;"></textarea></div>
                     <button onclick="sendStaffMessage()" class="btn-secondary" style="background:#7c3aed; width:100%;">إرسال الرسالة الآن 🚀</button>
                 </div>
 
                 <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:20px;">
-                    <h3 style="margin-top:0;">➕ إضافة موظف جديد</h3>
+                    <h3 style="margin-top:0;">➕ إضافة موظف جديد وتحديد صلاحياته</h3>
                     <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="staff-username" placeholder="اسم المستخدم" autocomplete="off"></div>
                     <div class="form-group"><label>كلمة المرور:</label><input type="password" id="staff-password" placeholder="كلمة المرور" autocomplete="new-password"></div>
-                    <button onclick="saveStaffMember()" class="btn-secondary" style="background:#7c3aed;">حفظ ملف الموظف 💾</button>
+                    
+                    <div class="form-group">
+                        <label><b>حدد الصلاحيات الممنوحة (ضع علامة صح ✔️):</b></label>
+                        <div class="permissions-box">
+                            <label><input type="checkbox" class="perm-check" value="orders"> الطلبات (الجديدة/المعالجة/التوصيل)</label><br>
+                            <label><input type="checkbox" class="perm-check" value="archive"> الأرشيف والروتور</label><br>
+                            <label><input type="checkbox" class="perm-check" value="trash"> سلة المهملات</label><br>
+                            <label><input type="checkbox" class="perm-check" value="analytics"> التحليلات المالية والأرباح</label><br>
+                            <label><input type="checkbox" class="perm-check" value="products"> إدارة وإضافة المنتجات</label><br>
+                            <label><input type="checkbox" class="perm-check" value="reviews"> تقييمات الزبائن</label><br>
+                            <label><input type="checkbox" class="perm-check" value="staff"> طاقم العمل والرسائل</label>
+                        </div>
+                    </div>
+
+                    <button onclick="saveStaffMember()" class="btn-secondary" style="background:#7c3aed; width:100%;">حفظ ملف الموظف وصلاحياته 💾</button>
                 </div>
                 <div id="staff-list-container">جاري التحميل...</div>
             </div>
@@ -285,7 +289,6 @@
             document.getElementById('modalMessage').innerText = message;
             document.getElementById('centerModal').style.display = 'flex';
         }
-        window.closeCenterManager = function() { document.getElementById('centerModal').style.display = 'none'; }
         window.closeCenterModal = function() { document.getElementById('centerModal').style.display = 'none'; }
 
         window.checkLogin = function() {
@@ -298,18 +301,18 @@
             if(u === currentAdminUser && p === currentAdminPass) {
                 sessionStorage.setItem('ecom_logged_user', u);
                 sessionStorage.setItem('ecom_is_admin', 'true');
-                recordActivity(u, 'تسجيل الدخول إلى لوحة التحكم');
-                initDashboard(u);
+                recordActivity(u, 'تسجيل الدخول كأدمن رئيسي');
+                initDashboard(u, true);
                 return;
             }
 
-            // فحص حسابات طاقم العمل
             let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
             if(staffList[u] && staffList[u].password === p) {
                 sessionStorage.setItem('ecom_logged_user', u);
                 sessionStorage.setItem('ecom_is_admin', 'false');
+                sessionStorage.setItem('ecom_staff_perms', JSON.stringify(staffList[u].permissions || []));
                 recordActivity(u, 'تسجيل الدخول كموظف');
-                initDashboard(u);
+                initDashboard(u, false);
                 return;
             }
 
@@ -328,12 +331,12 @@
         window.addEventListener('DOMContentLoaded', () => {
             let user = sessionStorage.getItem('ecom_logged_user');
             if(user) {
-                initDashboard(user);
+                let isAdmin = sessionStorage.getItem('ecom_is_admin') === 'true';
+                initDashboard(user, isAdmin);
                 startMessagePolling(user);
             }
         });
 
-        // التحقق الدوري من وجود رسائل جديدة مخصصة لهذا المستخدم لتظهر في وسط الشاشة فوراً
         function startMessagePolling(user) {
             setInterval(() => {
                 let pendingMsg = localStorage.getItem(`dz_msg_${user}`);
@@ -344,16 +347,68 @@
             }, 3000);
         }
 
-        async function initDashboard(user) {
+        async function initDashboard(user, isAdmin) {
             document.getElementById('login-box').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
-            document.getElementById('welcome-role').innerText = user;
+            document.getElementById('welcome-role').innerText = `${user} (${isAdmin ? 'أدمن' : 'موظف'})`;
+            
+            applyStaffPermissions(isAdmin);
+
             await loadProductsMap();
             loadAllOrders();
             loadProducts();
             loadAdminReviews();
             loadStaffList();
             startMessagePolling(user);
+        }
+
+        // تطبيق الصلاحيات وإخفاء التبويبات التي لا يملكها الموظف
+        function applyStaffPermissions(isAdmin) {
+            if(isAdmin) return; // الأدمن يرى كل شيء
+
+            let perms = JSON.parse(sessionStorage.getItem('ecom_staff_perms')) || [];
+            
+            let tabMapping = {
+                'orders': ['nav-orders-tab', 'nav-processing-tab', 'nav-shipping-tab', 'orders-tab', 'processing-tab', 'shipping-tab'],
+                'archive': ['nav-archive-tab', 'nav-return-tab', 'nav-fake-tab', 'archive-tab', 'return-tab', 'fake-tab'],
+                'trash': ['nav-trash-tab', 'trash-tab'],
+                'analytics': ['nav-analytics-tab', 'nav-wilaya-report-tab', 'analytics-tab', 'wilaya-report-tab'],
+                'products': ['nav-add-product-tab', 'nav-manage-products-tab', 'add-product-tab', 'manage-products-tab'],
+                'reviews': ['nav-reviews-tab', 'reviews-tab'],
+                'staff': ['nav-staff-tab', 'staff-tab']
+            };
+
+            // إخفاء كل التبويبات افتراضياً للموظف
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.style.display = 'none');
+            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+
+            // إظهار التبويبات المسموح بها فقط بناءً على علامات الصح
+            let firstAllowedTab = null;
+            for(let key in tabMapping) {
+                if(perms.includes(key)) {
+                    tabMapping[key].forEach(elemId => {
+                        let el = document.getElementById(elemId);
+                        if(el) {
+                            if(el.classList.contains('tab-btn')) el.style.display = 'block';
+                            if(!firstAllowedTab && el.classList.contains('tab-content')) firstAllowedTab = el.id;
+                        }
+                    });
+                }
+            }
+
+            // تفعيل أول تبويب متاح للموظف تلقائياً
+            if(firstAllowedTab) {
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+                document.getElementById(firstAllowedTab).classList.add('active');
+                // العثور على الزر الخاص به وتفعيله
+                let btnId = 'nav-' + firstAllowedTab;
+                let btnEl = document.getElementById(btnId);
+                if(btnEl) btnEl.classList.add('active');
+            } else {
+                alert('عذراً، لم يتم منحك أي صلاحيات دخول من طرف الأدمن.');
+                logout();
+            }
         }
 
         window.switchTab = function(tabId, event) {
@@ -390,12 +445,19 @@
             let u = document.getElementById('staff-username').value.trim();
             let p = document.getElementById('staff-password').value.trim();
             if(!u || !p) { showAlert('تنبيه', 'أدخل اسم المستخدم وكلمة المرور للموظف!'); return; }
+            
+            // جمع الصلاحيات التي تم وضع علامة صح عليها
+            let selectedPerms = [];
+            document.querySelectorAll('.perm-check:checked').forEach(cb => selectedPerms.push(cb.value));
+
             let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            staffList[u] = { password: p };
+            staffList[u] = { password: p, permissions: selectedPerms };
             localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
-            showAlert('نجاح', `تم حفظ الموظف (${u}) بنجاح!`);
+            
+            showAlert('نجاح', `تم حفظ الموظف (${u}) وصلاحياته بنجاح!`);
             document.getElementById('staff-username').value = '';
             document.getElementById('staff-password').value = '';
+            document.querySelectorAll('.perm-check').forEach(cb => cb.checked = false);
             loadStaffList();
         }
 
@@ -422,10 +484,11 @@
                 let isOnline = lastActive && (Date.now() - Number(lastActive) < 300000);
                 let dotClass = isOnline ? 'online' : 'offline';
                 let statusText = isOnline ? 'متصل الآن' : 'غير متصل';
+                let permsCount = staffList[u].permissions ? staffList[u].permissions.length : 0;
 
                 html += `
                     <div class="staff-status-card">
-                        <div><b>👤 موظف:</b> ${u} <span class="status-dot ${dotClass}"></span> <span style="font-size:12px; color:#64748b;">(${statusText})</span></div>
+                        <div><b>👤 موظف:</b> ${u} <span class="status-dot ${dotClass}"></span> <span style="font-size:12px; color:#64748b;">(${statusText} - صلاحيات: ${permsCount})</span></div>
                         <div style="display:flex; gap:5px;">
                             <button class="btn-secondary" onclick="openStaffPortal('${u}', 'موظف')" style="padding:4px 8px; font-size:12px;">السجل 📋</button>
                             <button onclick="deleteStaff('${u}')" class="btn-danger" style="padding:4px 8px; font-size:12px;">حذف 🗑️</button>
@@ -671,7 +734,6 @@
             document.querySelectorAll('.trash-checkbox').forEach(c => c.checked = master.checked);
         }
 
-        // فتح نافذة إدخال كلمة السر الخاصة بالحذف النهائي الآمن
         window.promptPermanentDelete = function() {
             let checked = document.querySelectorAll('.trash-checkbox:checked');
             if(checked.length === 0) { showAlert('تنبيه', 'حدد عنصراً واحداً على الأقل من سلة المهملات!'); return; }
@@ -679,7 +741,6 @@
             document.getElementById('deletePassModal').style.display = 'flex';
         }
 
-        // تنفيذ الحذف النهائي بعد مطابقة كلمة السر الخاصة بالأدمن
         window.executePermanentDelete = async function() {
             let enteredPass = document.getElementById('confirm-delete-pass').value.trim();
             let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
