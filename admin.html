@@ -105,7 +105,7 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الطلب مع الصورة المرفقة -->
+    <!-- نافذة تفاصيل الطلب مع الأزرار المخصصة بحسب الحالة -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
             <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب والصورة والملحقات</h3>
@@ -258,19 +258,13 @@
                 <div class="form-group"><label>رابط الفيديو:</label><input type="text" id="prod-video"></div>
                 <div class="form-group"><label>الوصف:</label><textarea id="prod-desc"></textarea></div>
                 
-                <!-- قسم ألوان ومقاسات الملابس -->
                 <div id="add-variants-section" style="display:none; margin:15px 0; border:1px solid #cbd5e1; padding:15px; border-radius:8px; background:#f8fafc;">
                     <h4 style="color:#b45309; margin-top:0;">🎨 تخصيص ألوان ومقاسات الملابس مع مخزون كل لون/مقاس:</h4>
                     <div id="variants-container"></div>
                     <button type="button" onclick="addVariantField()" class="btn-secondary" style="background:#d97706; margin-top:5px; font-size:12px;">➕ إضافة لون ومقاس آخر</button>
                 </div>
 
-                <hr style="margin:20px 0;">
-                <div class="form-group"><label><input type="checkbox" id="enable-offers"> <b>تفعيل العروض الذهبية</b></label></div>
-                <div id="offers-container"></div>
-                <button type="button" onclick="addOfferField()" class="btn-secondary" style="background:#d97706; margin-bottom:15px; font-size:12px;">➕ إضافة عرض آخر</button>
-
-                <button onclick="addProduct()">نشر المنتج للمتجر 🚀</button>
+                <button onclick="addProduct()" style="margin-top:15px;">نشر المنتج للمتجر 🚀</button>
             </div>
         </div>
 
@@ -319,11 +313,11 @@
             div.className = 'variant-box-admin';
             div.innerHTML = `
                 <div style="display:flex; gap:10px;">
-                    <div style="flex:1;"><label style="font-size:11px;">اللون:</label><input type="text" class="variant-color" value="${color}" placeholder="مثال: أبيض / أسود"></div>
-                    <div style="flex:1;"><label style="font-size:11px;">المقاس:</label><input type="text" class="variant-size" value="${size}" placeholder="مثال: L / XL"></div>
-                    <div style="flex:1;"><label style="font-size:11px;">الكمية للون/المقاس:</label><input type="number" class="variant-stock" value="${stock}"></div>
+                    <div style="flex:1;"><label style="font-size:11px;">اللون:</label><input type="text" class="variant-color" value="${color}" placeholder="أبيض / أسود"></div>
+                    <div style="flex:1;"><label style="font-size:11px;">المقاس:</label><input type="text" class="variant-size" value="${size}" placeholder="L / XL"></div>
+                    <div style="flex:1;"><label style="font-size:11px;">الكمية:</label><input type="number" class="variant-stock" value="${stock}"></div>
                 </div>
-                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:3px 6px; font-size:10px; margin-top:5px;">حذف هذا الخيار ❌</button>
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:3px 6px; font-size:10px; margin-top:5px;">حذف ❌</button>
             `;
             container.appendChild(div);
         }
@@ -390,7 +384,8 @@
             document.getElementById('setting-whatsapp-num').value = localStorage.getItem('dz_whatsapp_support') || '213700000000';
 
             if(!perms.addProd) {
-                document.getElementById('nav-btn-add').style.display = 'none';
+                let addBtn = document.getElementById('nav-btn-add');
+                if(addBtn) addBtn.style.display = 'none';
             }
 
             await loadProductsMap();
@@ -518,6 +513,7 @@
             loadAllOrders();
         }
 
+        // تفاصيل الطلب مع الأزرار المخصصة بحسب الطلب بدقة
         window.openOrderModal = function(id) {
             const o = ordersCache[id];
             if(!o) return;
@@ -537,13 +533,46 @@
                 <b>📌 الحالة الحالية:</b> <b>${o.status}</b>
             `;
 
-            let actionsHtml = staffPermissions.process ? `
-                <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', true)" style="background:#2563eb;">نقل للمعالجة 🔄</button>
-                <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
-                <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم ✅</button>
-                <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
-                <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">إلغاء ❌</button>
-            ` : '<p style="color:red;">ليس لديك صلاحية تعديل حالة الطلبات.</p>';
+            let actionsHtml = '';
+            let currentStatus = o.status || '';
+
+            if(!staffPermissions.process) {
+                actionsHtml = '<p style="color:red;">ليس لديك صلاحية تعديل حالة الطلبات.</p>';
+            } else {
+                // 1. في الطلب الجديد: زر معالجة (يذهب للمعالجة)، زر وهمي (يذهب للوهمية)، زر ملغى (يذهب للوهمية كما طلبت أو ملغى)
+                if(currentStatus.includes('جديد')) {
+                    actionsHtml = `
+                        <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', true)" style="background:#2563eb;">نقل للمعالجة 🔄</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'وهمي ⚠️', 'timeFake')" style="background:#dc2626;">وهمي ⚠️</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'وهمي ⚠️', 'timeFake')" class="btn-danger">ملغى (للوهمية) ❌</button>
+                    `;
+                }
+                // 2. في المعالجة: زر التوصيل (يذهب للتوصيل)
+                else if(currentStatus.includes('المعالجة')) {
+                    actionsHtml = `
+                        <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
+                    `;
+                }
+                // 3. في التوصيل: زر التأكيد (يذهب للأرشيف)، زر روتور (يذهب للروتور)، زر ملغى (يذهب لملغى)
+                else if(currentStatus.includes('التوصيل')) {
+                    actionsHtml = `
+                        <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم (أرشيف) ✅</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">ملغى ❌</button>
+                    `;
+                }
+                // 4. في باقي الأقسام والأرشيف: تظهر جميع الخيارات بمرونة كاملة
+                else {
+                    actionsHtml = `
+                        <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', false)" style="background:#2563eb;">نقل للمعالجة 🔄</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم ✅</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'وهمي ⚠️', 'timeFake')" style="background:#dc2626;">وهمي ⚠️</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">ملغى ❌</button>
+                    `;
+                }
+            }
 
             document.getElementById('orderModalActions').innerHTML = actionsHtml;
             document.getElementById('orderModal').style.display = 'flex';
@@ -566,7 +595,6 @@
                             let newStock = Math.max(0, currentStock - (o.quantity || 1));
                             
                             let updateObj = { stock: newStock };
-                            // إذا كان ملابساً ومحدداً بلون ومقاس، نقص من مخزون ذلك الفروقات بدقة
                             if(pData.variants && o.color && o.size) {
                                 pData.variants.forEach(v => {
                                     if(v.color === o.color && v.size === o.size) {
@@ -616,7 +644,6 @@
             for(let u in staffList) {
                 let perms = staffList[u].permissions || {};
                 let pText = `معالجة: ${perms.process ? '✅':'❌'} | إضافة منتجات: ${perms.addProd ? '✅':'❌'} | حذف: ${perms.del ? '✅':'❌'}`;
-                
                 let deleteStaffBtn = isUserAdmin ? `<button onclick="promptDeleteStaff('${u}')" class="btn-danger" style="padding:4px 10px; font-size:11px;">حذف 🗑️</button>` : '';
 
                 html += `
@@ -772,6 +799,53 @@
             showAlert('نجاح', 'تم تحديث الإعدادات بنجاح 💾!');
         }
 
+        window.loadAllReviewsForAdmin = function() {
+            let container = document.getElementById('admin-reviews-list-container');
+            if(!container) return;
+            let html = '';
+            let totalCount = 0;
+
+            for(let key in localStorage) {
+                if(key.startsWith('dz_reviews_')) {
+                    let prodId = key.replace('dz_reviews_', '');
+                    let reviews = JSON.parse(localStorage.getItem(key)) || [];
+                    let prodName = productsFullCache[prodId]?.name || `منتج (ID: ${prodId})`;
+
+                    reviews.forEach((rev, index) => {
+                        totalCount++;
+                        let stars = '⭐'.repeat(Number(rev.rating));
+                        let isHidden = rev.hidden === true;
+
+                        html += `
+                            <div style="background:#f8fafc; border:1px solid ${isHidden ? '#fca5a5':'#cbd5e1'}; padding:12px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                                <div>
+                                    <span style="font-size:11px; background:#e2e8f0; padding:2px 6px; border-radius:4px;">📦 ${prodName}</span>
+                                    <h4 style="margin:5px 0 2px 0; color:#1e293b;">👤 ${rev.name} <span style="font-size:12px; font-weight:normal; color:#64748b;">(${rev.date})</span></h4>
+                                    <div style="font-size:13px; color:#f59e0b; margin-bottom:3px;">${stars}</div>
+                                    <p style="margin:0; font-size:13px; color:#333;">${rev.comment}</p>
+                                    ${isHidden ? '<span style="color:red; font-size:11px; font-weight:bold;">[مخفي 🙈]</span>' : '<span style="color:green; font-size:11px; font-weight:bold;">[ظاهر 👀]</span>'}
+                                </div>
+                                <div style="display:flex; gap:6px;">
+                                    <button onclick="toggleReviewVisibility('${prodId}', ${index})" style="background:${isHidden ? '#16a34a':'#dc2626'}; padding:6px 12px; font-size:12px;">${isHidden ? 'إظهار 👀' : 'إخفاء 🙈'}</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+            container.innerHTML = totalCount === 0 ? '<p style="text-align:center; color:#64748b;">لا توجد تعليقات مسجلة بعد.</p>' : html;
+        }
+
+        window.toggleReviewVisibility = function(prodId, index) {
+            let reviewsKey = `dz_reviews_${prodId}`;
+            let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
+            if(reviews[index]) {
+                reviews[index].hidden = !reviews[index].hidden;
+                localStorage.setItem(reviewsKey, JSON.stringify(reviews));
+                loadAllReviewsForAdmin();
+            }
+        }
+
         window.updateAnalyticsData = function(orders) {
             let totalProfit = 0, totalBuy = 0, totalSell = 0, routerLoss = 0;
             let productSalesCount = {};
@@ -833,7 +907,7 @@
             if(sortedProducts.length === 0) {
                 topProdContainer.innerHTML = '<p style="font-size:13px; color:#64748b;">لا توجد طلبات مسجلة بعد.</p>';
             } else {
-                let pTableHtml = `<table class="products-analytics-table"><thead><tr><th>📦 اسم المنتج</th><th>🔥 عدد الوحدات المباعة</th><th>💰 إجمالي المبيعات</th></tr></thead><tbody>`;
+                let pTableHtml = `<table class="products-analytics-table"><thead><tr><th>📦 اسم المنتج</th><th>🔥 الوحدات المباعة</th><th>💰 المبيعات</th></tr></thead><tbody>`;
                 sortedProducts.forEach(pName => {
                     let item = productSalesCount[pName];
                     pTableHtml += `<tr><td><b>${pName}</b></td><td>${item.count} وحدة</td><td style="color:green; font-weight:bold;">${item.totalRevenue} دج</td></tr>`;
@@ -848,18 +922,10 @@
                 dailyContainer.innerHTML = '<p style="font-size:13px; color:#64748b;">لا توجد بيانات تحليل يومي بعد.</p>';
                 return;
             }
-            let tableHtml = `<table class="daily-report-table"><thead><tr><th>📅 اليوم / التاريخ</th><th>📦 عدد الطلبات</th><th>💰 إجمالي المبيعات</th><th>📈 الأرباح المؤكدة</th><th>⚠️ خسائر الروتور</th></tr></thead><tbody>`;
+            let tableHtml = `<table class="daily-report-table"><thead><tr><th>📅 التاريخ</th><th>📦 الطلبات</th><th>💰 المبيعات</th><th>📈 الأرباح</th><th>⚠️ الروتور</th></tr></thead><tbody>`;
             sortedDays.forEach(day => {
                 let d = dailyMap[day];
-                tableHtml += `
-                    <tr>
-                        <td><b>${day}</b></td>
-                        <td>${d.ordersCount} طلب</td>
-                        <td>${d.sell} دج</td>
-                        <td style="color:green; font-weight:bold;">${d.profit} دج</td>
-                        <td style="color:red;">${d.routerLoss} دج</td>
-                    </tr>
-                `;
+                tableHtml += `<tr><td><b>${day}</b></td><td>${d.ordersCount} طلب</td><td>${d.sell} دج</td><td style="color:green; font-weight:bold;">${d.profit} دج</td><td style="color:red;">${d.routerLoss} دج</td></tr>`;
             });
             tableHtml += `</tbody></table>`;
             dailyContainer.innerHTML = tableHtml;
@@ -872,6 +938,25 @@
             let yearStart = new Date(date.getFullYear(), 0, 1);
             let weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
             return `${date.getFullYear()}-W${weekNo}`;
+        }
+
+        function generateWilayaDetailedReport(orders) {
+            let wilayaMap = {};
+            orders.forEach(o => {
+                if(o.status && o.status.includes('مهملات')) return;
+                let w = o.wilaya || 'غير محددة';
+                if(!wilayaMap[w]) wilayaMap[w] = { home: 0, desk: 0, total: 0 };
+                if(o.deliveryType && o.deliveryType.includes('منزل')) wilayaMap[w].home++;
+                else wilayaMap[w].desk++;
+                wilayaMap[w].total++;
+            });
+            let html = `<table class="wilaya-table"><thead><tr><th>الولاية</th><th>🏠 للمنزل</th><th>🏢 للمكتب</th><th>📊 المجموع</th></tr></thead><tbody>`;
+            for(let w in wilayaMap) {
+                html += `<tr><td><b>${w}</b></td><td>${wilayaMap[w].home}</td><td>${wilayaMap[w].desk}</td><td><b>${wilayaMap[w].total}</b></td></tr>`;
+            }
+            html += `</tbody></table>`;
+            let reportEl = document.getElementById('wilaya-report-content');
+            if(reportEl) reportEl.innerHTML = html;
         }
     </script>
 </body>
