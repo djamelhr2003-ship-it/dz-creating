@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لوحة التحكم - الصلاحيات وإدارة الحذف</title>
+    <title>لوحة التحكم - إدارة المنتجات، العروض المتقدمة، والأفراد</title>
     <style>
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
@@ -55,9 +55,9 @@
         .stat-card h4 { margin: 0 0 8px 0; font-size: 14px; color: #94a3b8; }
         .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
 
-        .image-input-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-        .btn-add-img { background: #3b82f6; color: white; border: none; width: 45px; height: 42px; border-radius: 6px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-remove-img { background: #ef4444; color: white; border: none; width: 40px; height: 42px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .image-input-row, .promo-input-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .btn-add-img, .btn-add-promo { background: #3b82f6; color: white; border: none; width: 45px; height: 42px; border-radius: 6px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-remove-img, .btn-remove-promo { background: #ef4444; color: white; border: none; width: 40px; height: 42px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -76,6 +76,44 @@
             <div id="orderDetailsContent" style="font-size: 14px; line-height: 1.8; color: #1e293b; margin-bottom: 20px;"></div>
             <div id="orderModalActions" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end;"></div>
             <button onclick="closeOrderModal()" class="btn-secondary" style="margin-top: 15px; width: 100%; background: #64748b;">إغلاق النافذة ❌</button>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل المنتج -->
+    <div class="modal-overlay" id="editProductModal">
+        <div class="modal-card">
+            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">✏️ تعديل المنتج</h3>
+            <input type="hidden" id="edit-prod-id">
+            <div class="form-group"><label>اسم المنتج:</label><input type="text" id="edit-prod-name"></div>
+            <div class="form-group"><label>سعر الشراء (دج):</label><input type="number" id="edit-prod-buy"></div>
+            <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="edit-prod-price"></div>
+            <div class="form-group"><label>الكمية في المخزون:</label><input type="number" id="edit-prod-stock"></div>
+            <div class="form-group"><label>التصنيف:</label><input type="text" id="edit-prod-cat"></div>
+            <button onclick="saveProductEdits()" style="width:100%; background:#27ae60; margin-top:10px;">حفظ التعديلات 💾</button>
+            <button onclick="document.getElementById('editProductModal').style.display='none'" class="btn-secondary" style="width:100%; margin-top:8px; background:#64748b;">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل الموظف/الفرد -->
+    <div class="modal-overlay" id="editStaffModal">
+        <div class="modal-card">
+            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">✏️ تعديل ملف الموظف</h3>
+            <input type="hidden" id="edit-staff-original-name">
+            <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="edit-staff-username"></div>
+            <div class="form-group"><label>كلمة المرور الجديدة:</label><input type="text" id="edit-staff-password"></div>
+            <div style="margin: 15px 0;">
+                <label><b>الصلاحيات المفعلة (✓):</b></label>
+                <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; margin-top:8px;">
+                    <label><input type="checkbox" class="edit-perm-chk" value="orders-tab"> الطلبات</label>
+                    <label><input type="checkbox" class="edit-perm-chk" value="wilaya-report-tab"> تقرير الولايات</label>
+                    <label><input type="checkbox" class="edit-perm-chk" value="analytics-tab"> التحليلات</label>
+                    <label><input type="checkbox" class="edit-perm-chk" value="reviews-tab"> التعليقات</label>
+                    <label><input type="checkbox" class="edit-perm-chk" value="add-product-tab"> إضافة منتج</label>
+                    <label><input type="checkbox" class="edit-perm-chk" value="manage-products-tab"> إدارة المنتجات</label>
+                </div>
+            </div>
+            <button onclick="saveStaffEdits()" style="width:100%; background:#27ae60;">تحديث ملف الفرد 💾</button>
+            <button onclick="document.getElementById('editStaffModal').style.display='none'" class="btn-secondary" style="width:100%; margin-top:8px; background:#64748b;">إلغاء</button>
         </div>
     </div>
 
@@ -109,7 +147,7 @@
                 <button class="tab-btn" id="btn-wilaya-report-tab" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
                 <button class="tab-btn" id="btn-analytics-tab" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
                 <button class="tab-btn" id="btn-reviews-tab" onclick="switchTab('reviews-tab', event)">💬 التعليقات</button>
-                <button class="tab-btn" id="btn-staff-tab" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 الفريق</button>
+                <button class="tab-btn" id="btn-staff-tab" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 الأفراد</button>
                 <button class="tab-btn" id="btn-add-product-tab" onclick="switchTab('add-product-tab', event)">➕ إضافة</button>
                 <button class="tab-btn" id="btn-manage-products-tab" onclick="switchTab('manage-products-tab', event)">🏷️ المنتجات</button>
                 <button class="tab-btn" id="btn-settings-tab" onclick="switchTab('settings-tab', event)">⚙️ الإعدادات</button>
@@ -244,39 +282,40 @@
             <div class="container" style="border: 2px solid #7c3aed;">
                 <h2 style="color: #7c3aed;">👥 إدارة الأفراد وتحديد الصلاحيات الفردية</h2>
                 <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:20px;">
-                    <h3>➕ إنشاء أو تعديل ملف موظف</h3>
+                    <h3>➕ إضافة موظف جديد</h3>
                     <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="staff-username" placeholder="مثال: employé1"></div>
                     <div class="form-group"><label>كلمة المرور:</label><input type="password" id="staff-password" placeholder="كلمة المرور"></div>
                     <div style="margin: 15px 0;">
-                        <label><b>حدد الصلاحيات الخاصة بهذا الفرد (علّم بـ ✓):</b></label>
+                        <label><b>الصلاحيات المفعلة بـ (✓):</b></label>
                         <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:10px; margin-top:10px;">
                             <label><input type="checkbox" class="perm-chk" value="orders-tab"> الطلبات</label>
                             <label><input type="checkbox" class="perm-chk" value="wilaya-report-tab"> تقرير الولايات</label>
                             <label><input type="checkbox" class="perm-chk" value="analytics-tab"> التحليلات والأرباح</label>
-                            <label><input type="checkbox" class="perm-chk" value="reviews-tab"> التعليقات والتقييمات</label>
+                            <label><input type="checkbox" class="perm-chk" value="reviews-tab"> التعليقات</label>
                             <label><input type="checkbox" class="perm-chk" value="add-product-tab"> إضافة منتجات</label>
                             <label><input type="checkbox" class="perm-chk" value="manage-products-tab"> إدارة المنتجات</label>
                         </div>
                     </div>
-                    <button onclick="saveStaffMember()" class="btn-secondary" style="background:#7c3aed;">حفظ ملف الصلاحيات للفرد 💾</button>
+                    <button onclick="saveStaffMember()" class="btn-secondary" style="background:#7c3aed;">حفظ ملف الموظف 💾</button>
                 </div>
-                <h3>قائمة الموظفين المسجلين:</h3>
+                <h3>قائمة الأفراد المسجلين:</h3>
                 <div id="staff-list-container">جاري التحميل...</div>
             </div>
         </div>
 
+        <!-- إضافة منتج مع العروض الخاصة المتعددة بالزر (+) -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد للمتجر ➕</h2>
                 <div class="form-group"><label>اسم المنتج:</label><input type="text" id="prod-name"></div>
                 <div class="form-group"><label>سعر الشراء (التكلفة دج):</label><input type="number" id="prod-buy-price" oninput="calculateMarginPreview()"></div>
-                <div class="form-group"><label>سعر البيع (دج):</label><input type="number" id="prod-price" oninput="calculateMarginPreview()"></div>
+                <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="prod-price" oninput="calculateMarginPreview()"></div>
                 <div style="background:#e0f2fe; padding:10px; border-radius:6px; margin-bottom:15px; font-size:14px; color:#0369a1;">
                     <b>💡 هامش الربح للقطعة:</b> <span id="margin-preview" style="font-weight:bold; font-size:16px;">0</span> دج
                 </div>
                 <div class="form-group"><label>الكمية في المخزون:</label><input type="number" id="prod-stock"></div>
-                <div class="form-group"><label>الحد الأقصى للطلب:</label><input type="number" id="prod-max-limit" placeholder="99"></div>
                 <div class="form-group"><label>التصنيف:</label><input type="text" id="prod-category-new" placeholder="التصنيف"></div>
+                
                 <div class="form-group">
                     <label>روابط الصور:</label>
                     <div id="image-inputs-container">
@@ -286,6 +325,20 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- خانة العروض الخاصة المتعددة مع زر الزائد (+) -->
+                <div style="background: #fdf2f8; padding: 15px; border-radius: 8px; border: 1px dashed #f472b6; margin-bottom: 15px;">
+                    <label><b>🔥 العروض الخاصة (أضف أكثر من عرض باستخدام زر ＋):</b></label>
+                    <div id="promos-inputs-container" style="margin-top:10px;">
+                        <div class="promo-input-row">
+                            <input type="text" class="promo-title-input" placeholder="عنوان العرض (مثلاً: عرض حبة + حبة هدية)">
+                            <input type="number" class="promo-old-price-input" placeholder="السعر القديم ❌" style="max-width:130px;">
+                            <input type="number" class="promo-new-price-input" placeholder="السعر الجديد ✔️" style="max-width:130px;">
+                            <button type="button" class="btn-add-promo" onclick="addPromoInput()">＋</button>
+                        </div>
+                    </div>
+                </div>
+
                 <button onclick="addProduct()">نشر المنتج 🚀</button>
             </div>
         </div>
@@ -294,13 +347,16 @@
             <div class="container"><h2>إدارة وتعديل المنتجات 🏷️</h2><div id="products-list">جاري التحميل...</div></div>
         </div>
 
+        <!-- إعدادات الأدمن وتغيير البيانات -->
         <div id="settings-tab" class="tab-content">
             <div class="container">
-                <h2>⚙️ الإعدادات</h2>
+                <h2>⚙️ إعدادات الحساب الرئيسي</h2>
                 <div class="form-group" style="max-width: 400px; margin: 0 auto;">
-                    <label>تغيير كلمة المرور:</label>
-                    <input type="password" id="my-new-pass" placeholder="كلمة المرور الجديدة">
-                    <button class="btn-secondary" onclick="showAlert('تم التحديث', 'تم تغيير كلمة السر بنجاح!')" style="margin-top: 8px;">تحديث</button>
+                    <label>اسم المستخدم الجديد:</label>
+                    <input type="text" id="admin-new-user" value="admin">
+                    <label style="margin-top:10px;">كلمة المرور الجديدة:</label>
+                    <input type="password" id="admin-new-pass" placeholder="كلمة المرور الجديدة">
+                    <button class="btn-secondary" onclick="updateAdminCredentials()" style="margin-top: 12px; width:100%;">تحديث إعدادات الأدمن 💾</button>
                 </div>
             </div>
         </div>
@@ -340,12 +396,34 @@
             document.getElementById('margin-preview').innerText = margin;
         }
 
+        window.addImageInput = function() {
+            const container = document.getElementById('image-inputs-container');
+            const row = document.createElement('div');
+            row.className = 'image-input-row';
+            row.innerHTML = `<input type="text" class="image-url-input" placeholder="https://..."><button type="button" class="btn-remove-img" onclick="this.parentElement.remove()">✕</button>`;
+            container.appendChild(row);
+        }
+
+        // إضافة خانة عرض خاص جديدة بالضغط على زر (+)
+        window.addPromoInput = function() {
+            const container = document.getElementById('promos-inputs-container');
+            const row = document.createElement('div');
+            row.className = 'promo-input-row';
+            row.innerHTML = `
+                <input type="text" class="promo-title-input" placeholder="عنوان العرض...">
+                <input type="number" class="promo-old-price-input" placeholder="السعر القديم ❌" style="max-width:130px;">
+                <input type="number" class="promo-new-price-input" placeholder="السعر الجديد ✔️" style="max-width:130px;">
+                <button type="button" class="btn-remove-promo" onclick="this.parentElement.remove()">✕</button>
+            `;
+            container.appendChild(row);
+        }
+
         window.openOrderModal = function(id) {
             const o = ordersCache[id];
             if(!o) return;
 
             let stars = '⭐'.repeat(o.rating || 5);
-            let productData = productsMap[o.productName] || { img: 'https://via.placeholder.com/150', buyPrice: 0 };
+            let productData = productsMap[o.productName] || { img: 'https://via.placeholder.com/150' };
             let orderDate = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleString('ar-DZ') : 'غير متوفر';
 
             let contentHtml = `
@@ -355,15 +433,13 @@
                 <b>📅 تاريخ الطلب:</b> ${orderDate}<br>
                 <b>👤 الزبون:</b> ${o.fullName}<br>
                 <b>📞 الهاتف:</b> ${o.phone}<br>
-                <b>📍 الولاية والبلدية:</b> ${o.wilaya} (${o.commune})<br>
+                <b>📍 الولاية:</b> ${o.wilaya} (${o.commune})<br>
                 <b>📦 المنتج:</b> ${o.productName} (الكمية: ${o.quantity})<br>
                 <b>🚚 نوع التوصيل:</b> ${o.deliveryType}<br>
-                <b>💰 السعر الإجمالي النهائي:</b> <span style="color:#ef4444; font-weight:bold;">${o.finalTotal || 0} دج</span><br>
+                <b>💰 السعر الإجمالي:</b> <span style="color:#ef4444; font-weight:bold;">${o.finalTotal || 0} دج</span><br>
                 <hr style="border:0; border-top:1px solid #e2e8f0; margin:8px 0;">
                 <b>⭐ تقييم الزبون:</b> ${stars} (${o.rating || 5}/5)<br>
-                <b>💬 تعليق الزبون:</b> <i style="color:#2563eb;">"${o.comment || 'بدون تعليق'}"</i><br>
-                <hr style="border:0; border-top:1px solid #e2e8f0; margin:8px 0;">
-                <b>📌 الحالة الحالية:</b> ${o.status || 'جديد ⏳'}
+                <b>💬 التعليق:</b> <i style="color:#2563eb;">"${o.comment || 'بدون تعليق'}"</i><br>
             `;
             document.getElementById('orderDetailsContent').innerHTML = contentHtml;
 
@@ -376,23 +452,22 @@
             } else {
                 if(status.includes('جديد')) {
                     actionsHtml = `
-                        <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄')" class="btn-warning">بدء المعالجة 🔄</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'طلب وهمي 🚨')" class="btn-danger">نقل للوهمي 🚨</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄')" class="btn-warning">معالجة 🔄</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'طلب وهمي 🚨')" class="btn-danger">وهمي 🚨</button>
                     `;
                 } else if(status.includes('المعالجة')) {
-                    actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚')" class="btn-secondary">إرسال للشحن 🚚</button>`;
+                    actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚')" class="btn-secondary">شحن 🚚</button>`;
                 } else if(status.includes('التوصيل')) {
                     actionsHtml = `
-                        <button onclick="updateOrderStatus('${o.id}', 'مؤكد ومسلم بنجاح ✅')" style="background:#27ae60;">تأكيد التسلم ✅</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️')" class="btn-danger">تسجيل روتور ⚠️</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'مؤكد ومسلم بنجاح ✅')" style="background:#27ae60;">تأكيد ✅</button>
+                        <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️')" class="btn-danger">روتور ⚠️</button>
                     `;
                 } else if(status.includes('وهمي')) {
-                    actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'جديد ⏳')" class="btn-warning">إعادة للطلبات الجديدة 🔄</button>`;
+                    actionsHtml = `<button onclick="updateOrderStatus('${o.id}', 'جديد ⏳')" class="btn-warning">إعادة للجديدة 🔄</button>`;
                 } else {
-                    actionsHtml = `<span style="color:#64748b; font-weight:bold;">الطلب مكتمل نهائياً</span>`;
+                    actionsHtml = `<span style="color:#64748b; font-weight:bold;">مكتمل نهائياً</span>`;
                 }
 
-                // شرط إظهار زر الحذف: حصرياً في "الطلبات الجديدة" أو "الأرشيف"، وفقط للأدمن الرئيسي (admin) وليس للأفراد
                 let isNewOrder = status.includes('جديد');
                 let isArchiveOrder = status.includes('مسلم') || status.includes('مؤكد');
 
@@ -420,10 +495,13 @@
         }
 
         window.checkLogin = async function() {
+            let adminUser = localStorage.getItem('dz_admin_user') || 'admin';
+            let adminPass = localStorage.getItem('dz_admin_pass') || 'dzstore2026';
+
             const u = document.getElementById('login-username').value.trim();
             const p = document.getElementById('login-pass').value.trim();
             
-            if(u === "admin" && p === "dzstore2026") {
+            if(u === adminUser && p === adminPass) {
                 sessionStorage.setItem('ecom_logged_user', 'admin');
                 sessionStorage.setItem('ecom_permissions', JSON.stringify(['all']));
                 initDashboard('admin');
@@ -493,6 +571,16 @@
             }
         }
 
+        window.updateAdminCredentials = function() {
+            let newUser = document.getElementById('admin-new-user').value.trim();
+            let newPass = document.getElementById('admin-new-pass').value.trim();
+            if(!newUser || !newPass) { showAlert('تنبيه', 'الرجاء إدخال اسم المستخدم وكلمة المرور الجديدة!'); return; }
+
+            localStorage.setItem('dz_admin_user', newUser);
+            localStorage.setItem('dz_admin_pass', newPass);
+            showAlert('نجاح', 'تم تحديث بيانات حساب الأدمن الرئيسي بنجاح!');
+        }
+
         window.saveStaffMember = function() {
             let u = document.getElementById('staff-username').value.trim();
             let p = document.getElementById('staff-password').value.trim();
@@ -507,7 +595,7 @@
             staffList[u] = { password: p, permissions: selectedPerms };
             localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
 
-            showAlert('نجاح', `تم حفظ ملف الصلاحيات للفرد (${u}) بنجاح!`);
+            showAlert('نجاح', `تم حفظ ملف الفرد (${u}) بنجاح!`);
             document.getElementById('staff-username').value = '';
             document.getElementById('staff-password').value = '';
             document.querySelectorAll('.perm-chk').forEach(c => c.checked = false);
@@ -523,14 +611,55 @@
                 html += `
                     <div style="background:#fff; padding:10px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                         <div>
-                            <b>👤 الفرد:</b> ${u} <br>
-                            <span style="font-size:12px; color:#64748b;">الصلاحيات المفعلة بـ (✓): ${staffList[u].permissions.join(', ')}</span>
+                            <b>👤 الفرد:</b> ${u} | <b>كلمة المرور:</b> ${staffList[u].password} <br>
+                            <span style="font-size:12px; color:#64748b;">الصلاحيات المفعلة: ${staffList[u].permissions.join(', ')}</span>
                         </div>
-                        <button onclick="deleteStaff('${u}')" class="btn-danger" style="padding:6px 10px; font-size:12px;">حذف 🗑️</button>
+                        <div style="display:flex; gap:5px;">
+                            <button onclick="openEditStaffModal('${u}')" class="btn-secondary" style="padding:6px 10px; font-size:12px;">تعديل ✏️</button>
+                            <button onclick="deleteStaff('${u}')" class="btn-danger" style="padding:6px 10px; font-size:12px;">حذف 🗑️</button>
+                        </div>
                     </div>
                 `;
             }
             container.innerHTML = html !== '' ? html : '<p style="color:#64748b;">لا توجد حسابات أفراد مضافة بعد.</p>';
+        }
+
+        window.openEditStaffModal = function(username) {
+            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
+            let staff = staffList[username];
+            if(!staff) return;
+
+            document.getElementById('edit-staff-original-name').value = username;
+            document.getElementById('edit-staff-username').value = username;
+            document.getElementById('edit-staff-password').value = staff.password;
+
+            document.querySelectorAll('.edit-perm-chk').forEach(chk => {
+                chk.checked = staff.permissions.includes(chk.value);
+            });
+
+            document.getElementById('editStaffModal').style.display = 'flex';
+        }
+
+        window.saveStaffEdits = function() {
+            let origName = document.getElementById('edit-staff-original-name').value;
+            let newName = document.getElementById('edit-staff-username').value.trim();
+            let newPass = document.getElementById('edit-staff-password').value.trim();
+
+            let selectedPerms = [];
+            document.querySelectorAll('.edit-perm-chk:checked').forEach(chk => {
+                selectedPerms.push(chk.value);
+            });
+
+            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
+            if(origName !== newName) {
+                delete staffList[origName];
+            }
+            staffList[newName] = { password: newPass, permissions: selectedPerms };
+            localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
+
+            document.getElementById('editStaffModal').style.display = 'none';
+            showAlert('نجاح', 'تم تحديث ملف الموظف بنجاح!');
+            loadStaffList();
         }
 
         window.deleteStaff = function(u) {
@@ -542,29 +671,30 @@
 
         window.logout = function() { sessionStorage.clear(); location.reload(); }
 
-        window.addImageInput = function() {
-            const container = document.getElementById('image-inputs-container');
-            const row = document.createElement('div');
-            row.className = 'image-input-row';
-            row.innerHTML = `<input type="text" class="image-url-input" placeholder="https://..."><button type="button" class="btn-remove-img" onclick="this.parentElement.remove()">✕</button>`;
-            container.appendChild(row);
-        }
-
         window.addProduct = async function() {
             const name = document.getElementById('prod-name').value.trim();
             const buyPrice = Number(document.getElementById('prod-buy-price').value) || 0;
             const price = Number(document.getElementById('prod-price').value) || 0;
             const stock = Number(document.getElementById('prod-stock').value) || 0;
-            const maxLimit = Number(document.getElementById('prod-max-limit').value) || 99;
             const category = document.getElementById('prod-category-new').value.trim() || 'عام';
+            
             let imageUrls = [];
             document.querySelectorAll('.image-url-input').forEach(i => { if(i.value.trim()) imageUrls.push(i.value.trim()); });
 
-            if(!name || !price || !stock) { showAlert('تنبيه', 'الرجاء ملء الحقول الرئيسية!'); return; }
+            // جمع العروض الخاصة المتعددة
+            let promos = [];
+            document.querySelectorAll('.promo-input-row').forEach(row => {
+                let t = row.querySelector('.promo-title-input').value.trim();
+                let oldP = Number(row.querySelector('.promo-old-price-input').value) || 0;
+                let newP = Number(row.querySelector('.promo-new-price-input').value) || 0;
+                if(t) promos.push({ title: t, oldPrice: oldP, newPrice: newP });
+            });
+
+            if(!name || !price || !stock) { showAlert('تنبيه', 'الرجاء ملء الحقول الأساسية!'); return; }
             let profitMargin = price - buyPrice;
 
             try {
-                await addDoc(collection(db, "products"), { name, buyPrice, price, profitMargin, stock, maxLimit, category, imageUrls, reviews: [], createdAt: new Date() });
+                await addDoc(collection(db, "products"), { name, buyPrice, price, profitMargin, stock, category, imageUrls, promos, reviews: [], createdAt: new Date() });
                 showAlert('نجاح', `تم إضافة المنتج "${name}" بنجاح!`);
                 await loadProductsMap();
                 loadProducts();
@@ -578,13 +708,82 @@
                 snap.forEach(d => {
                     const p = d.data();
                     productsMap[p.name] = {
+                        id: d.id,
                         img: (p.imageUrls && p.imageUrls.length > 0) ? p.imageUrls[0] : 'https://via.placeholder.com/50',
                         buyPrice: p.buyPrice || 0,
                         sellPrice: p.price || 0,
-                        margin: p.profitMargin || ((p.price || 0) - (p.buyPrice || 0))
+                        margin: p.profitMargin || ((p.price || 0) - (p.buyPrice || 0)),
+                        stock: p.stock || 0,
+                        category: p.category || 'عام',
+                        data: p
                     };
                 });
             } catch(e) { console.error(e); }
+        }
+
+        async function loadProducts() {
+            const list = document.getElementById('products-list');
+            const snap = await getDocs(collection(db, "products"));
+            list.innerHTML = '';
+            snap.forEach(d => {
+                const p = { id: d.id, ...d.data() };
+                let margin = p.profitMargin || (p.price - p.buyPrice || 0);
+                list.innerHTML += `
+                    <div class="product-row">
+                        <span><b>${p.name}</b> [شراء: ${p.buyPrice || 0} دج | بيع: ${p.price} دج | المخزون: ${p.stock}]</span>
+                        <div style="display:flex; gap:5px;">
+                            <button onclick="openEditProductModal('${p.id}')" class="btn-secondary" style="padding:6px 10px; font-size:12px;">تعديل ✏️</button>
+                            <button onclick="deleteProduct('${p.id}')" class="btn-danger" style="padding:6px 10px; font-size:12px;">حذف 🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.openEditProductModal = async function(id) {
+            try {
+                let docSnap = await getDoc(doc(db, "products", id));
+                if(!docSnap.exists()) return;
+                let p = docSnap.data();
+
+                document.getElementById('edit-prod-id').value = id;
+                document.getElementById('edit-prod-name').value = p.name;
+                document.getElementById('edit-prod-buy').value = p.buyPrice || 0;
+                document.getElementById('edit-prod-price').value = p.price || 0;
+                document.getElementById('edit-prod-stock').value = p.stock || 0;
+                document.getElementById('edit-prod-cat').value = p.category || 'عام';
+
+                document.getElementById('editProductModal').style.display = 'flex';
+            } catch(e) { showAlert('خطأ', 'فشل فتح نافذة التعديل.'); }
+        }
+
+        window.saveProductEdits = async function() {
+            let id = document.getElementById('edit-prod-id').value;
+            let name = document.getElementById('edit-prod-name').value.trim();
+            let buyPrice = Number(document.getElementById('edit-prod-buy').value) || 0;
+            let price = Number(document.getElementById('edit-prod-price').value) || 0;
+            let stock = Number(document.getElementById('edit-prod-stock').value) || 0;
+            let category = document.getElementById('edit-prod-cat').value.trim() || 'عام';
+            let profitMargin = price - buyPrice;
+
+            try {
+                await updateDoc(doc(db, "products", id), { name, buyPrice, price, profitMargin, stock, category });
+                document.getElementById('editProductModal').style.display = 'none';
+                showAlert('نجاح', 'تم تحديث بيانات المنتج بنجاح!');
+                await loadProductsMap();
+                loadProducts();
+            } catch(e) { showAlert('خطأ', 'فشل حفظ التعديلات.'); }
+        }
+
+        window.deleteProduct = async function(id) {
+            if(confirm("هل أنت متأكد من حذف هذا المنتج؟")) {
+                try {
+                    await deleteDoc(doc(db, "products", id));
+                    showAlert('تم الحذف', 'تم حذف المنتج بنجاح.');
+                    await loadProductsMap();
+                    loadProducts();
+                } catch(e) { showAlert('خطأ', 'فشل حذف المنتج.'); }
+            }
         }
 
         window.moveToTrash = async function(id) {
@@ -719,14 +918,14 @@
 
             orders.forEach(o => {
                 const status = o.status || 'جديد ⏳';
-                const productData = productsMap[o.productName] || { img: 'https://via.placeholder.com/50' };
+                let pData = productsMap[o.productName] || { img: 'https://via.placeholder.com/50' };
                 let isFake = status.includes('وهمي');
                 let isTrash = status.includes('مهملات');
                 let cardClass = isFake ? 'order-mini-card fake-warning' : 'order-mini-card';
 
                 let miniCardHtml = `
                     <div class="${cardClass}" onclick="openOrderModal('${o.id}')">
-                        <img src="${productData.img}" class="order-mini-thumb">
+                        <img src="${pData.img}" class="order-mini-thumb">
                         <div>
                             <h4>👤 ${o.fullName} ${isFake ? '🚨(وهمي)' : ''}</h4>
                             <p><b>الهاتف:</b> ${o.phone}</p>
@@ -773,16 +972,6 @@
                 closeOrderModal();
                 loadAllOrders();
             } catch(e) {}
-        }
-
-        async function loadProducts() {
-            const list = document.getElementById('products-list');
-            const snap = await getDocs(collection(db, "products"));
-            list.innerHTML = '';
-            snap.forEach(d => {
-                const p = d.data();
-                list.innerHTML += `<div class="product-row"><span><b>${p.name}</b> [سعر: ${p.price} دج]</span></div>`;
-            });
         }
     </script>
 </body>
