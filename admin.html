@@ -172,7 +172,6 @@
         
         <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ المهملات (تُحذف نهائياً فقط من هنا)</h2><div id="orders-list-trash" class="orders-list-strip"></div></div></div>
 
-        <!-- قسم الطاقم -->
         <div id="staff-tab" class="tab-content">
             <div class="container" style="border: 2px solid #8b5cf6;">
                 <h2 style="color: #8b5cf6;">👥 إدارة طاقم العمل والصلاحيات</h2>
@@ -182,7 +181,6 @@
             </div>
         </div>
 
-        <!-- قسم الإعدادات -->
         <div id="settings-tab" class="tab-content">
             <div class="container" style="border: 2px solid #475569;">
                 <h2 style="color: #475569;">⚙️ إعدادات المتجر وبيانات الأدمن</h2>
@@ -198,7 +196,6 @@
             </div>
         </div>
 
-        <!-- وسائل التواصل الاجتماعي -->
         <div id="social-media-tab" class="tab-content">
             <div class="container" style="border: 2px solid #25d366;">
                 <h2 style="color: #25d366;">🌐 إدارة روابط وسائل التواصل الاجتماعي</h2>
@@ -228,7 +225,6 @@
 
         <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات</h2><div id="wilaya-report-content"></div></div></div>
         
-        <!-- قسم التحليلات الشاملة والمحدثة -->
         <div id="analytics-tab" class="tab-content">
             <div class="container" style="border: 2px solid #059669;">
                 <h2 style="color: #059669;">💰 التحليلات المالية والشاملة للمتجر</h2>
@@ -330,7 +326,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyDdJY7mI1DON...", authDomain: "creater-ecom.firebaseapp.com", projectId: "creater-ecom", storageBucket: "creater-ecom.appspot.com", messagingSenderId: "893449950593", appId: "1:893449950593:web:..." };
+        // الإعدادات الحقيقية لـ Firebase الخاصة بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdJY7mI1DOMKh7zTJs_Ve3d4Xp1YBdMYI",
+            authDomain: "creater-ecom.firebaseapp.com",
+            projectId: "creater-ecom",
+            storageBucket: "creater-ecom.firebasestorage.app",
+            messagingSenderId: "893449950593",
+            appId: "1:893449950593:web:22c5f6f220ea809efb8480",
+            measurementId: "G-MR5XLYXV0Q"
+        };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
@@ -583,7 +588,6 @@
             document.getElementById('settings-whatsapp').value = localStorage.getItem('dz_whatsapp_support') || '213700000000';
             document.getElementById('settings-admin-user').value = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
 
-            // محاكاة حية للزوار في الوقت الحاضر
             setInterval(() => {
                 let onlineCount = Math.floor(Math.random() * 5) + 1;
                 let el = document.getElementById('stat-online-visitors');
@@ -646,7 +650,9 @@
                 loadStaffAdmin();
                 generateWilayaDetailedReport(allFetchedOrders);
                 updateAnalyticsData(allFetchedOrders);
-            } catch(e) {}
+            } catch(e) {
+                console.error(e);
+            }
         }
 
         window.renderOrdersFiltered = function() {
@@ -932,7 +938,6 @@
                     routerLoss += 600;
                 }
 
-                // فحص طلبات اليوم
                 if(o.createdAt) {
                     let dObj = new Date(o.createdAt.seconds ? o.createdAt.seconds * 1000 : o.createdAt);
                     let orderDateStr = dObj.toISOString().split('T')[0];
