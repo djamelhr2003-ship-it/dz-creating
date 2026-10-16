@@ -49,8 +49,14 @@
         .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
 
         .staff-status-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
-        .variant-box-admin { background: #fef9c3; border: 1.5px solid #facc15; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
         .filter-bar { background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        
+        /* تنسيق مربع العروض الخاصة الذهبي */
+        .golden-offer-box { background: #fef9c3; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .price-old-wrapper { position: relative; display: inline-block; width: 100%; }
+        .price-old-wrapper::after { content: '✕'; color: red; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 16px; pointer-events: none; }
+        .price-new-wrapper { position: relative; display: inline-block; width: 100%; }
+        .price-new-wrapper::after { content: '✓'; color: green; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 16px; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -63,39 +69,41 @@
         </div>
     </div>
 
+    <!-- نافذة تأكيد الحذف بكلمة المرور -->
     <div class="modal-overlay" id="passwordModal" style="z-index: 6000;">
         <div class="modal-card" style="max-width: 380px; text-align: center;">
-            <h3 style="color: #c0392b; margin-top:0;">🔒 تأكيد العملية بكلمة المرور</h3>
-            <p style="font-size: 13px; color: #555;">أدخل كلمة مرور الأدمن لتأكيد الحذف:</p>
+            <h3 style="color: #c0392b; margin-top:0;">🔒 تأكيد الحذف بكلمة المرور</h3>
+            <p style="font-size: 13px; color: #555;">أدخل كلمة مرور الأدمن لنقل العنصر إلى المهملات:</p>
             <div class="form-group"><input type="password" id="admin-action-pass" autocomplete="new-password"></div>
-            <button onclick="confirmAdminAction()" class="btn-danger" style="width: 100%; margin-bottom: 8px;">تأكيد 🗑️</button>
+            <button onclick="confirmAdminAction()" class="btn-danger" style="width: 100%; margin-bottom: 8px;">تأكيد للحذف 🗑️</button>
             <button onclick="document.getElementById('passwordModal').style.display='none'" class="btn-secondary" style="width: 100%; background: #64748b;">إلغاء</button>
         </div>
     </div>
 
-    <!-- نافذة تعديل المنتج والعروض الذهبية -->
+    <!-- نافذة تعديل المنتج -->
     <div class="modal-overlay" id="editProductModal" style="z-index: 5500;">
         <div class="modal-card">
-            <h3 style="margin-top:0; color:#2563eb;">✏️ تعديل المنتج والعروض الذهبية</h3>
+            <h3 style="margin-top:0; color:#2563eb;">✏️ تعديل المنتج والألوان والمقاسات</h3>
             <input type="hidden" id="edit-prod-id">
             <div class="form-group"><label>اسم المنتج:</label><input type="text" id="edit-prod-name"></div>
+            <div class="form-group"><label>الصنف:</label>
+                <select id="edit-prod-category">
+                    <option value="ميكب العناية والتجميل">ميكب العناية والتجميل</option>
+                    <option value="ألبسة وملابس">ألبسة وملابس</option>
+                    <option value="أكسسوارات">أكسسوارات</option>
+                </select>
+            </div>
+            <div class="form-group"><label>الألوان المتاحة (مفصولة بفواصل):</label><input type="text" id="edit-prod-colors" placeholder="أسود، أبيض، أحمر"></div>
+            <div class="form-group"><label>المقاسات المتاحة (مفصولة بفواصل):</label><input type="text" id="edit-prod-sizes" placeholder="S, M, L, XL"></div>
             <div class="form-group"><label>سعر الشراء:</label><input type="number" id="edit-prod-buy-price"></div>
             <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="edit-prod-price"></div>
-            <div class="form-group"><label>سعر قديم مشطوب (اختياري للعرض الذهبي):</label><input type="number" id="edit-prod-old-price"></div>
             <div class="form-group"><label>كمية المخزون:</label><input type="number" id="edit-prod-stock"></div>
-            
-            <div class="form-group">
-                <label>روابط الصور:</label>
-                <div id="edit-images-inputs-container"></div>
-                <button type="button" onclick="addEditImageInput()" class="btn-secondary" style="background:#2563eb; margin-top:5px; font-size:12px;">➕ إضافة صورة أخرى</button>
-            </div>
-
             <button onclick="saveProductEdits()" style="background:#2563eb; width:100%; margin-bottom:8px;">حفظ التعديلات 💾</button>
             <button onclick="document.getElementById('editProductModal').style.display='none'" class="btn-secondary" style="width:100%; background:#64748b;">إلغاء</button>
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الطلب وسجل التوقيت -->
+    <!-- نافذة تفاصيل الطلب -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
             <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب، جدول التوقيت والملاحظات</h3>
@@ -141,6 +149,8 @@
                 <button class="tab-btn" onclick="switchTab('return-tab', event)">⚠️ الروتور</button>
                 <button class="tab-btn" onclick="switchTab('cancelled-tab', event)" style="background:#b91c1c; color:white;">❌ ملغى</button>
                 <button class="tab-btn" onclick="switchTab('trash-tab', event)" style="background:#64748b; color:white;">🗑️ المهملات</button>
+                <button class="tab-btn" onclick="switchTab('golden-offers-tab', event)" style="background:#f59e0b; color:white;">⭐ العروض الخاصة</button>
+                <button class="tab-btn" onclick="switchTab('ads-mgmt-tab', event)" style="background:#0284c7; color:white;">📢 الإعلانات</button>
                 <button class="tab-btn" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
                 <button class="tab-btn" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
                 <button class="tab-btn" onclick="switchTab('reviews-mgmt-tab', event)" style="background: #0284c7; color: white;">💬 التعليقات</button>
@@ -148,6 +158,26 @@
                 <button class="tab-btn" onclick="switchTab('add-product-tab', event)" id="nav-btn-add">➕ إضافة منتج</button>
                 <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المخزون</button>
                 <button class="tab-btn" onclick="switchTab('settings-tab', event)" style="background: #e67e22; color: white;">⚙️ الإعدادات</button>
+            </div>
+        </div>
+
+        <!-- تبويب العروض الخاصة الذهبية -->
+        <div id="golden-offers-tab" class="tab-content">
+            <div class="container" style="border: 2px solid #f59e0b;">
+                <h2 style="color: #f59e0b;">⭐ إدارة العروض الخاصة والعداد التنازلي</h2>
+                <button onclick="addGoldenOfferForm()" class="btn-warning" style="margin-bottom: 15px;">➕ إضافة عرض خاص جديد</button>
+                <div id="golden-offers-container">جاري التحميل...</div>
+                <button onclick="saveGoldenOffers()" style="background:#f59e0b; width:100%; margin-top:15px;">حفظ ونشر العروض 💾</button>
+            </div>
+        </div>
+
+        <!-- تبويب الإعلانات -->
+        <div id="ads-mgmt-tab" class="tab-content">
+            <div class="container" style="border: 2px solid #0284c7;">
+                <h2 style="color: #0284c7;">📢 إدارة الإعلانات والتنبيهات</h2>
+                <div class="form-group"><label>نص أو رابط الإعلان:</label><textarea id="admin-ad-text" placeholder="اكتب نص الإعلان هنا أو ضع رابطه..."></textarea></div>
+                <div class="form-group"><label><input type="checkbox" id="admin-ad-visible" checked> إظهار الإعلان للزوار في المتجر</label></div>
+                <button onclick="saveStoreAnnouncement()" style="background:#0284c7; width:100%;">حفظ الإعلان 💾</button>
             </div>
         </div>
 
@@ -254,7 +284,7 @@
 
         <div id="analytics-tab" class="tab-content">
             <div class="container">
-                <h2>💰 التحليلات المالية، إحصائيات الزوار، والمنتجات الأكثر طلباً</h2>
+                <h2>💰 التحليلات المالية وإحصائيات الزوار</h2>
                 <button onclick="window.print()" class="btn-secondary" style="margin-bottom:15px;">🖨️ طباعة التحليلات والتقارير</button>
                 
                 <div class="stats-grid" style="margin-top:20px;">
@@ -271,11 +301,8 @@
                     <div class="stat-card" style="background: linear-gradient(135deg, #dc2626, #991b1b);"><h4>خسائر الروتور (اليوم)</h4><span id="stat-total-router-loss">0 دج</span></div>
                 </div>
 
-                <h3 style="margin-top:30px; color:#1e293b; text-align:right;">🏆 تحليل المنتجات الأكثر طلباً ومبيعاً:</h3>
+                <h3 style="margin-top:30px; color:#1e293b; text-align:right;">🏆 تحليل المنتجات الأكثر طلباً:</h3>
                 <div id="top-products-analytics-container">جاري التحليل...</div>
-
-                <h3 style="margin-top:30px; color:#1e293b; text-align:right;">📅 التحليل اليومي لكل يوم على حدة:</h3>
-                <div id="daily-analytics-container">جاري التجهيز...</div>
             </div>
         </div>
 
@@ -286,14 +313,6 @@
                     <h3 style="margin-top:0; color:#7c3aed;">➕ إضافة موظف جديد وتحديد صلاحياته</h3>
                     <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="staff-username" autocomplete="off"></div>
                     <div class="form-group"><label>كلمة المرور:</label><input type="password" id="staff-password" autocomplete="new-password"></div>
-                    
-                    <div style="background:white; padding:10px; border-radius:6px; border:1px solid #cbd5e1; margin-bottom:12px;">
-                        <label style="margin-bottom:8px; color:#1e293b;">الصلاحيات المسموح بها للموظف:</label>
-                        <label style="font-weight:normal; font-size:13px; margin-bottom:5px;"><input type="checkbox" id="perm-process" checked> معالجة وتأكيد الطلبات (مثل الأدمن)</label>
-                        <label style="font-weight:normal; font-size:13px; margin-bottom:5px;"><input type="checkbox" id="perm-add-prod" checked> إضافة وتعديل المنتجات</label>
-                        <label style="font-weight:normal; font-size:13px;"><input type="checkbox" id="perm-delete"> صلاحية الحذف (للمهملات)</label>
-                    </div>
-
                     <button onclick="saveStaffMember()" class="btn-secondary" style="background:#7c3aed; width:100%;">حفظ الموظف الجديد 💾</button>
                 </div>
                 <div id="staff-list-container">جاري التحميل...</div>
@@ -310,23 +329,32 @@
             </div>
         </div>
 
+        <!-- إضافة منتج مع الفيديوهات بدقة 1080p والأصناف المحدثة -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
-                <h2>إضافة منتج مع العروض الذهبية والصور ➕</h2>
+                <h2>إضافة منتج (ميكب، ألبسة، أكسسوارات) وفيديوهات 1080p ➕</h2>
                 <div class="form-group"><label>اسم المنتج:</label><input type="text" id="prod-name"></div>
+                <div class="form-group"><label>الصنف الرئيسي:</label>
+                    <select id="prod-category">
+                        <option value="ميكب العناية والتجميل">ميكب العناية والتجميل</option>
+                        <option value="ألبسة وملابس">ألبسة وملابس</option>
+                        <option value="أكسسوارات">أكسسوارات</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>الألوان المتاحة (مفصولة بفواصل):</label><input type="text" id="prod-colors" placeholder="أسود، أبيض، أحمر"></div>
+                <div class="form-group"><label>المقاسات المتاحة (مفصولة بفواصل):</label><input type="text" id="prod-sizes" placeholder="S, M, L, XL"></div>
                 <div class="form-group"><label>سعر الشراء:</label><input type="number" id="prod-buy-price"></div>
                 <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="prod-price"></div>
-                <div class="form-group"><label>سعر قديم مشطوب (اختياري للعرض الذهبي):</label><input type="number" id="prod-old-price"></div>
                 <div class="form-group"><label>كمية المخزون الإجمالية:</label><input type="number" id="prod-stock" value="10"></div>
                 
                 <div class="form-group">
-                    <label>روابط الصور:</label>
-                    <div id="images-inputs-container">
+                    <label>روابط فيديوهات المنتج بدقة 1080p:</label>
+                    <div id="video-inputs-container">
                         <div style="display:flex; gap:5px; margin-bottom:5px;">
-                            <input type="text" class="prod-img-input" placeholder="رابط الصورة 1">
+                            <input type="text" class="prod-video-input" placeholder="رابط فيديو بدقة 1080p">
                         </div>
                     </div>
-                    <button type="button" onclick="addImageInput()" class="btn-secondary" style="background:#2563eb; margin-top:5px; font-size:12px;">➕ إضافة رابط صورة أخرى</button>
+                    <button type="button" onclick="addVideoInput()" class="btn-secondary" style="background:#2563eb; margin-top:5px; font-size:12px;">➕ إضافة فيديو آخر بدقة 1080p</button>
                 </div>
 
                 <div class="form-group"><label>الوصف:</label><textarea id="prod-desc"></textarea></div>
@@ -362,731 +390,4 @@
         }
         window.closeCenterModal = function() { document.getElementById('centerModal').style.display = 'none'; }
 
-        window.addImageInput = function(val = '') {
-            let container = document.getElementById('images-inputs-container');
-            let div = document.createElement('div');
-            div.style.cssText = 'display:flex; gap:5px; margin-bottom:5px;';
-            div.innerHTML = `<input type="text" class="prod-img-input" value="${val}" placeholder="رابط صورة إضافية"><button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف ❌</button>`;
-            container.appendChild(div);
-        }
-
-        window.addEditImageInput = function(val = '') {
-            let container = document.getElementById('edit-images-inputs-container');
-            let div = document.createElement('div');
-            div.style.cssText = 'display:flex; gap:5px; margin-bottom:5px;';
-            div.innerHTML = `<input type="text" class="edit-prod-img-input" value="${val}" placeholder="رابط صورة إضافية"><button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف ❌</button>`;
-            container.appendChild(div);
-        }
-
-        window.checkLogin = function() {
-            let u = document.getElementById('login-username').value.trim();
-            let p = document.getElementById('login-pass').value.trim();
-            let currentAdminUser = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
-            let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
-
-            if(u === currentAdminUser && p === currentAdminPass) {
-                sessionStorage.setItem('ecom_logged_user', u);
-                sessionStorage.setItem('ecom_is_admin', 'true');
-                sessionStorage.setItem('ecom_permissions', JSON.stringify({ process: true, addProd: true, del: true }));
-                initDashboard(u, true, { process: true, addProd: true, del: true });
-                return;
-            }
-
-            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            if(staffList[u] && staffList[u].password === p) {
-                sessionStorage.setItem('ecom_logged_user', u);
-                sessionStorage.setItem('ecom_is_admin', 'false');
-                sessionStorage.setItem('ecom_permissions', JSON.stringify(staffList[u].permissions));
-                initDashboard(u, false, staffList[u].permissions);
-                return;
-            }
-            document.getElementById('login-error').innerText = 'خطأ في اسم المستخدم أو كلمة المرور!';
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            let user = sessionStorage.getItem('ecom_logged_user');
-            if(user) {
-                let isAdmin = sessionStorage.getItem('ecom_is_admin') === 'true';
-                let perms = JSON.parse(sessionStorage.getItem('ecom_permissions')) || { process: true, addProd: true, del: isAdmin };
-                initDashboard(user, isAdmin, perms);
-            }
-        });
-
-        async function initDashboard(user, isAdmin, perms) {
-            loggedInUser = user;
-            isUserAdmin = isAdmin;
-            staffPermissions = perms;
-            document.getElementById('login-box').style.display = 'none';
-            document.getElementById('admin-content').style.display = 'block';
-            document.getElementById('welcome-role').innerText = `${user} (${isAdmin ? 'أدمن' : 'موظف'})`;
-            
-            document.getElementById('setting-admin-user').value = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
-            document.getElementById('setting-admin-pass').value = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
-            document.getElementById('setting-whatsapp-num').value = localStorage.getItem('dz_whatsapp_support') || '213700000000';
-
-            if(!perms.addProd) {
-                let addBtn = document.getElementById('nav-btn-add');
-                if(addBtn) addBtn.style.display = 'none';
-            }
-
-            await loadProductsMap();
-            await loadAllOrders();
-            loadProducts();
-            loadStaffList();
-            loadAllReviewsForAdmin();
-
-            setInterval(loadAllOrdersInBackground, 10000); // تحديث دوري وفحص الطلبات الجديدة
-        }
-
-        window.switchTab = function(tabId, event) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            if(event && event.currentTarget) event.currentTarget.classList.add('active');
-            if(tabId === 'reviews-mgmt-tab') loadAllReviewsForAdmin();
-        }
-
-        window.logout = function() {
-            sessionStorage.clear();
-            location.reload();
-        }
-
-        async function loadAllOrders() {
-            try {
-                const snap = await getDocs(collection(db, "orders"));
-                allFetchedOrders = [];
-                ordersCache = {};
-                let now = new Date();
-
-                for(let d of snap.docs) {
-                    const o = { id: d.id, ...d.data() };
-                    
-                    // فحص الحذف التلقائي للمهملات بعد 48 ساعة
-                    if(o.status && o.status.includes('مهملات') && o.trashTime) {
-                        let trashDate = new Date(o.trashTime);
-                        let hoursDiff = (now - trashDate) / (1000 * 60 * 60);
-                        if(hoursDiff >= 48) {
-                            await deleteDoc(doc(db, "orders", d.id));
-                            continue;
-                        }
-                    }
-
-                    // التحقق التلقائي من الطلبات الوهمية والمكررة لنفس الشخص في نفس اليوم
-                    if(o.status === 'جديد ⏳') {
-                        let isDuplicate = allFetchedOrders.some(existing => 
-                            existing.phone === o.phone && 
-                            existing.status === 'جديد ⏳' && 
-                            new Date(existing.createdAt?.toDate ? existing.createdAt.toDate() : new Date()).toDateString() === new Date(o.createdAt?.toDate ? o.createdAt.toDate() : new Date()).toDateString()
-                        );
-                        if(isDuplicate) {
-                            o.status = 'وهمي ⚠️';
-                            await updateDoc(doc(db, "orders", d.id), { status: 'وهمي ⚠️', timeFake: new Date().toLocaleString('ar-DZ') });
-                        }
-                    }
-
-                    ordersCache[o.id] = o;
-                    allFetchedOrders.push(o);
-                }
-
-                // تنبيه صوتي خفيف عند وصول طلب جديد
-                if(lastOrdersCount > 0 && allFetchedOrders.length > lastOrdersCount) {
-                    playNotificationSound();
-                }
-                lastOrdersCount = allFetchedOrders.length;
-
-                renderOrdersFiltered();
-                generateWilayaDetailedReport(allFetchedOrders);
-                updateAnalyticsData(allFetchedOrders);
-                loadStaffList();
-            } catch(e) {}
-        }
-
-        async function loadAllOrdersInBackground() {
-            try {
-                const snap = await getDocs(collection(db, "orders"));
-                if(snap.docs.length > lastOrdersCount) {
-                    playNotificationSound();
-                    loadAllOrders();
-                }
-            } catch(e) {}
-        }
-
-        function playNotificationSound() {
-            try {
-                let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-                audio.play();
-            } catch(e) {}
-        }
-
-        window.resetFilter = function(type) {
-            document.getElementById(`search-${type}`).value = '';
-            document.getElementById(`date-${type}`).value = '';
-            renderOrdersFiltered();
-        }
-
-        window.renderOrdersFiltered = function() {
-            renderList('new', 'orders-list-new', 'جديد ⏳');
-            renderList('fake', 'orders-list-fake', 'وهمي ⚠️');
-            renderList('proc', 'orders-list-processing', 'قيد المعالجة 🔄');
-            renderList('ship', 'orders-list-shipping', 'جاري التوصيل 🚚');
-            renderList('arch', 'orders-list-archive', 'أرشيف (مسلم) ✅');
-            renderList('ret', 'orders-list-return', 'مرتجع (روتور) ⚠️');
-            renderList('canc', 'orders-list-cancelled', 'ملغى ❌');
-            renderTrashList();
-        }
-
-        function renderList(type, elementId, targetStatusKeyword) {
-            let container = document.getElementById(elementId);
-            if(!container) return;
-            container.innerHTML = '';
-
-            let searchQuery = document.getElementById(`search-${type}`)?.value.trim().toLowerCase() || '';
-            let dateQuery = document.getElementById(`date-${type}`)?.value || '';
-
-            allFetchedOrders.forEach(o => {
-                const status = o.status || 'جديد ⏳';
-                if(!status.includes(targetStatusKeyword)) return;
-
-                let orderDateStr = o.createdAt?.toDate ? o.createdAt.toDate().toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-
-                if(searchQuery && !o.fullName.toLowerCase().includes(searchQuery) && !o.phone.includes(searchQuery)) return;
-                if(dateQuery && orderDateStr !== dateQuery) return;
-
-                let pImg = o.imageUrl || productsMap[o.productName]?.img || 'https://via.placeholder.com/50';
-                let deleteButtonHtml = staffPermissions.del ? `<button onclick="promptDeleteOrder('${o.id}', '${status}')" class="btn-danger" style="padding:5px; font-size:11px;">حذف 🗑️</button>` : '';
-
-                container.innerHTML += `
-                    <div class="order-mini-card">
-                        <div style="display:flex; gap:10px; align-items:center; cursor:pointer; flex:1;" onclick="openOrderModal('${o.id}')">
-                            <img src="${pImg}" class="order-mini-thumb">
-                            <div style="overflow:hidden;">
-                                <h4 style="margin:0 0 2px 0; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">👤 ${o.fullName}</h4>
-                                <p style="margin:0; font-size:11px; color:#555;">📦 ${o.productName}</p>
-                                <p style="margin:0; font-size:10px; color:#64748b;">📅 ${orderDateStr}</p>
-                                <p style="margin:0; color:#ef4444; font-weight:bold; font-size:12px;">${o.finalTotal || 0} دج</p>
-                            </div>
-                        </div>
-                        <div>${deleteButtonHtml}</div>
-                    </div>
-                `;
-            });
-        }
-
-        function renderTrashList() {
-            let container = document.getElementById('orders-list-trash');
-            if(!container) return;
-            container.innerHTML = '';
-
-            allFetchedOrders.forEach(o => {
-                const status = o.status || '';
-                if(!status.includes('مهملات')) return;
-
-                let pImg = o.imageUrl || productsMap[o.productName]?.img || 'https://via.placeholder.com/50';
-                let restoreBtn = staffPermissions.del ? `<button onclick="restoreOrder('${o.id}')" style="background:#10b981; padding:5px; font-size:11px; width:100%; margin-bottom:4px;">استعادة ♻️</button><button onclick="permanentDelete('${o.id}')" class="btn-danger" style="padding:5px; font-size:11px; width:100%;">حذف نهائي ❌</button>` : '';
-
-                container.innerHTML += `
-                    <div class="order-mini-card">
-                        <div style="display:flex; gap:10px; align-items:center; flex:1;">
-                            <img src="${pImg}" class="order-mini-thumb">
-                            <div style="overflow:hidden;">
-                                <h4 style="margin:0 0 2px 0; font-size:13px;">👤 ${o.fullName}</h4>
-                                <p style="margin:0; font-size:11px; color:#555;">📦 ${o.productName}</p>
-                                <p style="margin:0; color:#ef4444; font-weight:bold; font-size:12px;">${o.finalTotal || 0} دج</p>
-                            </div>
-                        </div>
-                        <div style="width:100px;">${restoreBtn}</div>
-                    </div>
-                `;
-            });
-        }
-
-        window.promptDeleteOrder = function(id, currentStatus) {
-            if(!staffPermissions.del) { alert('ليس لديك صلاحية الحذف!'); return; }
-            pendingActionType = 'delete_order';
-            pendingActionId = id;
-            pendingOriginalStatus = currentStatus;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModal').style.display = 'flex';
-        }
-
-        window.confirmAdminAction = async function() {
-            let enteredPass = document.getElementById('admin-action-pass').value.trim();
-            let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
-            if(enteredPass !== currentAdminPass) { alert('كلمة المرور غير صحيحة!'); return; }
-            document.getElementById('passwordModal').style.display = 'none';
-
-            if(pendingActionType === 'delete_order') {
-                await updateDoc(doc(db, "orders", pendingActionId), { status: `مهملات | ${pendingOriginalStatus}`, trashTime: new Date().toISOString() });
-                loadAllOrders();
-            } else if(pendingActionType === 'delete_staff') {
-                let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-                delete staffList[pendingActionId];
-                localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
-                loadStaffList();
-            } else if(pendingActionType === 'delete_product') {
-                await updateDoc(doc(db, "products", pendingActionId), { status: 'مهملات', trashTime: new Date().toISOString() });
-                loadProducts();
-            }
-        }
-
-        window.restoreOrder = async function(id) {
-            let o = ordersCache[id];
-            if(!o) return;
-            let originalStatus = o.status.split('|')[1]?.trim() || 'جديد ⏳';
-            await updateDoc(doc(db, "orders", id), { status: originalStatus, trashTime: null });
-            loadAllOrders();
-        }
-
-        window.permanentDelete = async function(id) {
-            if(!staffPermissions.del) return;
-            await deleteDoc(doc(db, "orders", id));
-            loadAllOrders();
-        }
-
-        window.openOrderModal = function(id) {
-            const o = ordersCache[id];
-            if(!o) return;
-
-            let imgHtml = o.imageUrl ? `<div style="text-align:center; margin-bottom:10px;"><img src="${o.imageUrl}" style="width:100px; height:100px; object-fit:cover; border-radius:8px;"></div>` : '';
-            let notesHtml = o.customerNotes ? `<br><b>💬 ملاحظة الزبون:</b> <span style="color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:4px;">${o.customerNotes}</span>` : '<br><b>💬 ملاحظة الزبون:</b> لا توجد ملاحظات';
-
-            let timingTable = `
-                <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:10px; margin-top:10px; font-size:12px;">
-                    <b style="color:#1e293b;">📅 جدول التوقيت وسجل الحالات:</b><br>
-                    - وقت الإنشاء/الطلب: ${o.createdAt?.toDate ? o.createdAt.toDate().toLocaleString('ar-DZ') : 'غير متوفر'}<br>
-                    ${o.timeProcessing ? `- وقت الانتقال للمعالجة: ${o.timeProcessing}<br>` : ''}
-                    ${o.timeShipping ? `- وقت الانتقال للتوصيل: ${o.timeShipping}<br>` : ''}
-                    ${o.timeArchive ? `- وقت تأكيد التسليم (الأرشيف): ${o.timeArchive}<br>` : ''}
-                    ${o.timeReturn ? `- وقت تسجيل الروتور: ${o.timeReturn}<br>` : ''}
-                    ${o.timeCancelled ? `- وقت الإلغاء: ${o.timeCancelled}<br>` : ''}
-                    ${o.timeFake ? `- وقت التصنيف كـ وهمي: ${o.timeFake}<br>` : ''}
-                    ${o.processedBy ? `👤 آخر تعديل بواسطة: <b>${o.processedBy}</b>` : ''}
-                </div>
-            `;
-
-            document.getElementById('orderDetailsContent').innerHTML = `
-                ${imgHtml}
-                <b>👤 الزبون:</b> ${o.fullName}<br>
-                <b>📞 الهاتف:</b> ${o.phone}<br>
-                <b>📍 الولاية والبلدية:</b> ${o.wilaya} (${o.commune})<br>
-                <b>📦 الطلب:</b> ${o.productName}<br>
-                <b>🔢 الكمية:</b> ${o.quantity || 1}<br>
-                <b>🚚 نوع التوصيل:</b> ${o.deliveryType}<br>
-                ${notesHtml}<br>
-                <b>💰 المجموع الكلي:</b> <span style="color:red; font-weight:bold;">${o.finalTotal} دج</span><br>
-                <b>📌 الحالة الحالية:</b> <b>${o.status}</b>
-                ${timingTable}
-            `;
-
-            let actionsHtml = '';
-            if(!staffPermissions.process) {
-                actionsHtml = '<p style="color:red;">ليس لديك صلاحية تعديل حالة الطلبات.</p>';
-            } else {
-                let status = o.status || '';
-                if(status.includes('جديد')) {
-                    actionsHtml = `
-                        <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', true)" style="background:#2563eb;">تأكيد (للمعالجة) 🔄</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'وهمي ⚠️', 'timeFake')" style="background:#dc2626;">وهمي ⚠️</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">ملغى ❌</button>
-                    `;
-                } else if(status.includes('المعالجة')) {
-                    actionsHtml = `
-                        <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">ملغى ❌</button>
-                    `;
-                } else if(status.includes('التوصيل')) {
-                    actionsHtml = `
-                        <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم (أرشيف) ✅</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">ملغى ❌</button>
-                    `;
-                } else {
-                    actionsHtml = `
-                        <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing')" style="background:#2563eb;">نقل للمعالجة 🔄</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">نقل للتوصيل 🚚</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">تأكيد التسليم (أرشيف) ✅</button>
-                        <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
-                    `;
-                }
-            }
-
-            document.getElementById('orderModalActions').innerHTML = actionsHtml;
-            document.getElementById('orderModal').style.display = 'flex';
-        }
-
-        window.closeOrderModal = function() { document.getElementById('orderModal').style.display = 'none'; }
-        
-        window.updateOrderStatus = async function(id, newStatus, timeField, isProcessing = false) {
-            let updatePayload = { status: newStatus, [timeField]: new Date().toLocaleString('ar-DZ'), processedBy: loggedInUser };
-
-            if(isProcessing) {
-                let o = ordersCache[id];
-                if(o && o.productName) {
-                    let pRef = productsMap[o.productName];
-                    if(pRef && pRef.id) {
-                        let pDocSnap = await getDoc(doc(db, "products", pRef.id));
-                        if(pDocSnap.exists()) {
-                            let pData = pDocSnap.data();
-                            let currentStock = pData.stock !== undefined ? pData.stock : 10;
-                            let newStock = Math.max(0, currentStock - (o.quantity || 1));
-                            
-                            await updateDoc(doc(db, "products", pRef.id), { stock: newStock });
-                            
-                            // تنبيه انخفاض المخزون (5 قطع أو أقل)
-                            if(newStock <= 5) {
-                                showAlert('⚠️ تحذير مخزون منخفض', `المنتج (${pData.name}) وصل إلى كمية منخفضة جداً (${newStock} قطع متبقية)!`);
-                            }
-                        }
-                    }
-                }
-            }
-
-            await updateDoc(doc(db, "orders", id), updatePayload);
-            closeOrderModal();
-            loadAllOrders();
-        }
-
-        window.saveStaffMember = function() {
-            let u = document.getElementById('staff-username').value.trim();
-            let p = document.getElementById('staff-password').value.trim();
-            if(!u || !p) { alert('أدخل البيانات!'); return; }
-            
-            let permissions = {
-                process: document.getElementById('perm-process').checked,
-                addProd: document.getElementById('perm-add-prod').checked,
-                del: document.getElementById('perm-delete').checked
-            };
-
-            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            staffList[u] = { password: p, permissions, createdAt: new Date().toLocaleDateString('ar-DZ') };
-            localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
-            showAlert('نجاح', `تم حفظ الموظف (${u}) بنجاح!`);
-            document.getElementById('staff-username').value = '';
-            document.getElementById('staff-password').value = '';
-            loadStaffList();
-        }
-
-        window.loadStaffList = function() {
-            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            let container = document.getElementById('staff-list-container');
-            let currentAdmin = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
-
-            let html = `<div class="staff-status-card" style="border:2px solid #2563eb;"><h3 style="margin:0; color:#2563eb;">👑 الأدمن الرئيسي: ${currentAdmin}</h3></div>`;
-
-            for(let u in staffList) {
-                let perms = staffList[u].permissions || {};
-                
-                // حساب سجل إنجازات الموظف من الطلبات المعالجة أو المسجلة باسمه
-                let processedCount = 0, totalSales = 0;
-                allFetchedOrders.forEach(o => {
-                    if(o.processedBy === u && (o.status.includes('أرشيف') || o.status.includes('المعالجة'))) {
-                        processedCount++;
-                        totalSales += (o.finalTotal || 0);
-                    }
-                });
-
-                let deleteStaffBtn = isUserAdmin ? `<button onclick="promptDeleteStaff('${u}')" class="btn-danger" style="padding:4px 10px; font-size:11px;">حذف 🗑️</button>` : '';
-
-                html += `
-                    <div class="staff-status-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h3 style="margin:0; color:#7c3aed;">👤 موظف: ${u}</h3>
-                            ${deleteStaffBtn}
-                        </div>
-                        <p style="margin:5px 0; font-size:12px; color:#555;">الصلاحيات: معالجة (${perms.process ? '✅':'❌'}) | إضافة منتجات (${perms.addProd ? '✅':'❌'}) | حذف (${perms.del ? '✅':'❌'})</p>
-                        <div style="background:white; padding:8px; border-radius:6px; margin-top:5px; font-size:12px; border:1px solid #cbd5e1;">
-                            📊 <b>سجل الإنجازات:</b> عدد الطلبات المنجزة: <b>${processedCount} طلب</b> | إجمالي المبيعات المحققة: <span style="color:green; font-weight:bold;">${totalSales} دج</span>
-                        </div>
-                    </div>
-                `;
-            }
-            container.innerHTML = html;
-        }
-
-        window.promptDeleteStaff = function(username) {
-            if(!isUserAdmin) return;
-            pendingActionType = 'delete_staff';
-            pendingActionId = username;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModal').style.display = 'flex';
-        }
-
-        window.addProduct = async function() {
-            if(!staffPermissions.addProd) { alert('ليس لديك صلاحية إضافة المنتجات!'); return; }
-            let name = document.getElementById('prod-name').value.trim();
-            let buyPrice = Number(document.getElementById('prod-buy-price').value) || 0;
-            let price = Number(document.getElementById('prod-price').value) || 0;
-            let oldPrice = Number(document.getElementById('prod-old-price').value) || 0;
-            let stock = Number(document.getElementById('prod-stock').value) || 10;
-            let description = document.getElementById('prod-desc').value.trim();
-            
-            let imageUrls = [];
-            document.querySelectorAll('.prod-img-input').forEach(input => {
-                if(input.value.trim()) imageUrls.push(input.value.trim());
-            });
-
-            if(!name || !price) { showAlert('تنبيه', 'أدخل اسم المنتج وسعر البيع!'); return; }
-
-            await addDoc(collection(db, "products"), {
-                name, buyPrice, price, oldPrice, stock, description, imageUrls, createdAt: new Date()
-            });
-            showAlert('نجاح', 'تم نشر المنتج بنجاح!');
-            loadProducts();
-            loadProductsMap();
-        }
-
-        async function loadProductsMap() {
-            try {
-                const snap = await getDocs(collection(db, "products"));
-                productsMap = {}; productsFullCache = {};
-                snap.forEach(d => {
-                    const p = d.data();
-                    productsFullCache[d.id] = p;
-                    productsMap[p.name] = { id: d.id, img: p.imageUrls?.[0] || 'https://via.placeholder.com/50', buyPrice: p.buyPrice || 0, stock: p.stock !== undefined ? p.stock : 10 };
-                });
-            } catch(e) {}
-        }
-
-        async function loadProducts() {
-            const list = document.getElementById('products-list');
-            const snap = await getDocs(collection(db, "products"));
-            list.innerHTML = '';
-            snap.forEach(d => {
-                const p = d.data();
-                if(p.status === 'مهملات') return;
-                let stockVal = p.stock !== undefined ? p.stock : 10;
-                let deleteProdBtn = staffPermissions.del ? `<button onclick="promptDeleteProduct('${d.id}')" class="btn-danger" style="padding:4px 10px; font-size:12px;">حذف 🗑️</button>` : '';
-
-                list.innerHTML += `
-                    <div style="background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                        <span><b>${p.name}</b> - السعر: ${p.price} دج ${p.oldPrice ? `(سعر قديم: <span style="text-decoration:line-through;">${p.oldPrice}</span>)` : ''} | 📦 المخزون: <b>${stockVal}</b></span>
-                        <div style="display:flex; gap:6px;">
-                            <button onclick="openEditProductModal('${d.id}')" class="btn-warning" style="padding:4px 10px; font-size:12px;">تعديل ✏️</button>
-                            ${deleteProdBtn}
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        window.openEditProductModal = function(id) {
-            let p = productsFullCache[id];
-            if(!p) return;
-            document.getElementById('edit-prod-id').value = id;
-            document.getElementById('edit-prod-name').value = p.name || '';
-            document.getElementById('edit-prod-buy-price').value = p.buyPrice || 0;
-            document.getElementById('edit-prod-price').value = p.price || 0;
-            document.getElementById('edit-prod-old-price').value = p.oldPrice || 0;
-            document.getElementById('edit-prod-stock').value = p.stock !== undefined ? p.stock : 10;
-
-            let imgContainer = document.getElementById('edit-images-inputs-container');
-            imgContainer.innerHTML = '';
-            if(p.imageUrls && p.imageUrls.length > 0) {
-                p.imageUrls.forEach(url => addEditImageInput(url));
-            } else {
-                addEditImageInput('');
-            }
-            document.getElementById('editProductModal').style.display = 'flex';
-        }
-
-        window.saveProductEdits = async function() {
-            let id = document.getElementById('edit-prod-id').value;
-            let name = document.getElementById('edit-prod-name').value.trim();
-            let buyPrice = Number(document.getElementById('edit-prod-buy-price').value) || 0;
-            let price = Number(document.getElementById('edit-prod-price').value) || 0;
-            let oldPrice = Number(document.getElementById('edit-prod-old-price').value) || 0;
-            let stock = Number(document.getElementById('edit-prod-stock').value) || 0;
-            
-            let imageUrls = [];
-            document.querySelectorAll('.edit-prod-img-input').forEach(input => {
-                if(input.value.trim()) imageUrls.push(input.value.trim());
-            });
-
-            await updateDoc(doc(db, "products", id), { name, buyPrice, price, oldPrice, stock, imageUrls });
-            document.getElementById('editProductModal').style.display = 'none';
-            showAlert('نجاح', 'تم تحديث المنتج بنجاح 💾!');
-            loadProducts();
-            loadProductsMap();
-        }
-
-        window.promptDeleteProduct = function(id) {
-            if(!staffPermissions.del) { alert('ليس لديك صلاحية الحذف!'); return; }
-            pendingActionType = 'delete_product';
-            pendingActionId = id;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModal').style.display = 'flex';
-        }
-
-        window.updateAdminSettings = function() {
-            let u = document.getElementById('setting-admin-user').value.trim();
-            let p = document.getElementById('setting-admin-pass').value.trim();
-            let wa = document.getElementById('setting-whatsapp-num').value.trim();
-            if(!u || !p || !wa) { alert('أدخل الحقول كاملة!'); return; }
-            localStorage.setItem('dz_custom_admin_user', u);
-            localStorage.setItem('dz_custom_admin_pass', p);
-            localStorage.setItem('dz_whatsapp_support', wa);
-            showAlert('نجاح', 'تم تحديث الإعدادات بنجاح 💾!');
-        }
-
-        window.loadAllReviewsForAdmin = function() {
-            let container = document.getElementById('admin-reviews-list-container');
-            if(!container) return;
-            let html = '';
-            let totalCount = 0;
-
-            for(let key in localStorage) {
-                if(key.startsWith('dz_reviews_')) {
-                    let prodId = key.replace('dz_reviews_', '');
-                    let reviews = JSON.parse(localStorage.getItem(key)) || [];
-                    let prodName = productsFullCache[prodId]?.name || `منتج`;
-
-                    reviews.forEach((rev, index) => {
-                        totalCount++;
-                        let stars = '⭐'.repeat(Number(rev.rating));
-                        let isHidden = rev.hidden === true;
-
-                        html += `
-                            <div style="background:#f8fafc; border:1px solid ${isHidden ? '#fca5a5':'#cbd5e1'}; padding:12px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                                <div>
-                                    <span style="font-size:11px; background:#e2e8f0; padding:2px 6px; border-radius:4px;">📦 ${prodName}</span>
-                                    <h4 style="margin:5px 0 2px 0; color:#1e293b;">👤 ${rev.name} <span style="font-size:12px; font-weight:normal; color:#64748b;">(${rev.date})</span></h4>
-                                    <div style="font-size:13px; color:#f59e0b; margin-bottom:3px;">${stars}</div>
-                                    <p style="margin:0; font-size:13px; color:#333;">${rev.comment}</p>
-                                    ${isHidden ? '<span style="color:red; font-size:11px; font-weight:bold;">[مخفي عن الزبون 🙈]</span>' : '<span style="color:green; font-size:11px; font-weight:bold;">[ظاهر في المتجر 👀]</span>'}
-                                </div>
-                                <div>
-                                    <button onclick="toggleReviewVisibility('${prodId}', ${index})" style="background:${isHidden ? '#16a34a':'#dc2626'}; padding:6px 12px; font-size:12px;">${isHidden ? 'إظهار للزبون 👀' : 'إخفاء عن الزبون 🙈'}</button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-            }
-            container.innerHTML = totalCount === 0 ? '<p style="text-align:center; color:#64748b;">لا توجد تعليقات مسجلة بعد.</p>' : html;
-        }
-
-        window.toggleReviewVisibility = function(prodId, index) {
-            let reviewsKey = `dz_reviews_${prodId}`;
-            let reviews = JSON.parse(localStorage.getItem(reviewsKey)) || [];
-            if(reviews[index]) {
-                reviews[index].hidden = !reviews[index].hidden;
-                localStorage.setItem(reviewsKey, JSON.stringify(reviews));
-                loadAllReviewsForAdmin();
-            }
-        }
-
-        window.updateAnalyticsData = function(orders) {
-            let totalProfit = 0, totalBuy = 0, totalSell = 0, routerLoss = 0;
-            let productSalesCount = {};
-            let dailyMap = {};
-            let todayDateStr = new Date().toISOString().split('T')[0];
-
-            orders.forEach(o => {
-                if(o.status && (o.status.includes('مهملات') || o.status.includes('ملغى') || o.status.includes('وهمي'))) return;
-                let orderDateObj = o.createdAt?.toDate ? o.createdAt.toDate() : new Date();
-                let orderDateStr = orderDateObj.toISOString().split('T')[0];
-
-                let sellPrice = (o.finalTotal || 0);
-                let pData = productsMap[o.productName] || { buyPrice: 0 };
-                let buyPriceTotal = (pData.buyPrice * (o.quantity || 1));
-                
-                let profit = o.status && o.status.includes('أرشيف') ? (sellPrice - buyPriceTotal) : 0;
-                let routerFee = o.status && o.status.includes('روتور') ? 600 : 0;
-
-                if(!dailyMap[orderDateStr]) dailyMap[orderDateStr] = { ordersCount: 0, sell: 0, profit: 0, routerLoss: 0 };
-                dailyMap[orderDateStr].ordersCount++;
-                dailyMap[orderDateStr].sell += sellPrice;
-                dailyMap[orderDateStr].profit += profit;
-                dailyMap[orderDateStr].routerLoss += routerFee;
-
-                if(orderDateStr === todayDateStr) {
-                    totalSell += sellPrice;
-                    totalBuy += buyPriceTotal;
-                    if(o.status && o.status.includes('أرشيف')) totalProfit += profit;
-                    if(o.status && o.status.includes('روتور')) routerLoss += routerFee;
-                }
-
-                if(o.productName) {
-                    if(!productSalesCount[o.productName]) productSalesCount[o.productName] = { count: 0, totalRevenue: 0 };
-                    productSalesCount[o.productName].count += (o.quantity || 1);
-                    productSalesCount[o.productName].totalRevenue += sellPrice;
-                }
-            });
-
-            document.getElementById('stat-total-profit').innerText = totalProfit + ' دج';
-            document.getElementById('stat-total-buy-price').innerText = totalBuy + ' دج';
-            document.getElementById('stat-total-sell-price').innerText = totalSell + ' دج';
-            document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
-
-            let visitorsData = JSON.parse(localStorage.getItem('dz_store_visitors')) || { days: {}, weeks: {}, months: {} };
-            let weekStr = getWeekKey(new Date());
-            let monthStr = todayDateStr.substring(0, 7);
-
-            document.getElementById('stat-visitors-day').innerText = visitorsData.days[todayDateStr] || 0;
-            document.getElementById('stat-visitors-week').innerText = visitorsData.weeks[weekStr] || 0;
-            document.getElementById('stat-visitors-month').innerText = visitorsData.months[monthStr] || 0;
-
-            let viewsMap = JSON.parse(localStorage.getItem('dz_product_views')) || {};
-            let topViewedProd = Object.keys(viewsMap).reduce((a, b) => viewsMap[a] > viewsMap[b] ? a : b, 'لا توجد مشاهدات');
-            document.getElementById('stat-top-viewed').innerText = topViewedProd;
-
-            let topProdContainer = document.getElementById('top-products-analytics-container');
-            let sortedProducts = Object.keys(productSalesCount).sort((a,b) => productSalesCount[b].count - productSalesCount[a].count);
-            
-            if(sortedProducts.length === 0) {
-                topProdContainer.innerHTML = '<p style="font-size:13px; color:#64748b;">لا توجد طلبات مسجلة بعد.</p>';
-            } else {
-                let pTableHtml = `<table class="products-analytics-table"><thead><tr><th>📦 اسم المنتج</th><th>🔥 الوحدات المباعة</th><th>💰 المبيعات</th></tr></thead><tbody>`;
-                sortedProducts.forEach(pName => {
-                    let item = productSalesCount[pName];
-                    pTableHtml += `<tr><td><b>${pName}</b></td><td>${item.count} وحدة</td><td style="color:green; font-weight:bold;">${item.totalRevenue} دج</td></tr>`;
-                });
-                pTableHtml += `</tbody></table>`;
-                topProdContainer.innerHTML = pTableHtml;
-            }
-
-            let dailyContainer = document.getElementById('daily-analytics-container');
-            let sortedDays = Object.keys(dailyMap).sort().reverse();
-            if(sortedDays.length === 0) {
-                dailyContainer.innerHTML = '<p style="font-size:13px; color:#64748b;">لا توجد بيانات تحليل يومي بعد.</p>';
-                return;
-            }
-            let tableHtml = `<table class="daily-report-table"><thead><tr><th>📅 التاريخ</th><th>📦 الطلبات</th><th>💰 المبيعات</th><th>📈 الأرباح</th><th>⚠️ الروتور</th></tr></thead><tbody>`;
-            sortedDays.forEach(day => {
-                let d = dailyMap[day];
-                tableHtml += `<tr><td><b>${day}</b></td><td>${d.ordersCount} طلب</td><td>${d.sell} دج</td><td style="color:green; font-weight:bold;">${d.profit} دج</td><td style="color:red;">${d.routerLoss} دج</td></tr>`;
-            });
-            tableHtml += `</tbody></table>`;
-            dailyContainer.innerHTML = tableHtml;
-        }
-
-        function getWeekKey(d) {
-            let date = new Date(d.getTime());
-            date.setHours(0, 0, 0, 0);
-            date.setDate(date.getDate() + 4 - (date.getDay() || 7));
-            let yearStart = new Date(date.getFullYear(), 0, 1);
-            let weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
-            return `${date.getFullYear()}-W${weekNo}`;
-        }
-
-        function generateWilayaDetailedReport(orders) {
-            let wilayaMap = {};
-            orders.forEach(o => {
-                if(o.status && o.status.includes('مهملات')) return;
-                let w = o.wilaya || 'غير محددة';
-                if(!wilayaMap[w]) wilayaMap[w] = { home: 0, desk: 0, total: 0 };
-                if(o.deliveryType && o.deliveryType.includes('منزل')) wilayaMap[w].home++;
-                else wilayaMap[w].desk++;
-                wilayaMap[w].total++;
-            });
-            let html = `<table class="wilaya-table"><thead><tr><th>الولاية</th><th>🏠 للمنزل</th><th>🏢 للمكتب</th><th>📊 المجموع</th></tr></thead><tbody>`;
-            for(let w in wilayaMap) {
-                html += `<tr><td><b>${w}</b></td><td>${wilayaMap[w].home}</td><td>${wilayaMap[w].desk}</td><td><b>${wilayaMap[w].total}</b></td></tr>`;
-            }
-            html += `</tbody></table>`;
-            let reportEl = document.getElementById('wilaya-report-content');
-            if(reportEl) reportEl.innerHTML = html;
-        }
-    </script>
-</body>
-</html>
+        window.addVideoInput = function
