@@ -130,11 +130,11 @@
     <!-- شاشة تسجيل الدخول -->
     <div id="login-box">
         <h2>تسجيل دخول لوحة التحكم - LAVENDER_store.dz 🔐</h2>
-        <div class="form-group" style="text-align: right;"><label>اسم المستخدم:</label><input type="text" id="login-username" autocomplete="off"></div>
+        <div class="form-group" style="text-align: right;"><label>اسم المستخدم:</label><input type="text" id="login-username" autocomplete="off" placeholder="djamel hr"></div>
         <div class="form-group" style="text-align: right;">
             <label>كلمة المرور:</label>
             <div class="password-container">
-                <input type="password" id="login-pass" autocomplete="new-password">
+                <input type="password" id="login-pass" autocomplete="new-password" placeholder="Djamel2003">
                 <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">👁️</button>
             </div>
         </div>
@@ -479,6 +479,7 @@
 
         window.addSocialLinkForm = function(url = '', iconUrl = '') {
             let container = document.getElementById('social-links-container');
+            if(!container) return;
             let div = document.createElement('div');
             div.className = 'social-box';
             div.innerHTML = `
@@ -1169,7 +1170,7 @@
             orders.forEach(o => {
                 if(o.status && o.status.includes('مهملات')) return;
                 let w = o.wilaya || 'غير محددة';
-                let dtype = o.deliveryType || 'المنزل'; // افتراضي إذا لم يُحدد
+                let dtype = o.deliveryType || 'المنزل';
 
                 if(!wilayaMap[w]) {
                     wilayaMap[w] = { office: 0, home: 0, total: 0 };
