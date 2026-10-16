@@ -36,7 +36,6 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-        /* تصميم المستطيل الصغير والطويل المطور */
         .orders-list-strip { display: flex; flex-direction: column; gap: 8px; }
         .order-strip-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: 0.2s; flex-wrap: wrap; }
         .order-strip-card:hover { border-color: #2563eb; background: #f1f5f9; }
@@ -57,7 +56,8 @@
         .filter-bar { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .golden-offer-box { background: #fef9c3; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .social-box { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; gap: 10px; align-items: center; }
-        .staff-box { background: #f8fafc; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        .staff-box { background: #f8fafc; border: 1px solid #cbd5e1; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .permissions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 8px; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; }
     </style>
 </head>
 <body>
@@ -110,7 +110,7 @@
     <!-- لوحة التحكم الرئيسية -->
     <div id="admin-content">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; background: #232f3e; color: white;">
-            <h2 style="margin: 0; color: white;">LAVENDER_store.dz - لوحة التحكم</h2>
+            <h2 style="margin: 0; color: white;" id="welcome-admin-title">LAVENDER_store.dz - لوحة التحكم</h2>
             <div style="display: flex; gap: 10px;">
                 <a href="index.html" class="btn-store" style="margin: 0; padding: 8px 15px; font-size: 13px; background:#374151;">🛍️ المتجر</a>
                 <button onclick="logout()" class="btn-danger" style="width: auto; padding: 8px 15px; font-size: 13px;">خروج</button>
@@ -172,25 +172,29 @@
         
         <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ المهملات (تُحذف نهائياً فقط من هنا)</h2><div id="orders-list-trash" class="orders-list-strip"></div></div></div>
 
-        <!-- قسم الطاقم -->
+        <!-- قسم الطاقم مع حساب الأعمال المنجزة وصلاحيات علامة الصح -->
         <div id="staff-tab" class="tab-content">
             <div class="container" style="border: 2px solid #8b5cf6;">
-                <h2 style="color: #8b5cf6;">👥 إدارة طاقم العمل</h2>
+                <h2 style="color: #8b5cf6;">👥 إدارة طاقم العمل والصلاحيات</h2>
                 <div id="staff-list-container"></div>
                 <button type="button" onclick="addStaffForm()" class="btn-secondary" style="background:#8b5cf6; margin-bottom:15px; width:100%;">➕ إضافة عضو طاقم جديد</button>
-                <button onclick="saveStaffList()" style="background:#8b5cf6; width:100%;">حفظ بيانات الطاقم 💾</button>
+                <button onclick="saveStaffList()" style="background:#8b5cf6; width:100%;">حفظ بيانات الطاقم والصلاحيات 💾</button>
             </div>
         </div>
 
-        <!-- قسم الإعدادات -->
+        <!-- قسم الإعدادات (تغيير اسم المستخدم وكلمة المرور للأدمن) -->
         <div id="settings-tab" class="tab-content">
             <div class="container" style="border: 2px solid #475569;">
-                <h2 style="color: #475569;">⚙️ إعدادات المتجر العامة</h2>
+                <h2 style="color: #475569;">⚙️ إعدادات المتجر وبيانات الأدمن</h2>
                 <div class="form-group">
                     <label>رقم أو رابط واتساب الدعم:</label>
                     <input type="text" id="settings-whatsapp" placeholder="مثال: 213700000000">
                 </div>
-                <button onclick="saveStoreSettings()" style="background:#475569; width:100%;">حفظ الإعدادات 💾</button>
+                <hr style="margin:20px 0;">
+                <h3>🔐 تغيير اسم المستخدم وكلمة المرور للوحة التحكم</h3>
+                <div class="form-group"><label>اسم المستخدم الجديد:</label><input type="text" id="settings-admin-user"></div>
+                <div class="form-group"><label>كلمة المرور الجديدة:</label><input type="password" id="settings-admin-pass"></div>
+                <button onclick="saveStoreSettings()" style="background:#475569; width:100%;">حفظ الإعدادات وبيانات الدخول 💾</button>
             </div>
         </div>
 
@@ -291,6 +295,7 @@
 
         let ordersCache = {}, allFetchedOrders = [], productsMap = {}, productsFullCache = {};
         let pendingActionType = null, pendingActionId = null, pendingOriginalStatus = null;
+        let currentUserRole = 'admin', currentUsername = '';
 
         window.togglePasswordVisibility = function() {
             let passInput = document.getElementById('login-pass');
@@ -353,14 +358,40 @@
             else links.forEach(l => addSocialLinkForm(l.url, l.iconUrl));
         }
 
-        window.addStaffForm = function(name = '', role = '') {
+        // إدارة الطاقم مع الصلاحيات (عبر علامات صح) وحساب الأعمال المنجزة
+        window.addStaffForm = function(username = '', pass = '', permissions = {}) {
             let container = document.getElementById('staff-list-container');
+            let pOrders = permissions.orders !== false ? 'checked' : '';
+            let pProducts = permissions.products !== false ? 'checked' : '';
+            let pAnalytics = permissions.analytics !== false ? 'checked' : '';
+            let pOffers = permissions.offers !== false ? 'checked' : '';
+
+            // حساب عدد الطلبيات المعالجة أو التي قام بمعالجتها هذا العامل
+            let staffName = username;
+            let processedCount = 0;
+            if(staffName && allFetchedOrders) {
+                processedCount = allFetchedOrders.filter(o => o.processedBy === staffName).length;
+            }
+
             let div = document.createElement('div');
             div.className = 'staff-box';
             div.innerHTML = `
-                <div class="form-group" style="margin-bottom:8px;"><label>اسم العضو:</label><input type="text" class="staff-name" value="${name}" placeholder="اسم موظف الطاقم"></div>
-                <div class="form-group" style="margin-bottom:8px;"><label>الدور / المهمة:</label><input type="text" class="staff-role" value="${role}" placeholder="مثال: مسؤول التوصيل، الدعم الفني"></div>
-                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:5px 10px; font-size:11px;">حذف العضو 🗑️</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <h4 style="margin:0; color:#8b5cf6;">👤 بيانات الموظف</h4>
+                    <span style="font-size:12px; background:#e0e7ff; color:#3730a3; padding:3px 8px; border-radius:4px;">📊 الطلبيات المنجزة: <b>${processedCount}</b></span>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:8px;">
+                    <div class="form-group"><label>اسم المستخدم:</label><input type="text" class="staff-username" value="${username}" placeholder="اسم المستخدم للعامل"></div>
+                    <div class="form-group"><label>كلمة المرور:</label><input type="text" class="staff-pass" value="${pass}" placeholder="كلمة المرور"></div>
+                </div>
+                <label style="font-size:12px; font-weight:bold; color:#475569;">الصلاحيات الممنوحة (علامات صح):</label>
+                <div class="permissions-grid">
+                    <label><input type="checkbox" class="perm-orders" ${pOrders}> إدارة الطلبات</label>
+                    <label><input type="checkbox" class="perm-products" ${pProducts}> إدارة المخزون</label>
+                    <label><input type="checkbox" class="perm-analytics" ${pAnalytics}> التحليلات والأرباح</label>
+                    <label><input type="checkbox" class="perm-offers" ${pOffers}> العروض والإعلانات</label>
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:5px 10px; font-size:11px; margin-top:10px;">حذف العضو 🗑️</button>
             `;
             container.appendChild(div);
         }
@@ -368,26 +399,38 @@
         window.saveStaffList = function() {
             let staff = [];
             document.querySelectorAll('.staff-box').forEach(box => {
-                let name = box.querySelector('.staff-name').value.trim();
-                let role = box.querySelector('.staff-role').value.trim();
-                if(name) staff.push({ name, role });
+                let username = box.querySelector('.staff-username').value.trim();
+                let pass = box.querySelector('.staff-pass').value.trim();
+                let permissions = {
+                    orders: box.querySelector('.perm-orders').checked,
+                    products: box.querySelector('.perm-products').checked,
+                    analytics: box.querySelector('.perm-analytics').checked,
+                    offers: box.querySelector('.perm-offers').checked
+                };
+                if(username && pass) staff.push({ username, pass, permissions });
             });
-            localStorage.setItem('dz_store_staff', JSON.stringify(staff));
-            showAlert('نجاح العملية ✅', 'تم حفظ بيانات طاقم العمل بنجاح 👥!');
+            localStorage.setItem('dz_store_staff_team', JSON.stringify(staff));
+            showAlert('نجاح العملية ✅', 'تم حفظ بيانات الطاقم والصلاحيات بنجاح 👥!');
         }
 
         function loadStaffAdmin() {
             let container = document.getElementById('staff-list-container');
             container.innerHTML = '';
-            let staff = JSON.parse(localStorage.getItem('dz_store_staff')) || [];
+            let staff = JSON.parse(localStorage.getItem('dz_store_staff_team')) || [];
             if(staff.length === 0) addStaffForm();
-            else staff.forEach(s => addStaffForm(s.name, s.role));
+            else staff.forEach(s => addStaffForm(s.username, s.pass, s.permissions));
         }
 
         window.saveStoreSettings = function() {
             let wa = document.getElementById('settings-whatsapp').value.trim();
+            let newU = document.getElementById('settings-admin-user').value.trim();
+            let newP = document.getElementById('settings-admin-pass').value.trim();
+
             localStorage.setItem('dz_whatsapp_support', wa);
-            showAlert('نجاح العملية ✅', 'تم حفظ إعدادات المتجر العامة بنجاح ⚙️!');
+            if(newU) localStorage.setItem('dz_custom_admin_user', newU);
+            if(newP) localStorage.setItem('dz_custom_admin_pass', newP);
+
+            showAlert('نجاح العملية ✅', 'تم حفظ الإعدادات وتحديث بيانات الأدمن بنجاح ⚙️!');
         }
 
         window.addGoldenOfferForm = function(productId = '', details = '', oldPrice = '', newPrice = '', endTime = '', visible = true) {
@@ -439,32 +482,69 @@
         window.checkLogin = function() {
             let u = document.getElementById('login-username').value.trim();
             let p = document.getElementById('login-pass').value.trim();
+            
             let adminUser = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
             let adminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
 
             if(u === adminUser && p === adminPass) {
                 sessionStorage.setItem('ecom_logged_user', u);
-                sessionStorage.setItem('ecom_is_admin', 'true');
-                initDashboard();
+                sessionStorage.setItem('ecom_user_role', 'admin');
+                initDashboard('admin', u);
                 return;
             }
+
+            // التحقق من طاقم العمل (Staff)
+            let staffList = JSON.parse(localStorage.getItem('dz_store_staff_team')) || [];
+            let foundStaff = staffList.find(s => s.username === u && s.pass === p);
+            if(foundStaff) {
+                sessionStorage.setItem('ecom_logged_user', u);
+                sessionStorage.setItem('ecom_user_role', 'staff');
+                sessionStorage.setItem('ecom_staff_perms', JSON.stringify(foundStaff.permissions));
+                initDashboard('staff', u);
+                return;
+            }
+
             document.getElementById('login-error').innerText = 'خطأ في اسم المستخدم أو كلمة المرور!';
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             let user = sessionStorage.getItem('ecom_logged_user');
-            if(user) initDashboard();
+            if(user) {
+                let role = sessionStorage.getItem('ecom_user_role') || 'admin';
+                initDashboard(role, user);
+            }
         });
 
-        async function initDashboard() {
+        async function initDashboard(role, username) {
+            currentUserRole = role;
+            currentUsername = username;
             document.getElementById('login-box').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
-            
+            document.getElementById('welcome-admin-title').innerText = `LAVENDER_store.dz - أهلاً ${username} (${role === 'admin' ? 'مدير عام' : 'طاقم عمل'})`;
+
+            if(role === 'staff') {
+                // تطبيق الصلاحيات للأعضاء عبر إخفاء التبويبات غير المسموحة
+                let perms = JSON.parse(sessionStorage.getItem('ecom_staff_perms')) || {};
+                if(!perms.orders) {
+                    document.querySelectorAll('#orders-tab, [onclick*="orders-tab"], [onclick*="processing-tab"], [onclick*="shipping-tab"], [onclick*="archive-tab"], [onclick*="return-tab"], [onclick*="cancelled-tab"], [onclick*="fake-orders-tab"]').forEach(el => el.style.display = 'none');
+                }
+                if(!perms.products) {
+                    document.querySelectorAll('#add-product-tab, #manage-products-tab, [onclick*="add-product-tab"], [onclick*="manage-products-tab"]').forEach(el => el.style.display = 'none');
+                }
+                if(!perms.analytics) {
+                    document.querySelectorAll('#analytics-tab, #wilaya-report-tab, [onclick*="analytics-tab"], [onclick*="wilaya-report-tab"]').forEach(el => el.style.display = 'none');
+                }
+                if(!perms.offers) {
+                    document.querySelectorAll('#golden-offers-tab, #ads-mgmt-tab, #social-media-tab, #staff-tab, #settings-tab, [onclick*="golden-offers-tab"], [onclick*="ads-mgmt-tab"], [onclick*="social-media-tab"], [onclick*="staff-tab"], [onclick*="settings-tab"]').forEach(el => el.style.display = 'none');
+                }
+            }
+
             let savedAd = JSON.parse(localStorage.getItem('dz_store_announcement')) || {};
             document.getElementById('admin-ad-text').value = savedAd.text || '';
             document.getElementById('admin-ad-visible').checked = savedAd.visible !== false;
 
             document.getElementById('settings-whatsapp').value = localStorage.getItem('dz_whatsapp_support') || '213700000000';
+            document.getElementById('settings-admin-user').value = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
 
             await loadProductsMap();
             loadGoldenOffersAdmin();
@@ -488,14 +568,13 @@
             try {
                 const snap = await getDocs(collection(db, "orders"));
                 allFetchedOrders = []; ordersCache = {};
-                
-                // فحص الطلبات وتطبيق الفحص التلقائي للطلبات الوهمية (نفس الزبون في نفس اليوم)
+                let now = new Date();
+
                 let tempOrders = [];
                 snap.forEach(d => {
                     tempOrders.push({ id: d.id, ...d.data() });
                 });
 
-                // ترتيب تصاعدي حسب التاريخ للتحقق من التكرار في نفس اليوم
                 tempOrders.sort((a, b) => {
                     let timeA = new Date(a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (a.createdAt || 0));
                     let timeB = new Date(b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (b.createdAt || 0));
@@ -509,7 +588,6 @@
                     let dateStr = dObj.toISOString().split('T')[0];
                     let customerKey = `${(o.phone || '').trim()}_${(o.fullName || '').trim()}_${dateStr}`;
 
-                    // التحقق إذا كان الطلب جديداً وصدر طلب سابق لنفس الشخص في نفس اليوم
                     if(o.status && o.status.includes('جديد') && seenCustomersToday.has(customerKey)) {
                         o.status = 'وهمي ⚠️';
                         await updateDoc(doc(db, "orders", o.id), { status: 'وهمي ⚠️' });
@@ -522,6 +600,7 @@
                 }
 
                 renderOrdersFiltered();
+                loadStaffAdmin(); // تحديث إحصائيات الأعمال المنجزة لطاقم العمل
                 generateWilayaDetailedReport(allFetchedOrders);
                 updateAnalyticsData(allFetchedOrders);
             } catch(e) {}
@@ -564,6 +643,7 @@
 
                 let firstImg = o.cartItems?.[0]?.imageUrl || 'https://via.placeholder.com/50';
                 let fakeBtnHtml = showFakeBtn ? `<button onclick="markAsFake('${o.id}')" style="background:#dc2626; padding:5px 8px; font-size:11px;">وهمي ⚠️</button>` : '';
+                let processedByTxt = o.processedBy ? `<span style="font-size:10px; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px;">👤 بواسطة: ${o.processedBy}</span>` : '';
 
                 container.innerHTML += `
                     <div class="order-strip-card">
@@ -575,6 +655,7 @@
                                     <h4 style="margin:0; font-size:13px; color:#1e293b;">👤 ${o.fullName} (${o.phone})</h4>
                                     <span style="font-size:11px; color:#64748b;">📍 ${o.wilaya || '-'}</span>
                                     <span style="font-size:11px; color:#0284c7;">📅 ${dateStr}</span>
+                                    ${processedByTxt}
                                 </div>
                                 <p style="margin:3px 0 0 0; font-size:12px; color:#475569;">📦 ${o.productName}</p>
                             </div>
@@ -590,7 +671,7 @@
         }
 
         window.markAsFake = async function(id) {
-            await updateDoc(doc(db, "orders", id), { status: 'وهمي ⚠️' });
+            await updateDoc(doc(db, "orders", id), { status: 'وهمي ⚠️', processedBy: currentUsername });
             showAlert('نجاح العملية ✅', 'تم نقل الطلب إلى قسم الطلبات الوهمية بنجاح!');
             loadAllOrders();
         }
@@ -605,9 +686,9 @@
             if(selectedIds.length === 0) { showAlert('تنبيه', 'يرجى تحديد عنصر واحد على الأقل أولاً!'); return; }
 
             for(let id of selectedIds) {
-                await updateDoc(doc(db, "orders", id), { status: targetStatus, [timeField]: new Date().toLocaleString('ar-DZ') });
+                await updateDoc(doc(db, "orders", id), { status: targetStatus, [timeField]: new Date().toLocaleString('ar-DZ'), processedBy: currentUsername });
             }
-            showAlert('نجاح العملية ✅', `تم تحديث ${selectedIds.length} طلب بنجاح!`);
+            showAlert('نجاح العملية ✅', `تم تحديث ${selectedIds.length} طلب بنجاح بواسطة ${currentUsername}!`);
             loadAllOrders();
         }
 
@@ -718,9 +799,9 @@
                     if(pDoc.exists()) await updateDoc(doc(db, "products", pRef.id), { stock: Math.max(0, (pDoc.data().stock || 10) - 1) });
                 }
             }
-            await updateDoc(doc(db, "orders", id), { status: newStatus, [timeField]: new Date().toLocaleString('ar-DZ') });
+            await updateDoc(doc(db, "orders", id), { status: newStatus, [timeField]: new Date().toLocaleString('ar-DZ'), processedBy: currentUsername });
             closeOrderModal();
-            showAlert('نجاح العملية ✅', 'تم تحديث حالة الطلب بنجاح!');
+            showAlert('نجاح العملية ✅', `تم تحديث حالة الطلب بنجاح بواسطة ${currentUsername}!`);
             loadAllOrders();
         }
 
