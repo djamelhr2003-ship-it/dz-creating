@@ -157,7 +157,7 @@
             </div>
         </div>
 
-        <!-- دمـج العروض الخاصة -->
+        <!-- إدارة العروض الخاصة مربوطة بالمنتجات -->
         <div id="golden-offers-tab" class="tab-content">
             <div class="container" style="border: 2px solid #f59e0b;">
                 <h2 style="color: #f59e0b;">⭐ إدارة العروض الخاصة والعداد التنازلي</h2>
@@ -206,7 +206,7 @@
             </div>
         </div>
 
-        <!-- إضافة منتج مع روابط صور متعددة بزر علامة الزائد (+) -->
+        <!-- إضافة منتج مع روابط صور متعددة وفيديوهات -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد ➕</h2>
@@ -276,7 +276,6 @@
         }
         window.closeCenterModal = function() { document.getElementById('centerModal').style.display = 'none'; }
 
-        // إضافة حقل صورة جديد عبر زر علامة الزائد (+)
         window.addImageInput = function(val = '') {
             let container = document.getElementById('image-inputs-container');
             let div = document.createElement('div');
@@ -293,18 +292,24 @@
             container.appendChild(div);
         }
 
-        window.addGoldenOfferForm = function(details = '', oldPrice = '', newPrice = '', endTime = '', visible = true) {
+        window.addGoldenOfferForm = function(productId = '', details = '', oldPrice = '', newPrice = '', endTime = '', visible = true) {
             let container = document.getElementById('golden-offers-container');
+            let productOptions = '<option value="">-- اختر المنتج المشمول بالعرض --</option>';
+            for(let name in productsMap) {
+                productOptions += `<option value="${name}" ${productId === name ? 'selected' : ''}>${name}</option>`;
+            }
+
             let div = document.createElement('div');
             div.className = 'golden-offer-box';
             div.innerHTML = `
-                <div class="form-group"><label>تفاصيل العرض:</label><textarea class="offer-details">${details}</textarea></div>
+                <div class="form-group"><label>المنتج المشمول بالعرض:</label><select class="offer-product-select">${productOptions}</select></div>
+                <div class="form-group"><label>تفاصيل العرض / العنوان:</label><textarea class="offer-details">${details}</textarea></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div class="form-group"><label>السعر القديم:</label><input type="number" class="offer-old-price" value="${oldPrice}"></div>
-                    <div class="form-group"><label>سعر العرض:</label><input type="number" class="offer-new-price" value="${newPrice}"></div>
+                    <div class="form-group"><label>السعر الأصلي:</label><input type="number" class="offer-old-price" value="${oldPrice}"></div>
+                    <div class="form-group"><label>سعر العرض الجديد:</label><input type="number" class="offer-new-price" value="${newPrice}"></div>
                 </div>
-                <div class="form-group"><label>تاريخ الانتهاء:</label><input type="datetime-local" class="offer-end-time" value="${endTime}"></div>
-                <div class="form-group"><label><input type="checkbox" class="offer-visible" ${visible ? 'checked':''}> إظهار العرض</label></div>
+                <div class="form-group"><label>تاريخ ووقت انتهاء العرض:</label><input type="datetime-local" class="offer-end-time" value="${endTime}"></div>
+                <div class="form-group"><label><input type="checkbox" class="offer-visible" ${visible ? 'checked':''}> إظهار العرض في المتجر</label></div>
                 <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="font-size:12px; padding:5px 10px;">حذف العرض 🗑️</button>
             `;
             container.appendChild(div);
@@ -314,6 +319,7 @@
             let offers = [];
             document.querySelectorAll('.golden-offer-box').forEach(box => {
                 offers.push({
+                    productName: box.querySelector('.offer-product-select').value,
                     details: box.querySelector('.offer-details').value,
                     oldPrice: box.querySelector('.offer-old-price').value,
                     newPrice: box.querySelector('.offer-new-price').value,
@@ -322,7 +328,7 @@
                 });
             });
             localStorage.setItem('dz_golden_offers', JSON.stringify(offers));
-            showAlert('نجاح', 'تم حفظ ونشر العروض بنجاح ⭐!');
+            showAlert('نجاح', 'تم حفظ ونشر العروض وتحديث الأسعار بنجاح ⭐!');
         }
 
         function loadGoldenOffersAdmin() {
@@ -330,7 +336,7 @@
             container.innerHTML = '';
             let offers = JSON.parse(localStorage.getItem('dz_golden_offers')) || [];
             if(offers.length === 0) addGoldenOfferForm();
-            else offers.forEach(o => addGoldenOfferForm(o.details, o.oldPrice, o.newPrice, o.endTime, o.visible));
+            else offers.forEach(o => addGoldenOfferForm(o.productName, o.details, o.oldPrice, o.newPrice, o.endTime, o.visible));
         }
 
         window.saveStoreAnnouncement = function() {
@@ -370,8 +376,8 @@
             document.getElementById('admin-ad-text').value = savedAd.text || '';
             document.getElementById('admin-ad-visible').checked = savedAd.visible !== false;
 
-            loadGoldenOffersAdmin();
             await loadProductsMap();
+            loadGoldenOffersAdmin();
             await loadAllOrders();
             loadProducts();
             loadAllReviewsForAdmin();
@@ -459,7 +465,6 @@
             });
         }
 
-        // أزرار الحذف بكفاءة تامة عبر تأكيد كلمة المرور
         window.promptDeleteOrder = function(id, currentStatus) {
             pendingActionType = 'delete_order'; pendingActionId = id; pendingOriginalStatus = currentStatus;
             document.getElementById('admin-action-pass').value = '';
@@ -531,7 +536,7 @@
 
         window.closeOrderModal = function() { document.getElementById('orderModal').style.display = 'none'; }
 
-        window.updateOrderStatus = async function(id, newStatus, timeField, isProcessing = false, isReturn = false, isCancelled = false) {
+        window.updateOrderStatus = async function(id, newStatus, timeField, isProcessing = false) {
             let o = ordersCache[id];
             if(!o) return;
             if(isProcessing && o.status.includes('جديد')) {
@@ -616,11 +621,10 @@
         }
 
         window.updateAnalyticsData = function(orders) {
-            let totalProfit = 0, totalSell = 0, routerLoss = 0;
+            let totalSell = 0, routerLoss = 0;
             orders.forEach(o => {
                 if(o.status && (o.status.includes('مهملات') || o.status.includes('ملغى') || o.status.includes('وهمي'))) return;
-                let sellPrice = (o.finalTotal || 0);
-                totalSell += sellPrice;
+                totalSell += (o.finalTotal || 0);
                 if(o.status && o.status.includes('روتور')) routerLoss += 600;
             });
             document.getElementById('stat-total-profit').innerText = (totalSell - routerLoss) + ' دج';
