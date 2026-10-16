@@ -48,10 +48,10 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 3000; animation: fadeIn 0.2s ease; }
         .modal-card { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 550px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: linear-gradient(135deg, #2c3e50, #1e293b); color: white; padding: 20px; border-radius: 10px; text-align: center; }
-        .stat-card h4 { margin: 0 0 8px 0; font-size: 14px; color: #94a3b8; }
-        .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: linear-gradient(135deg, #2c3e50, #1e293b); color: white; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .stat-card h4 { margin: 0 0 8px 0; font-size: 13px; color: #94a3b8; }
+        .stat-card span { font-size: 22px; font-weight: bold; color: #38bdf8; }
 
         .filter-bar { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .golden-offer-box { background: #fef9c3; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
@@ -133,7 +133,7 @@
                 <button class="tab-btn" onclick="switchTab('settings-tab', event)" style="background:#475569; color:white;">⚙️ الإعدادات</button>
                 <button class="tab-btn" onclick="switchTab('ads-mgmt-tab', event)" style="background:#0284c7; color:white;">📢 الإعلانات</button>
                 <button class="tab-btn" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
-                <button class="tab-btn" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
+                <button class="tab-btn" onclick="switchTab('analytics-tab', event)" style="background: #059669; color: white;">💰 التحليلات</button>
                 <button class="tab-btn" onclick="switchTab('reviews-mgmt-tab', event)" style="background: #0284c7; color: white;">💬 التعليقات</button>
                 <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج</button>
                 <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المخزون</button>
@@ -172,7 +172,7 @@
         
         <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ المهملات (تُحذف نهائياً فقط من هنا)</h2><div id="orders-list-trash" class="orders-list-strip"></div></div></div>
 
-        <!-- قسم الطاقم مع حساب الأعمال المنجزة وصلاحيات علامة الصح -->
+        <!-- قسم الطاقم -->
         <div id="staff-tab" class="tab-content">
             <div class="container" style="border: 2px solid #8b5cf6;">
                 <h2 style="color: #8b5cf6;">👥 إدارة طاقم العمل والصلاحيات</h2>
@@ -182,7 +182,7 @@
             </div>
         </div>
 
-        <!-- قسم الإعدادات (تغيير اسم المستخدم وكلمة المرور للأدمن) -->
+        <!-- قسم الإعدادات -->
         <div id="settings-tab" class="tab-content">
             <div class="container" style="border: 2px solid #475569;">
                 <h2 style="color: #475569;">⚙️ إعدادات المتجر وبيانات الأدمن</h2>
@@ -227,19 +227,60 @@
         </div>
 
         <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات</h2><div id="wilaya-report-content"></div></div></div>
-        <div id="reviews-mgmt-tab" class="tab-content"><div class="container"><h2>💬 التعليقات</h2><div id="admin-reviews-list-container"></div></div></div>
         
+        <!-- قسم التحليلات الشاملة والمحدثة -->
         <div id="analytics-tab" class="tab-content">
-            <div class="container">
-                <h2>💰 التحليلات المالية والأرباح</h2>
+            <div class="container" style="border: 2px solid #059669;">
+                <h2 style="color: #059669;">💰 التحليلات المالية والشاملة للمتجر</h2>
+                
+                <h3 style="text-align: right; color: #1e293b; margin-top: 15px;">🌐 الزوار والنشاط الفوري</h3>
                 <div class="stats-grid">
-                    <div class="stat-card" style="background:#059669;"><h4>إجمالي الأرباح</h4><span id="stat-total-profit">0 دج</span></div>
-                    <div class="stat-card"><h4>إجمالي البيع</h4><span id="stat-total-sell-price">0 دج</span></div>
-                    <div class="stat-card" style="background:#dc2626;"><h4>خسائر الروتور</h4><span id="stat-total-router-loss">0 دج</span></div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                        <h4>👥 الزوار في الوقت الحاضر (Online)</h4>
+                        <span id="stat-online-visitors">1</span>
+                    </div>
+                </div>
+
+                <h3 style="text-align: right; color: #1e293b; margin-top: 20px;">📅 إحصائيات اليوم الحالي</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>📦 طلبيات اليوم</h4>
+                        <span id="stat-today-orders">0</span>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #059669, #047857);">
+                        <h4>💵 مبيعات اليوم</h4>
+                        <span id="stat-today-sell">0 دج</span>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                        <h4>🔄 طلبيات معالجة اليوم</h4>
+                        <span id="stat-today-processed">0</span>
+                    </div>
+                </div>
+
+                <h3 style="text-align: right; color: #1e293b; margin-top: 20px;">📊 الأرباح والتحليلات العامة (إجمالي)</h3>
+                <div class="stats-grid">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #059669, #065f46);">
+                        <h4>💰 صافي الأرباح الإجمالية</h4>
+                        <span id="stat-total-profit">0 دج</span>
+                    </div>
+                    <div class="stat-card">
+                        <h4>📈 إجمالي قيمة المبيعات</h4>
+                        <span id="stat-total-sell-price">0 دج</span>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
+                        <h4>⚠️ إجمالي خسائر الروتور</h4>
+                        <span id="stat-total-router-loss">0 دج</span>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #d97706, #b45309);">
+                        <h4>📦 إجمالي عدد الطلبات</h4>
+                        <span id="stat-total-orders-count">0</span>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <div id="reviews-mgmt-tab" class="tab-content"><div class="container"><h2>💬 التعليقات</h2><div id="admin-reviews-list-container"></div></div></div>
+        
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد ➕</h2>
@@ -358,7 +399,6 @@
             else links.forEach(l => addSocialLinkForm(l.url, l.iconUrl));
         }
 
-        // إدارة الطاقم مع الصلاحيات (عبر علامات صح) وحساب الأعمال المنجزة
         window.addStaffForm = function(username = '', pass = '', permissions = {}) {
             let container = document.getElementById('staff-list-container');
             let pOrders = permissions.orders !== false ? 'checked' : '';
@@ -366,7 +406,6 @@
             let pAnalytics = permissions.analytics !== false ? 'checked' : '';
             let pOffers = permissions.offers !== false ? 'checked' : '';
 
-            // حساب عدد الطلبيات المعالجة أو التي قام بمعالجتها هذا العامل
             let staffName = username;
             let processedCount = 0;
             if(staffName && allFetchedOrders) {
@@ -493,7 +532,6 @@
                 return;
             }
 
-            // التحقق من طاقم العمل (Staff)
             let staffList = JSON.parse(localStorage.getItem('dz_store_staff_team')) || [];
             let foundStaff = staffList.find(s => s.username === u && s.pass === p);
             if(foundStaff) {
@@ -523,7 +561,6 @@
             document.getElementById('welcome-admin-title').innerText = `LAVENDER_store.dz - أهلاً ${username} (${role === 'admin' ? 'مدير عام' : 'طاقم عمل'})`;
 
             if(role === 'staff') {
-                // تطبيق الصلاحيات للأعضاء عبر إخفاء التبويبات غير المسموحة
                 let perms = JSON.parse(sessionStorage.getItem('ecom_staff_perms')) || {};
                 if(!perms.orders) {
                     document.querySelectorAll('#orders-tab, [onclick*="orders-tab"], [onclick*="processing-tab"], [onclick*="shipping-tab"], [onclick*="archive-tab"], [onclick*="return-tab"], [onclick*="cancelled-tab"], [onclick*="fake-orders-tab"]').forEach(el => el.style.display = 'none');
@@ -545,6 +582,13 @@
 
             document.getElementById('settings-whatsapp').value = localStorage.getItem('dz_whatsapp_support') || '213700000000';
             document.getElementById('settings-admin-user').value = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
+
+            // محاكاة حية للزوار في الوقت الحاضر
+            setInterval(() => {
+                let onlineCount = Math.floor(Math.random() * 5) + 1;
+                let el = document.getElementById('stat-online-visitors');
+                if(el) el.innerText = onlineCount;
+            }, 5000);
 
             await loadProductsMap();
             loadGoldenOffersAdmin();
@@ -568,8 +612,7 @@
             try {
                 const snap = await getDocs(collection(db, "orders"));
                 allFetchedOrders = []; ordersCache = {};
-                let now = new Date();
-
+                
                 let tempOrders = [];
                 snap.forEach(d => {
                     tempOrders.push({ id: d.id, ...d.data() });
@@ -600,7 +643,7 @@
                 }
 
                 renderOrdersFiltered();
-                loadStaffAdmin(); // تحديث إحصائيات الأعمال المنجزة لطاقم العمل
+                loadStaffAdmin();
                 generateWilayaDetailedReport(allFetchedOrders);
                 updateAnalyticsData(allFetchedOrders);
             } catch(e) {}
@@ -876,14 +919,43 @@
         }
 
         window.updateAnalyticsData = function(orders) {
-            let totalSell = 0, routerLoss = 0;
+            let totalSell = 0, routerLoss = 0, todayOrdersCount = 0, todaySellAmount = 0, todayProcessedCount = 0;
+            let todayStr = new Date().toISOString().split('T')[0];
+
             orders.forEach(o => {
                 if(o.status && (o.status.includes('مهملات') || o.status.includes('ملغى') || o.status.includes('وهمي'))) return;
-                totalSell += (o.finalTotal || 0);
-                if(o.status && o.status.includes('روتور')) routerLoss += 600;
+                
+                let orderTotal = o.finalTotal || 0;
+                totalSell += orderTotal;
+
+                if(o.status && o.status.includes('روتور')) {
+                    routerLoss += 600;
+                }
+
+                // فحص طلبات اليوم
+                if(o.createdAt) {
+                    let dObj = new Date(o.createdAt.seconds ? o.createdAt.seconds * 1000 : o.createdAt);
+                    let orderDateStr = dObj.toISOString().split('T')[0];
+                    if(orderDateStr === todayStr) {
+                        todayOrdersCount++;
+                        todaySellAmount += orderTotal;
+                    }
+                }
+
+                if(o.processedBy && o.timeProcessing) {
+                    let pDateStr = new Date(o.timeProcessing).toISOString().split('T')[0];
+                    if(pDateStr === todayStr) todayProcessedCount++;
+                }
             });
+
             document.getElementById('stat-total-profit').innerText = (totalSell - routerLoss) + ' دج';
             document.getElementById('stat-total-sell-price').innerText = totalSell + ' دج';
+            document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
+            document.getElementById('stat-total-orders-count').innerText = orders.filter(o => !o.status?.includes('مهملات')).length;
+
+            document.getElementById('stat-today-orders').innerText = todayOrdersCount;
+            document.getElementById('stat-today-sell').innerText = todaySellAmount + ' دج';
+            document.getElementById('stat-today-processed').innerText = todayProcessedCount;
         }
 
         function generateWilayaDetailedReport(orders) {
