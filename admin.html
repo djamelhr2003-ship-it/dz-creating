@@ -390,4 +390,369 @@
         }
         window.closeCenterModal = function() { document.getElementById('centerModal').style.display = 'none'; }
 
-        window.addVideoInput = function
+        window.addVideoInput = function(val = '') {
+            let container = document.getElementById('video-inputs-container');
+            let div = document.createElement('div');
+            div.style.cssText = 'display:flex; gap:5px; margin-bottom:5px;';
+            div.innerHTML = `<input type="text" class="prod-video-input" value="${val}" placeholder="رابط فيديو 1080p إضافي"><button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف ❌</button>`;
+            container.appendChild(div);
+        }
+
+        window.addGoldenOfferForm = function(details = '', oldPrice = '', newPrice = '', endTime = '', visible = true) {
+            let container = document.getElementById('golden-offers-container');
+            let div = document.createElement('div');
+            div.className = 'golden-offer-box';
+            div.innerHTML = `
+                <div class="form-group"><label>تفاصيل العرض:</label><textarea class="offer-details">${details}</textarea></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="form-group"><label>السعر القديم:</label><div class="price-old-wrapper"><input type="number" class="offer-old-price" value="${oldPrice}"></div></div>
+                    <div class="form-group"><label>سعر العرض:</label><div class="price-new-wrapper"><input type="number" class="offer-new-price" value="${newPrice}"></div></div>
+                </div>
+                <div class="form-group"><label>تاريخ ووقت انتهاء العرض:</label><input type="datetime-local" class="offer-end-time" value="${endTime}"></div>
+                <div class="form-group"><label><input type="checkbox" class="offer-visible" ${visible ? 'checked':''}> إظهار العرض للزوار</label></div>
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="font-size:12px; padding:5px 10px;">حذف العرض 🗑️</button>
+            `;
+            container.appendChild(div);
+        }
+
+        window.saveGoldenOffers = function() {
+            let offers = [];
+            document.querySelectorAll('.golden-offer-box').forEach(box => {
+                offers.push({
+                    details: box.querySelector('.offer-details').value,
+                    oldPrice: box.querySelector('.offer-old-price').value,
+                    newPrice: box.querySelector('.offer-new-price').value,
+                    endTime: box.querySelector('.offer-end-time').value,
+                    visible: box.querySelector('.offer-visible').checked
+                });
+            });
+            localStorage.setItem('dz_golden_offers', JSON.stringify(offers));
+            showAlert('نجاح', 'تم حفظ ونشر العروض الخاصة بنجاح ⭐!');
+        }
+
+        function loadGoldenOffersAdmin() {
+            let container = document.getElementById('golden-offers-container');
+            container.innerHTML = '';
+            let offers = JSON.parse(localStorage.getItem('dz_golden_offers')) || [];
+            if(offers.length === 0) {
+                addGoldenOfferForm();
+            } else {
+                offers.forEach(o => addGoldenOfferForm(o.details, o.oldPrice, o.newPrice, o.endTime, o.visible));
+            }
+        }
+
+        window.saveStoreAnnouncement = function() {
+            let text = document.getElementById('admin-ad-text').value;
+            let visible = document.getElementById('admin-ad-visible').checked;
+            localStorage.setItem('dz_store_announcement', JSON.stringify({ text, visible }));
+            showAlert('نجاح', 'تم حفظ الإعلان ونشره بنجاح 📢!');
+        }
+
+        window.checkLogin = function() {
+            let u = document.getElementById('login-username').value.trim();
+            let p = document.getElementById('login-pass').value.trim();
+            let currentAdminUser = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
+            let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
+
+            if(u === currentAdminUser && p === currentAdminPass) {
+                sessionStorage.setItem('ecom_logged_user', u);
+                sessionStorage.setItem('ecom_is_admin', 'true');
+                sessionStorage.setItem('ecom_permissions', JSON.stringify({ process: true, addProd: true, del: true }));
+                initDashboard(u, true, { process: true, addProd: true, del: true });
+                return;
+            }
+
+            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
+            if(staffList[u] && staffList[u].password === p) {
+                sessionStorage.setItem('ecom_logged_user', u);
+                sessionStorage.setItem('ecom_is_admin', 'false');
+                sessionStorage.setItem('ecom_permissions', JSON.stringify(staffList[u].permissions));
+                initDashboard(u, false, staffList[u].permissions);
+                return;
+            }
+            document.getElementById('login-error').innerText = 'خطأ في اسم المستخدم أو كلمة المرور!';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            let user = sessionStorage.getItem('ecom_logged_user');
+            if(user) {
+                let isAdmin = sessionStorage.getItem('ecom_is_admin') === 'true';
+                let perms = JSON.parse(sessionStorage.getItem('ecom_permissions')) || { process: true, addProd: true, del: isAdmin };
+                initDashboard(user, isAdmin, perms);
+            }
+        });
+
+        async function initDashboard(user, isAdmin, perms) {
+            loggedInUser = user;
+            isUserAdmin = isAdmin;
+            staffPermissions = perms;
+            document.getElementById('login-box').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+            document.getElementById('welcome-role').innerText = `${user} (${isAdmin ? 'أدمن' : 'موظف'})`;
+            
+            document.getElementById('setting-admin-user').value = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
+            document.getElementById('setting-admin-pass').value = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
+            document.getElementById('setting-whatsapp-num').value = localStorage.getItem('dz_whatsapp_support') || '213700000000';
+
+            let savedAd = JSON.parse(localStorage.getItem('dz_store_announcement')) || {};
+            document.getElementById('admin-ad-text').value = savedAd.text || '';
+            document.getElementById('admin-ad-visible').checked = savedAd.visible !== false;
+
+            loadGoldenOffersAdmin();
+            await loadProductsMap();
+            await loadAllOrders();
+            loadProducts();
+            loadStaffList();
+            loadAllReviewsForAdmin();
+
+            setInterval(loadAllOrdersInBackground, 10000);
+        }
+
+        window.switchTab = function(tabId, event) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if(event && event.currentTarget) event.currentTarget.classList.add('active');
+        }
+
+        window.logout = function() {
+            sessionStorage.clear();
+            location.reload();
+        }
+
+        async function loadAllOrders() {
+            try {
+                const snap = await getDocs(collection(db, "orders"));
+                allFetchedOrders = [];
+                ordersCache = {};
+                let now = new Date();
+
+                for(let d of snap.docs) {
+                    const o = { id: d.id, ...d.data() };
+                    if(o.status && o.status.includes('مهملات') && o.trashTime) {
+                        let trashDate = new Date(o.trashTime);
+                        if((now - trashDate) / (1000 * 60 * 60) >= 48) {
+                            await deleteDoc(doc(db, "orders", d.id));
+                            continue;
+                        }
+                    }
+                    ordersCache[o.id] = o;
+                    allFetchedOrders.push(o);
+                }
+                renderOrdersFiltered();
+            } catch(e) {}
+        }
+
+        async function loadAllOrdersInBackground() {
+            try {
+                const snap = await getDocs(collection(db, "orders"));
+                if(snap.docs.length > lastOrdersCount) loadAllOrders();
+            } catch(e) {}
+        }
+
+        window.resetFilter = function(type) {
+            document.getElementById(`search-${type}`).value = '';
+            document.getElementById(`date-${type}`).value = '';
+            renderOrdersFiltered();
+        }
+
+        window.renderOrdersFiltered = function() {
+            renderList('new', 'orders-list-new', 'جديد ⏳');
+            renderList('fake', 'orders-list-fake', 'وهمي ⚠️');
+            renderList('proc', 'orders-list-processing', 'قيد المعالجة 🔄');
+            renderList('ship', 'orders-list-shipping', 'جاري التوصيل 🚚');
+            renderList('arch', 'orders-list-archive', 'أرشيف (مسلم) ✅');
+            renderList('ret', 'orders-list-return', 'مرتجع (روتور) ⚠️');
+            renderList('canc', 'orders-list-cancelled', 'ملغى ❌');
+            renderTrashList();
+        }
+
+        function renderList(type, elementId, targetStatusKeyword) {
+            let container = document.getElementById(elementId);
+            if(!container) return;
+            container.innerHTML = '';
+            allFetchedOrders.forEach(o => {
+                const status = o.status || 'جديد ⏳';
+                if(!status.includes(targetStatusKeyword)) return;
+                container.innerHTML += `
+                    <div class="order-mini-card">
+                        <div style="cursor:pointer; flex:1;" onclick="openOrderModal('${o.id}')">
+                            <h4 style="margin:0 0 2px 0; font-size:13px;">👤 ${o.fullName}</h4>
+                            <p style="margin:0; font-size:11px;">📦 ${o.productName}</p>
+                            <p style="margin:0; color:#ef4444; font-weight:bold; font-size:12px;">${o.finalTotal || 0} دج</p>
+                        </div>
+                        <div><button onclick="promptDeleteOrder('${o.id}', '${status}')" class="btn-danger" style="padding:5px; font-size:11px;">حذف 🗑️</button></div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderTrashList() {
+            let container = document.getElementById('orders-list-trash');
+            if(!container) return;
+            container.innerHTML = '';
+            allFetchedOrders.forEach(o => {
+                if(!o.status?.includes('مهملات')) return;
+                container.innerHTML += `
+                    <div class="order-mini-card">
+                        <div><h4 style="margin:0;">👤 ${o.fullName}</h4><p style="margin:0; font-size:11px;">📦 ${o.productName}</p></div>
+                        <div style="width:100px;"><button onclick="restoreOrder('${o.id}')" style="background:#10b981; padding:5px; font-size:11px; width:100%; margin-bottom:4px;">استعادة ♻️</button><button onclick="permanentDelete('${o.id}')" class="btn-danger" style="padding:5px; font-size:11px; width:100%;">حذف نهائي ❌</button></div>
+                    </div>
+                `;
+            });
+        }
+
+        window.promptDeleteOrder = function(id, currentStatus) {
+            pendingActionType = 'delete_order';
+            pendingActionId = id;
+            pendingOriginalStatus = currentStatus;
+            document.getElementById('admin-action-pass').value = '';
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        window.confirmAdminAction = async function() {
+            let enteredPass = document.getElementById('admin-action-pass').value.trim();
+            let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
+            if(enteredPass !== currentAdminPass) { alert('كلمة المرور غير صحيحة!'); return; }
+            document.getElementById('passwordModal').style.display = 'none';
+
+            if(pendingActionType === 'delete_order') {
+                await updateDoc(doc(db, "orders", pendingActionId), { status: `مهملات | ${pendingOriginalStatus}`, trashTime: new Date().toISOString() });
+                loadAllOrders();
+            } else if(pendingActionType === 'delete_product') {
+                await updateDoc(doc(db, "products", pendingActionId), { status: 'مهملات', trashTime: new Date().toISOString() });
+                loadProducts();
+            }
+        }
+
+        window.restoreOrder = async function(id) {
+            let o = ordersCache[id];
+            if(!o) return;
+            let originalStatus = o.status.split('|')[1]?.trim() || 'جديد ⏳';
+            await updateDoc(doc(db, "orders", id), { status: originalStatus, trashTime: null });
+            loadAllOrders();
+        }
+
+        window.permanentDelete = async function(id) {
+            await deleteDoc(doc(db, "orders", id));
+            loadAllOrders();
+        }
+
+        window.openOrderModal = function(id) {
+            const o = ordersCache[id];
+            if(!o) return;
+            document.getElementById('orderDetailsContent').innerHTML = `<b>👤 الزبون:</b> ${o.fullName}<br><b>📞 الهاتف:</b> ${o.phone}<br><b>📦 الطلب:</b> ${o.productName}<br><b>💰 المجموع:</b> ${o.finalTotal} دج`;
+            document.getElementById('orderModal').style.display = 'flex';
+        }
+        window.closeOrderModal = function() { document.getElementById('orderModal').style.display = 'none'; }
+
+        window.addProduct = async function() {
+            let name = document.getElementById('prod-name').value.trim();
+            let category = document.getElementById('prod-category').value;
+            let colors = document.getElementById('prod-colors').value.trim();
+            let sizes = document.getElementById('prod-sizes').value.trim();
+            let buyPrice = Number(document.getElementById('prod-buy-price').value) || 0;
+            let price = Number(document.getElementById('prod-price').value) || 0;
+            let stock = Number(document.getElementById('prod-stock').value) || 10;
+            let description = document.getElementById('prod-desc').value.trim();
+            
+            let videoUrls = [];
+            document.querySelectorAll('.prod-video-input').forEach(input => {
+                if(input.value.trim()) videoUrls.push(input.value.trim());
+            });
+
+            if(!name || !price) { showAlert('تنبيه', 'أدخل اسم المنتج وسعر البيع!'); return; }
+
+            await addDoc(collection(db, "products"), {
+                name, category, colors, sizes, buyPrice, price, stock, description, videoUrls, createdAt: new Date()
+            });
+            showAlert('نجاح', 'تم نشر المنتج بنجاح مع الفيديوهات والمواصفات!');
+            loadProducts();
+            loadProductsMap();
+        }
+
+        async function loadProductsMap() {
+            try {
+                const snap = await getDocs(collection(db, "products"));
+                productsMap = {}; productsFullCache = {};
+                snap.forEach(d => {
+                    const p = d.data();
+                    productsFullCache[d.id] = p;
+                    productsMap[p.name] = { id: d.id, buyPrice: p.buyPrice || 0, stock: p.stock !== undefined ? p.stock : 10 };
+                });
+            } catch(e) {}
+        }
+
+        async function loadProducts() {
+            const list = document.getElementById('products-list');
+            const snap = await getDocs(collection(db, "products"));
+            list.innerHTML = '';
+            snap.forEach(d => {
+                const p = d.data();
+                if(p.status === 'مهملات') return;
+                list.innerHTML += `
+                    <div style="background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <span><b>${p.name}</b> (${p.category || 'عام'}) - السعر: ${p.price} دج | 📦 المخزون: <b>${p.stock}</b></span>
+                        <div style="display:flex; gap:6px;">
+                            <button onclick="openEditProductModal('${d.id}')" class="btn-warning" style="padding:4px 10px; font-size:12px;">تعديل ✏️</button>
+                            <button onclick="promptDeleteProduct('${d.id}')" class="btn-danger" style="padding:4px 10px; font-size:12px;">حذف 🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.openEditProductModal = function(id) {
+            let p = productsFullCache[id];
+            if(!p) return;
+            document.getElementById('edit-prod-id').value = id;
+            document.getElementById('edit-prod-name').value = p.name || '';
+            document.getElementById('edit-prod-category').value = p.category || 'ميكب العناية والتجميل';
+            document.getElementById('edit-prod-colors').value = p.colors || '';
+            document.getElementById('edit-prod-sizes').value = p.sizes || '';
+            document.getElementById('edit-prod-buy-price').value = p.buyPrice || 0;
+            document.getElementById('edit-prod-price').value = p.price || 0;
+            document.getElementById('edit-prod-stock').value = p.stock !== undefined ? p.stock : 10;
+            document.getElementById('editProductModal').style.display = 'flex';
+        }
+
+        window.saveProductEdits = async function() {
+            let id = document.getElementById('edit-prod-id').value;
+            let name = document.getElementById('edit-prod-name').value.trim();
+            let category = document.getElementById('edit-prod-category').value;
+            let colors = document.getElementById('edit-prod-colors').value.trim();
+            let sizes = document.getElementById('edit-prod-sizes').value.trim();
+            let buyPrice = Number(document.getElementById('edit-prod-buy-price').value) || 0;
+            let price = Number(document.getElementById('edit-prod-price').value) || 0;
+            let stock = Number(document.getElementById('edit-prod-stock').value) || 0;
+
+            await updateDoc(doc(db, "products", id), { name, category, colors, sizes, buyPrice, price, stock });
+            document.getElementById('editProductModal').style.display = 'none';
+            showAlert('نجاح', 'تم تحديث المنتج بنجاح 💾!');
+            loadProducts();
+            loadProductsMap();
+        }
+
+        window.promptDeleteProduct = function(id) {
+            pendingActionType = 'delete_product';
+            pendingActionId = id;
+            document.getElementById('admin-action-pass').value = '';
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        window.updateAdminSettings = function() {
+            let u = document.getElementById('setting-admin-user').value.trim();
+            let p = document.getElementById('setting-admin-pass').value.trim();
+            let wa = document.getElementById('setting-whatsapp-num').value.trim();
+            if(!u || !p || !wa) { alert('أدخل الحقول كاملة!'); return; }
+            localStorage.setItem('dz_custom_admin_user', u);
+            localStorage.setItem('dz_custom_admin_pass', p);
+            localStorage.setItem('dz_whatsapp_support', wa);
+            showAlert('نجاح', 'تم تحديث الإعدادات بنجاح 💾!');
+        }
+
+        window.loadAllReviewsForAdmin = function() {}
+        window.loadStaffList = function() {}
+    </script>
+</body>
+</html>
