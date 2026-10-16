@@ -37,7 +37,6 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-        /* تنسيق مدمج وموفر للمساحة لبطاقات الطلبات */
         .orders-list-strip { display: flex; flex-direction: column; gap: 6px; }
         .order-strip-card { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; transition: 0.2s; width: 100%; }
         .order-strip-card:hover { border-color: #2563eb; background: #f8fafc; }
@@ -50,7 +49,7 @@
         .order-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #f1f5f9; color: #475569; display: inline-flex; align-items: center; gap: 3px; }
         .order-prod-desc { font-size: 11px; color: #64748b; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        .order-actions-side { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .order-actions-side { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
         .order-price-tag { color: #e11d48; font-weight: bold; font-size: 13px; white-space: nowrap; }
 
         .wilaya-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
@@ -80,6 +79,30 @@
             <h3 id="modalTitle" style="color: #2563eb; margin-top:0;">⚠️ تنبيه النظام</h3>
             <p id="modalMessage" style="color: #475569; font-size: 14px; line-height: 1.5;"></p>
             <button onclick="closeCenterModal()" style="margin-top: 12px; background: #2563eb; width: 100%;">فهمت ✅</button>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل المنتج -->
+    <div class="modal-overlay" id="editProductModal">
+        <div class="modal-card">
+            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; color: #2563eb;">✏️ تعديل المنتج والمخزون</h3>
+            <input type="hidden" id="edit-prod-id">
+            <div class="form-group"><label>اسم المنتج:</label><input type="text" id="edit-prod-name"></div>
+            <div class="form-group"><label>الصنف:</label>
+                <select id="edit-prod-category">
+                    <option value="ميكب العناية والتجميل">ميكب العناية والتجميل</option>
+                    <option value="ألبسة وملابس">ألبسة وملابس</option>
+                    <option value="أكسسوارات">أكسسوارات</option>
+                </select>
+            </div>
+            <div class="form-group"><label>سعر الشراء:</label><input type="number" id="edit-prod-buy-price"></div>
+            <div class="form-group"><label>سعر البيع (دج):</label><input type="number" id="edit-prod-price"></div>
+            <div class="form-group"><label>المخزون:</label><input type="number" id="edit-prod-stock"></div>
+            <div class="form-group"><label>الوصف:</label><textarea id="edit-prod-desc"></textarea></div>
+            <div style="display: flex; gap: 8px; margin-top: 15px;">
+                <button onclick="updateProductData()" style="flex: 1; background: #27ae60;">حفظ التعديلات 💾</button>
+                <button onclick="closeEditProductModal()" class="btn-secondary" style="flex: 1; background: #64748b;">إلغاء ❌</button>
+            </div>
         </div>
     </div>
 
@@ -1017,12 +1040,51 @@
                 list.innerHTML += `
                     <div style="background:#f8fafc; padding:8px 12px; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
                         <span style="font-size:12px;"><b>${p.name}</b> - السعر: ${p.price} دج | 📦 المخزون: <b>${p.stock}</b></span>
-                        <div>
+                        <div style="display:flex; gap:4px;">
+                            <button onclick="openEditProductModal('${d.id}')" style="background:#2563eb; padding:3px 8px; font-size:11px;">تعديل ✏️</button>
                             <button onclick="promptDeleteProduct('${d.id}')" class="btn-danger" style="padding:3px 8px; font-size:11px;">حذف 🗑️</button>
                         </div>
                     </div>
                 `;
             });
+        }
+
+        window.openEditProductModal = function(id) {
+            let p = productsFullCache[id];
+            if(!p) return;
+            document.getElementById('edit-prod-id').value = id;
+            document.getElementById('edit-prod-name').value = p.name || '';
+            document.getElementById('edit-prod-category').value = p.category || 'ميكب العناية والتجميل';
+            document.getElementById('edit-prod-buy-price').value = p.buyPrice || 0;
+            document.getElementById('edit-prod-price').value = p.price || 0;
+            document.getElementById('edit-prod-stock').value = p.stock !== undefined ? p.stock : 10;
+            document.getElementById('edit-prod-desc').value = p.description || '';
+            document.getElementById('editProductModal').style.display = 'flex';
+        }
+
+        window.closeEditProductModal = function() {
+            document.getElementById('editProductModal').style.display = 'none';
+        }
+
+        window.updateProductData = async function() {
+            let id = document.getElementById('edit-prod-id').value;
+            let name = document.getElementById('edit-prod-name').value.trim();
+            let category = document.getElementById('edit-prod-category').value;
+            let buyPrice = Number(document.getElementById('edit-prod-buy-price').value) || 0;
+            let price = Number(document.getElementById('edit-prod-price').value) || 0;
+            let stock = Number(document.getElementById('edit-prod-stock').value) || 0;
+            let description = document.getElementById('edit-prod-desc').value.trim();
+
+            if(!name || !price) { showAlert('تنبيه', 'يرجى إدخال اسم المنتج وسعر البيع!'); return; }
+
+            await updateDoc(doc(db, "products", id), {
+                name, category, buyPrice, price, stock, description
+            });
+
+            closeEditProductModal();
+            showAlert('نجاح العملية ✅', 'تم تحديث بيانات المنتج والمخزون بنجاح!');
+            loadProducts();
+            loadProductsMap();
         }
 
         window.loadAllReviewsForAdmin = function() {
