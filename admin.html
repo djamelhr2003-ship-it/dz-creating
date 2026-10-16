@@ -326,7 +326,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // الإعدادات الحقيقية لـ Firebase الخاصة بك
         const firebaseConfig = {
             apiKey: "AIzaSyDdJY7mI1DOMKh7zTJs_Ve3d4Xp1YBdMYI",
             authDomain: "creater-ecom.firebaseapp.com",
@@ -398,6 +397,7 @@
 
         function loadSocialLinksAdmin() {
             let container = document.getElementById('social-links-container');
+            if(!container) return;
             container.innerHTML = '';
             let links = JSON.parse(localStorage.getItem('dz_social_links')) || [];
             if(links.length === 0) addSocialLinkForm();
@@ -406,6 +406,7 @@
 
         window.addStaffForm = function(username = '', pass = '', permissions = {}) {
             let container = document.getElementById('staff-list-container');
+            if(!container) return;
             let pOrders = permissions.orders !== false ? 'checked' : '';
             let pProducts = permissions.products !== false ? 'checked' : '';
             let pAnalytics = permissions.analytics !== false ? 'checked' : '';
@@ -459,6 +460,7 @@
 
         function loadStaffAdmin() {
             let container = document.getElementById('staff-list-container');
+            if(!container) return;
             container.innerHTML = '';
             let staff = JSON.parse(localStorage.getItem('dz_store_staff_team')) || [];
             if(staff.length === 0) addStaffForm();
@@ -479,6 +481,7 @@
 
         window.addGoldenOfferForm = function(productId = '', details = '', oldPrice = '', newPrice = '', endTime = '', visible = true) {
             let container = document.getElementById('golden-offers-container');
+            if(!container) return;
             let productOptions = '<option value="">-- اختر المنتج المشمول بالعرض --</option>';
             for(let name in productsMap) {
                 productOptions += `<option value="${name}" ${productId === name ? 'selected' : ''}>${name}</option>`;
@@ -498,6 +501,15 @@
                 <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="font-size:12px; padding:5px 10px;">حذف العرض 🗑️</button>
             `;
             container.appendChild(div);
+        }
+
+        function loadGoldenOffersAdmin() {
+            let container = document.getElementById('golden-offers-container');
+            if(!container) return;
+            container.innerHTML = '';
+            let offers = JSON.parse(localStorage.getItem('dz_golden_offers')) || [];
+            if(offers.length === 0) addGoldenOfferForm();
+            else offers.forEach(o => addGoldenOfferForm(o.productName, o.details, o.oldPrice, o.newPrice, o.endTime, o.visible));
         }
 
         window.saveGoldenOffers = function() {
@@ -623,46 +635,33 @@
                 });
 
                 tempOrders.sort((a, b) => {
-                    let timeA = new Date(a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (a.createdAt || 0));
-                    let timeB = new Date(b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (b.createdAt || 0));
-                    return timeA - timeB;
+                    let timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (new Date(a.createdAt || 0).getTime());
+                    let timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (new Date(b.createdAt || 0).getTime());
+                    return timeB - timeA;
                 });
 
-                let seenCustomersToday = new Set();
-
                 for(let o of tempOrders) {
-                    let dObj = new Date(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || Date.now()));
-                    let dateStr = dObj.toISOString().split('T')[0];
-                    let customerKey = `${(o.phone || '').trim()}_${(o.fullName || '').trim()}_${dateStr}`;
-
-                    if(o.status && o.status.includes('جديد') && seenCustomersToday.has(customerKey)) {
-                        o.status = 'وهمي ⚠️';
-                        await updateDoc(doc(db, "orders", o.id), { status: 'وهمي ⚠️' });
-                    } else {
-                        seenCustomersToday.add(customerKey);
-                    }
-
                     ordersCache[o.id] = o;
                     allFetchedOrders.push(o);
                 }
 
                 renderOrdersFiltered();
-                loadStaffAdmin();
                 generateWilayaDetailedReport(allFetchedOrders);
                 updateAnalyticsData(allFetchedOrders);
             } catch(e) {
-                console.error(e);
+                console.error("Error fetching orders:", e);
+                document.getElementById('orders-list-new').innerHTML = '<p style="text-align:center; color:red;">حدث خطأ أثناء الاتصال بقاعدة البيانات أو لا توجد طلبيات بعد.</p>';
             }
         }
 
         window.renderOrdersFiltered = function() {
-            renderList('new', 'orders-list-new', 'جديد ⏳', 'search-new', 'date-new', true);
-            renderList('fake', 'orders-list-fake', 'وهمي ⚠️', 'search-fake', 'date-fake', false);
-            renderList('proc', 'orders-list-processing', 'قيد المعالجة 🔄', 'search-proc', 'date-proc', false);
-            renderList('ship', 'orders-list-shipping', 'جاري التوصيل 🚚', 'search-ship', 'date-ship', false);
-            renderList('arch', 'orders-list-archive', 'أرشيف (مسلم) ✅', 'search-arch', 'date-arch', false);
-            renderList('ret', 'orders-list-return', 'مرتجع (روتور) ⚠️', 'search-ret', 'date-ret', false);
-            renderList('canc', 'orders-list-cancelled', 'ملغى ❌', 'search-canc', 'date-canc', false);
+            renderList('new', 'orders-list-new', 'جديد', 'search-new', 'date-new', true);
+            renderList('fake', 'orders-list-fake', 'وهمي', 'search-fake', 'date-fake', false);
+            renderList('proc', 'orders-list-processing', 'معالجة', 'search-proc', 'date-proc', false);
+            renderList('ship', 'orders-list-shipping', 'توصيل', 'search-ship', 'date-ship', false);
+            renderList('arch', 'orders-list-archive', 'أرشيف', 'search-arch', 'date-arch', false);
+            renderList('ret', 'orders-list-return', 'روتور', 'search-ret', 'date-ret', false);
+            renderList('canc', 'orders-list-cancelled', 'ملغى', 'search-canc', 'date-canc', false);
             renderTrashList();
         }
 
@@ -674,22 +673,26 @@
             let query = document.getElementById(searchInputId)?.value.toLowerCase() || '';
             let selectedDate = document.getElementById(dateInputId)?.value || '';
 
+            let count = 0;
             allFetchedOrders.forEach(o => {
                 const status = o.status || 'جديد ⏳';
                 if(!status.includes(targetStatusKeyword)) return;
 
                 let matchQuery = !query || o.fullName?.toLowerCase().includes(query) || o.phone?.includes(query) || o.productName?.toLowerCase().includes(query);
                 let matchDate = true;
-                let dateStr = '';
+                let dateStr = 'غير محدد';
                 if(o.createdAt) {
                     let dObj = new Date(o.createdAt.seconds ? o.createdAt.seconds * 1000 : o.createdAt);
-                    dateStr = dObj.toLocaleDateString('ar-DZ') + ' ' + dObj.toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'});
-                    let orderDateOnly = dObj.toISOString().split('T')[0];
-                    if(selectedDate && orderDateOnly !== selectedDate) matchDate = false;
+                    if(!isNaN(dObj.getTime())) {
+                        dateStr = dObj.toLocaleDateString('ar-DZ') + ' ' + dObj.toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'});
+                        let orderDateOnly = dObj.toISOString().split('T')[0];
+                        if(selectedDate && orderDateOnly !== selectedDate) matchDate = false;
+                    }
                 }
 
                 if(!matchQuery || !matchDate) return;
 
+                count++;
                 let firstImg = o.cartItems?.[0]?.imageUrl || 'https://via.placeholder.com/50';
                 let fakeBtnHtml = showFakeBtn ? `<button onclick="markAsFake('${o.id}')" style="background:#dc2626; padding:5px 8px; font-size:11px;">وهمي ⚠️</button>` : '';
                 let processedByTxt = o.processedBy ? `<span style="font-size:10px; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px;">👤 بواسطة: ${o.processedBy}</span>` : '';
@@ -701,12 +704,12 @@
                             <img src="${firstImg}" class="order-strip-thumb" style="cursor:pointer;" onclick="openOrderModal('${o.id}')">
                             <div style="cursor:pointer; flex:1;" onclick="openOrderModal('${o.id}')">
                                 <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                                    <h4 style="margin:0; font-size:13px; color:#1e293b;">👤 ${o.fullName} (${o.phone})</h4>
+                                    <h4 style="margin:0; font-size:13px; color:#1e293b;">👤 ${o.fullName || 'بدون اسم'} (${o.phone || '-'})</h4>
                                     <span style="font-size:11px; color:#64748b;">📍 ${o.wilaya || '-'}</span>
                                     <span style="font-size:11px; color:#0284c7;">📅 ${dateStr}</span>
                                     ${processedByTxt}
                                 </div>
-                                <p style="margin:3px 0 0 0; font-size:12px; color:#475569;">📦 ${o.productName}</p>
+                                <p style="margin:3px 0 0 0; font-size:12px; color:#475569;">📦 ${o.productName || 'طلب متنوع'}</p>
                             </div>
                         </div>
                         <div style="display:flex; gap:8px; align-items:center;">
@@ -717,6 +720,10 @@
                     </div>
                 `;
             });
+
+            if(count === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#64748b; font-size:13px; padding:10px;">لا توجد طلبات في هذا القسم حالياً.</p>';
+            }
         }
 
         window.markAsFake = async function(id) {
@@ -745,11 +752,13 @@
             let container = document.getElementById('orders-list-trash');
             if(!container) return;
             container.innerHTML = '';
+            let count = 0;
             allFetchedOrders.forEach(o => {
                 if(!o.status?.includes('مهملات')) return;
+                count++;
                 container.innerHTML += `
                     <div class="order-strip-card">
-                        <div><h4 style="margin:0; font-size:13px;">👤 ${o.fullName} (${o.phone})</h4><p style="margin:0; font-size:11px;">📦 ${o.productName}</p></div>
+                        <div><h4 style="margin:0; font-size:13px;">👤 ${o.fullName || 'بدون اسم'} (${o.phone || '-'})</h4><p style="margin:0; font-size:11px;">📦 ${o.productName || '-'}</p></div>
                         <div style="display:flex; gap:5px;">
                             <button onclick="restoreOrder('${o.id}')" style="background:#10b981; padding:5px 10px; font-size:11px;">استعادة ♻️</button>
                             <button onclick="promptPermanentDelete('${o.id}')" class="btn-danger" style="padding:5px 10px; font-size:11px;">حذف نهائي ❌</button>
@@ -757,6 +766,7 @@
                     </div>
                 `;
             });
+            if(count === 0) container.innerHTML = '<p style="text-align:center; color:#64748b; font-size:13px; padding:10px;">سلة المهملات فارغة.</p>';
         }
 
         window.promptDeleteOrder = function(id, currentStatus) {
@@ -813,25 +823,25 @@
             let itemsHtml = '';
             if(o.cartItems) {
                 o.cartItems.forEach(item => {
-                    itemsHtml += `<div style="display:flex; gap:10px; align-items:center; background:#f8fafc; padding:6px; border-radius:6px; margin-bottom:5px;"><img src="${item.imageUrl}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"><div><b>${item.productName}</b> (${item.price} دج × ${item.quantity})</div></div>`;
+                    itemsHtml += `<div style="display:flex; gap:10px; align-items:center; background:#f8fafc; padding:6px; border-radius:6px; margin-bottom:5px;"><img src="${item.imageUrl || 'https://via.placeholder.com/40'}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"><div><b>${item.productName || item.name}</b> (${item.price || 0} دج × ${item.quantity || 1})</div></div>`;
                 });
             }
             document.getElementById('orderDetailsContent').innerHTML = `
-                <b>👤 الاسم:</b> ${o.fullName}<br>
-                <b>📞 الهاتف:</b> ${o.phone}<br>
+                <b>👤 الاسم:</b> ${o.fullName || 'غير محدد'}<br>
+                <b>📞 الهاتف:</b> ${o.phone || 'غير محدد'}<br>
                 <b>📍 الولاية:</b> ${o.wilaya || '-'}<br>
                 <b>🏘️ البلدية:</b> ${o.commune || '-'}<br>
                 <b>🚚 التوصيل:</b> ${o.deliveryType || '-'}<br>
                 <b>📝 الملاحظات:</b> <span style="color:#d97706;">${o.notes || 'لا توجد ملاحظات'}</span><br>
-                <b>💰 المجموع:</b> <span style="color:#e11d48; font-weight:bold;">${o.finalTotal} دج</span><br>
-                <div style="margin-top:10px;"><b>المنتجات:</b> ${itemsHtml}</div>
+                <b>💰 المجموع:</b> <span style="color:#e11d48; font-weight:bold;">${o.finalTotal || 0} دج</span><br>
+                <div style="margin-top:10px;"><b>المنتجات:</b> ${itemsHtml || 'لا توجد بيانات تفصيلية للمنتجات'}</div>
             `;
             document.getElementById('orderModalActions').innerHTML = `
                 <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', true)" style="background:#2563eb;">معالجة 🔄</button>
                 <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">التوصيل 🚚</button>
                 <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">أرشيف ✅</button>
-                <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn', false, true)" style="background:#b45309;">روتور ⚠️</button>
-                <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled', false, false, true)" class="btn-danger">ملغى ❌</button>
+                <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309;">روتور ⚠️</button>
+                <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled')" class="btn-danger">ملغى ❌</button>
             `;
             document.getElementById('orderModal').style.display = 'flex';
         }
@@ -841,7 +851,7 @@
         window.updateOrderStatus = async function(id, newStatus, timeField, isProcessing = false) {
             let o = ordersCache[id];
             if(!o) return;
-            if(isProcessing && o.status.includes('جديد')) {
+            if(isProcessing && o.status && o.status.includes('جديد') && o.productName) {
                 let pRef = productsMap[o.productName.split('(')[0].trim()];
                 if(pRef && pRef.id) {
                     let pDoc = await getDoc(doc(db, "products", pRef.id));
@@ -893,6 +903,7 @@
 
         async function loadProducts() {
             const list = document.getElementById('products-list');
+            if(!list) return;
             const snap = await getDocs(collection(db, "products"));
             list.innerHTML = '';
             snap.forEach(d => {
@@ -931,7 +942,7 @@
             orders.forEach(o => {
                 if(o.status && (o.status.includes('مهملات') || o.status.includes('ملغى') || o.status.includes('وهمي'))) return;
                 
-                let orderTotal = o.finalTotal || 0;
+                let orderTotal = Number(o.finalTotal) || 0;
                 totalSell += orderTotal;
 
                 if(o.status && o.status.includes('روتور')) {
@@ -940,10 +951,12 @@
 
                 if(o.createdAt) {
                     let dObj = new Date(o.createdAt.seconds ? o.createdAt.seconds * 1000 : o.createdAt);
-                    let orderDateStr = dObj.toISOString().split('T')[0];
-                    if(orderDateStr === todayStr) {
-                        todayOrdersCount++;
-                        todaySellAmount += orderTotal;
+                    if(!isNaN(dObj.getTime())) {
+                        let orderDateStr = dObj.toISOString().split('T')[0];
+                        if(orderDateStr === todayStr) {
+                            todayOrdersCount++;
+                            todaySellAmount += orderTotal;
+                        }
                     }
                 }
 
