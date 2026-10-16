@@ -153,23 +153,94 @@
                         <input type="checkbox" id="select-all-new" onclick="toggleSelectAll('new', this)"> تحديد الكل
                     </label>
                     <button onclick="batchAction('new', 'قيد المعالجة 🔄', 'timeProcessing')" class="btn-secondary" style="font-size:12px; padding:6px 12px;">معالجة المحدد 🔄</button>
+                    <button onclick="batchDelete('new')" class="btn-danger" style="font-size:12px; padding:6px 12px;">حذف المحدد 🗑️</button>
                 </div>
                 <div id="orders-list-new" class="orders-list-strip">جاري التحميل...</div>
             </div>
         </div>
         
-        <div id="fake-orders-tab" class="tab-content"><div class="container" style="border:2px solid #dc2626;"><h2 style="color:#dc2626;">⚠️ الطلبات الوهمية</h2><div class="filter-bar"><input type="text" id="search-fake" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-fake" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-fake" class="orders-list-strip"></div></div></div>
+        <!-- الطلبات الوهمية -->
+        <div id="fake-orders-tab" class="tab-content">
+            <div class="container" style="border:2px solid #dc2626;">
+                <h2 style="color:#dc2626;">⚠️ الطلبات الوهمية</h2>
+                <div class="filter-bar"><input type="text" id="search-fake" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-fake" onchange="renderOrdersFiltered()" style="flex:1;"></div>
+                <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap:wrap;">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="select-all-fake" onclick="toggleSelectAll('fake', this)"> تحديد الكل</label>
+                    <button onclick="batchDelete('fake')" class="btn-danger" style="font-size:12px; padding:6px 12px;">حذف المحدد 🗑️</button>
+                </div>
+                <div id="orders-list-fake" class="orders-list-strip"></div>
+            </div>
+        </div>
         
-        <div id="processing-tab" class="tab-content"><div class="container"><h2>قيد المعالجة 🔄</h2><div class="filter-bar"><input type="text" id="search-proc" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-proc" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-processing" class="orders-list-strip"></div></div></div>
+        <!-- قيد المعالجة -->
+        <div id="processing-tab" class="tab-content">
+            <div class="container">
+                <h2>قيد المعالجة 🔄</h2>
+                <div class="filter-bar"><input type="text" id="search-proc" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-proc" onchange="renderOrdersFiltered()" style="flex:1;"></div>
+                <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap:wrap;">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="select-all-proc" onclick="toggleSelectAll('proc', this)"> تحديد الكل</label>
+                    <button onclick="batchAction('proc', 'جاري التوصيل 🚚', 'timeShipping')" class="btn-warning" style="font-size:12px; padding:6px 12px;">توصيل المحدد 🚚</button>
+                    <button onclick="batchDelete('proc')" class="btn-danger" style="font-size:12px; padding:6px 12px;">حذف المحدد 🗑️</button>
+                </div>
+                <div id="orders-list-processing" class="orders-list-strip"></div>
+            </div>
+        </div>
         
-        <div id="shipping-tab" class="tab-content"><div class="container"><h2>جاري التوصيل 🚚</h2><div class="filter-bar"><input type="text" id="search-ship" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-ship" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-shipping" class="orders-list-strip"></div></div></div>
+        <!-- جاري التوصيل -->
+        <div id="shipping-tab" class="tab-content">
+            <div class="container">
+                <h2>جاري التوصيل 🚚</h2>
+                <div class="filter-bar"><input type="text" id="search-ship" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-ship" onchange="renderOrdersFiltered()" style="flex:1;"></div>
+                <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap:wrap;">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="select-all-ship" onclick="toggleSelectAll('ship', this)"> تحديد الكل</label>
+                    <button onclick="batchAction('ship', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60; font-size:12px; padding:6px 12px;">أرشيف المحدد ✅</button>
+                    <button onclick="batchAction('ship', 'مرتجع (روتور) ⚠️', 'timeReturn')" style="background:#b45309; font-size:12px; padding:6px 12px;">روتور المحدد ⚠️</button>
+                    <button onclick="batchDelete('ship')" class="btn-danger" style="font-size:12px; padding:6px 12px;">حذف المحدد 🗑️</button>
+                </div>
+                <div id="orders-list-shipping" class="orders-list-strip"></div>
+            </div>
+        </div>
         
-        <div id="archive-tab" class="tab-content"><div class="container"><h2>الأرشيف ✅</h2><div class="filter-bar"><input type="text" id="search-arch" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-arch" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-archive" class="orders-list-strip"></div></div></div>
+        <!-- الأرشيف -->
+        <div id="archive-tab" class="tab-content">
+            <div class="container">
+                <h2>الأرشيف ✅</h2>
+                <div class="filter-bar"><input type="text" id="search-arch" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-arch" onchange="renderOrdersFiltered()" style="flex:1;"></div>
+                <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap:wrap;">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="select-all-arch" onclick="toggleSelectAll('arch', this)"> تحديد الكل</label>
+                    <button onclick="batchDelete('arch')" class="btn-danger" style="font-size:12px; padding:6px 12px;">حذف المحدد 🗑️</button>
+                </div>
+                <div id="orders-list-archive" class="orders-list-strip"></div>
+            </div>
+        </div>
         
-        <div id="return-tab" class="tab-content"><div class="container"><h2>الروتور ⚠️</h2><div class="filter-bar"><input type="text" id="search-ret" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-ret" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-return" class="orders-list-strip"></div></div></div>
+        <!-- الروتور -->
+        <div id="return-tab" class="tab-content">
+            <div class="container">
+                <h2>الروتور ⚠️</h2>
+                <div class="filter-bar"><input type="text" id="search-ret" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-ret" onchange="renderOrdersFiltered()" style="flex:1;"></div>
+                <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap:wrap;">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="select-all-ret" onclick="toggleSelectAll('ret', this)"> تحديد الكل</label>
+                    <button onclick="batchDelete('ret')" class="btn-danger" style="font-size:12px; padding:6px 12px;">حذف المحدد 🗑️</button>
+                </div>
+                <div id="orders-list-return" class="orders-list-strip"></div>
+            </div>
+        </div>
         
-        <div id="cancelled-tab" class="tab-content"><div class="container"><h2>ملغى ❌</h2><div class="filter-bar"><input type="text" id="search-canc" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-canc" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-cancelled" class="orders-list-strip"></div></div></div>
+        <!-- ملغى -->
+        <div id="cancelled-tab" class="tab-content">
+            <div class="container">
+                <h2>ملغى ❌</h2>
+                <div class="filter-bar"><input type="text" id="search-canc" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-canc" onchange="renderOrdersFiltered()" style="flex:1;"></div>
+                <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap:wrap;">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;"><input type="checkbox" id="select-all-canc" onclick="toggleSelectAll('canc', this)"> تحديد الكل</label>
+                    <button onclick="batchDelete('canc')" class="btn-danger" style="font-size:12px; padding:6px 12px;">حذف المحدد 🗑️</button>
+                </div>
+                <div id="orders-list-cancelled" class="orders-list-strip"></div>
+            </div>
+        </div>
         
+        <!-- المهملات -->
         <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ المهملات (تُحذف نهائياً فقط من هنا)</h2><div id="orders-list-trash" class="orders-list-strip"></div></div></div>
 
         <div id="staff-tab" class="tab-content">
@@ -745,6 +816,22 @@
                 await updateDoc(doc(db, "orders", id), { status: targetStatus, [timeField]: new Date().toLocaleString('ar-DZ'), processedBy: currentUsername });
             }
             showAlert('نجاح العملية ✅', `تم تحديث ${selectedIds.length} طلب بنجاح بواسطة ${currentUsername}!`);
+            loadAllOrders();
+        }
+
+        window.batchDelete = async function(type) {
+            let selectedIds = [];
+            document.querySelectorAll(`.order-checkbox-${type}:checked`).forEach(cb => { selectedIds.push(cb.value); });
+            if(selectedIds.length === 0) { showAlert('تنبيه', 'يرجى تحديد عنصر واحد على الأقل أولاً!'); return; }
+
+            for(let id of selectedIds) {
+                let o = ordersCache[id];
+                if(o) {
+                    let currentStatus = o.status || 'جديد ⏳';
+                    await updateDoc(doc(db, "orders", id), { status: `مهملات | ${currentStatus}`, trashTime: new Date().toISOString() });
+                }
+            }
+            showAlert('نجاح العملية ✅', `تم نقل ${selectedIds.length} طلب إلى المهملات بنجاح!`);
             loadAllOrders();
         }
 
