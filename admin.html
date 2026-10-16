@@ -55,6 +55,7 @@
 
         .filter-bar { background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .golden-offer-box { background: #fef9c3; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .social-box { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; gap: 10px; align-items: center; }
     </style>
 </head>
 <body>
@@ -101,7 +102,7 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الطلب مع صور المنتجات والبيانات الكاملة -->
+    <!-- نافذة تفاصيل الطلب -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
             <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب والملاحظات</h3>
@@ -147,7 +148,8 @@
                 <button class="tab-btn" onclick="switchTab('return-tab', event)">⚠️ الروتور</button>
                 <button class="tab-btn" onclick="switchTab('cancelled-tab', event)" style="background:#b91c1c; color:white;">❌ ملغى</button>
                 <button class="tab-btn" onclick="switchTab('trash-tab', event)" style="background:#64748b; color:white;">🗑️ المهملات</button>
-                <button class="tab-btn" onclick="switchTab('golden-offers-tab', event)" style="background:#f59e0b; color:white;">⭐ العروض الخاصة</button>
+                <button class="tab-btn" onclick="switchTab('golden-offers-tab', event)" style="background:#f59e0b; color:white;">⭐ العروض</button>
+                <button class="tab-btn" onclick="switchTab('social-media-tab', event)" style="background:#25d366; color:white;">🌐 التواصل</button>
                 <button class="tab-btn" onclick="switchTab('ads-mgmt-tab', event)" style="background:#0284c7; color:white;">📢 الإعلانات</button>
                 <button class="tab-btn" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
                 <button class="tab-btn" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
@@ -157,7 +159,17 @@
             </div>
         </div>
 
-        <!-- إدارة العروض الخاصة مربوطة بالمنتجات -->
+        <!-- قسم وسائل التواصل الاجتماعي مع زر علامة الزائد (+) -->
+        <div id="social-media-tab" class="tab-content">
+            <div class="container" style="border: 2px solid #25d366;">
+                <h2 style="color: #25d366;">🌐 إدارة روابط وسائل التواصل الاجتماعي</h2>
+                <p style="font-size: 13px; color: #555;">أضف روابط مواقع التواصل الاجتماعي مع رابط الصورة المصغرة الخاصة بها لتظهر في أعلى المتجر:</p>
+                <div id="social-links-container"></div>
+                <button type="button" onclick="addSocialLinkForm()" class="btn-secondary" style="background:#25d366; margin-bottom:15px; width:100%;">➕ إضافة رابط تواصل اجتماعي جديد</button>
+                <button onclick="saveSocialLinks()" style="background:#25d366; width:100%;">حفظ ونشر روابط التواصل 💾</button>
+            </div>
+        </div>
+
         <div id="golden-offers-tab" class="tab-content">
             <div class="container" style="border: 2px solid #f59e0b;">
                 <h2 style="color: #f59e0b;">⭐ إدارة العروض الخاصة والعداد التنازلي</h2>
@@ -206,7 +218,6 @@
             </div>
         </div>
 
-        <!-- إضافة منتج مع روابط صور متعددة وفيديوهات -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج جديد ➕</h2>
@@ -292,6 +303,45 @@
             container.appendChild(div);
         }
 
+        // إدارة روابط وسائل التواصل الاجتماعي
+        window.addSocialLinkForm = function(url = '', iconUrl = '') {
+            let container = document.getElementById('social-links-container');
+            let div = document.createElement('div');
+            div.className = 'social-box';
+            div.innerHTML = `
+                <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+                    <input type="text" class="social-url" placeholder="رابط الموقع (مثال: https://facebook.com/...)" value="${url}">
+                    <input type="text" class="social-icon" placeholder="رابط الصورة المصغرة (مثال: https://.../fb.png)" value="${iconUrl}">
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:8px 12px; font-size:12px;">حذف 🗑️</button>
+            `;
+            container.appendChild(div);
+        }
+
+        window.saveSocialLinks = function() {
+            let links = [];
+            document.querySelectorAll('.social-box').forEach(box => {
+                let url = box.querySelector('.social-url').value.trim();
+                let iconUrl = box.querySelector('.social-icon').value.trim();
+                if(url && iconUrl) {
+                    links.push({ url, iconUrl });
+                }
+            });
+            localStorage.setItem('dz_social_links', JSON.stringify(links));
+            showAlert('نجاح', 'تم حفظ روابط وسائل التواصل الاجتماعي بنجاح 🌐!');
+        }
+
+        function loadSocialLinksAdmin() {
+            let container = document.getElementById('social-links-container');
+            container.innerHTML = '';
+            let links = JSON.parse(localStorage.getItem('dz_social_links')) || [];
+            if(links.length === 0) {
+                addSocialLinkForm();
+            } else {
+                links.forEach(l => addSocialLinkForm(l.url, l.iconUrl));
+            }
+        }
+
         window.addGoldenOfferForm = function(productId = '', details = '', oldPrice = '', newPrice = '', endTime = '', visible = true) {
             let container = document.getElementById('golden-offers-container');
             let productOptions = '<option value="">-- اختر المنتج المشمول بالعرض --</option>';
@@ -370,7 +420,6 @@
             loggedInUser = user; isUserAdmin = isAdmin;
             document.getElementById('login-box').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
-            document.getElementById('welcome-role').innerText = `${user} (${isAdmin ? 'أدمن' : 'موظف'})`;
             
             let savedAd = JSON.parse(localStorage.getItem('dz_store_announcement')) || {};
             document.getElementById('admin-ad-text').value = savedAd.text || '';
@@ -378,6 +427,7 @@
 
             await loadProductsMap();
             loadGoldenOffersAdmin();
+            loadSocialLinksAdmin();
             await loadAllOrders();
             loadProducts();
             loadAllReviewsForAdmin();
@@ -490,19 +540,6 @@
                 await updateDoc(doc(db, "products", pendingActionId), { status: 'مهملات', trashTime: new Date().toISOString() });
                 loadProducts();
             }
-        }
-
-        window.restoreOrder = async function(id) {
-            let o = ordersCache[id];
-            if(!o) return;
-            let originalStatus = o.status.split('|')[1]?.trim() || 'جديد ⏳';
-            await updateDoc(doc(db, "orders", id), { status: originalStatus, trashTime: null });
-            loadAllOrders();
-        }
-
-        window.permanentDelete = async function(id) {
-            await deleteDoc(doc(db, "orders", id));
-            loadAllOrders();
         }
 
         window.openOrderModal = function(id) {
