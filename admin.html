@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لوحة التحكم - LAVENDER_store.dz</title>
+    <title>لوحة التحكم الشاملة - LAVENDER_store.dz</title>
     <style>
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; animation: fadeIn 0.4s ease-in-out; }
         .container { max-width: 1150px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; transition: 0.3s; }
         h2, h3 { color: #2c3e50; text-align: center; }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
         input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; outline: none; transition: 0.2s; }
         input:focus, textarea:focus, select:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
         button { background: #27ae60; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: bold; transition: 0.2s; }
@@ -42,9 +41,9 @@
         .order-mini-card:hover { border-color: #2563eb; background: #f1f5f9; transform: translateY(-2px); }
         .order-mini-thumb { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; background: #eee; flex-shrink: 0; }
         
-        .wilaya-table, .daily-report-table, .products-analytics-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
-        .wilaya-table th, .wilaya-table td, .daily-report-table th, .daily-report-table td, .products-analytics-table th, .products-analytics-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-        .wilaya-table th, .daily-report-table th, .products-analytics-table th { background: #1e293b; color: white; }
+        .wilaya-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
+        .wilaya-table th, .wilaya-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+        .wilaya-table th { background: #1e293b; color: white; }
         
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 3000; animation: fadeIn 0.2s ease; }
         .modal-card { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 550px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
@@ -54,14 +53,8 @@
         .stat-card h4 { margin: 0 0 8px 0; font-size: 14px; color: #94a3b8; }
         .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
 
-        .staff-status-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .filter-bar { background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        
         .golden-offer-box { background: #fef9c3; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .price-old-wrapper { position: relative; display: inline-block; width: 100%; }
-        .price-old-wrapper::after { content: '✕'; color: red; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 16px; pointer-events: none; }
-        .price-new-wrapper { position: relative; display: inline-block; width: 100%; }
-        .price-new-wrapper::after { content: '✓'; color: green; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 16px; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -88,7 +81,7 @@
     <!-- نافذة تعديل المنتج -->
     <div class="modal-overlay" id="editProductModal" style="z-index: 5500;">
         <div class="modal-card">
-            <h3 style="margin-top:0; color:#2563eb;">✏️ تعديل المنتج والألوان والمقاسات</h3>
+            <h3 style="margin-top:0; color:#2563eb;">✏️ تعديل المنتج والمواصفات</h3>
             <input type="hidden" id="edit-prod-id">
             <div class="form-group"><label>اسم المنتج:</label><input type="text" id="edit-prod-name"></div>
             <div class="form-group"><label>الصنف:</label>
@@ -98,20 +91,20 @@
                     <option value="أكسسوارات">أكسسوارات</option>
                 </select>
             </div>
-            <div class="form-group"><label>الألوان المتاحة (مفصولة بفواصل):</label><input type="text" id="edit-prod-colors"></div>
-            <div class="form-group"><label>المقاسات المتاحة (مفصولة بفواصل):</label><input type="text" id="edit-prod-sizes"></div>
+            <div class="form-group"><label>الألوان (فواصل):</label><input type="text" id="edit-prod-colors"></div>
+            <div class="form-group"><label>المقاسات (فواصل):</label><input type="text" id="edit-prod-sizes"></div>
             <div class="form-group"><label>سعر الشراء:</label><input type="number" id="edit-prod-buy-price"></div>
-            <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="edit-prod-price"></div>
-            <div class="form-group"><label>كمية المخزون:</label><input type="number" id="edit-prod-stock"></div>
+            <div class="form-group"><label>سعر البيع (دج):</label><input type="number" id="edit-prod-price"></div>
+            <div class="form-group"><label>المخزون:</label><input type="number" id="edit-prod-stock"></div>
             <button onclick="saveProductEdits()" style="background:#2563eb; width:100%; margin-bottom:8px;">حفظ التعديلات 💾</button>
             <button onclick="document.getElementById('editProductModal').style.display='none'" class="btn-secondary" style="width:100%; background:#64748b;">إلغاء</button>
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الطلب وحالاته مع عرض صور المنتجات والبيانات الكاملة -->
+    <!-- نافذة تفاصيل الطلب مع صور المنتجات والبيانات الكاملة -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
-            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب، جدول التوقيت والملاحظات</h3>
+            <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب والملاحظات</h3>
             <div id="orderDetailsContent" style="font-size: 14px; line-height: 1.8; color: #1e293b; margin-bottom: 20px;"></div>
             <div id="orderModalActions" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;"></div>
             <button onclick="closeOrderModal()" class="btn-secondary" style="margin-top: 15px; width: 100%; background: #64748b;">إغلاق النافذة ❌</button>
@@ -137,7 +130,7 @@
     <!-- لوحة التحكم الرئيسية -->
     <div id="admin-content">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center; background: #232f3e; color: white;">
-            <h2 style="margin: 0; color: white;">LAVENDER_store.dz - لوحة التحكم (<span id="welcome-role"></span>)</h2>
+            <h2 style="margin: 0; color: white;">LAVENDER_store.dz - لوحة التحكم</h2>
             <div style="display: flex; gap: 10px;">
                 <a href="index.html" class="btn-store" style="margin: 0; padding: 8px 15px; font-size: 13px; background:#374151;">🛍️ المتجر</a>
                 <button onclick="logout()" class="btn-danger" style="width: auto; padding: 8px 15px; font-size: 13px;">خروج</button>
@@ -159,13 +152,12 @@
                 <button class="tab-btn" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
                 <button class="tab-btn" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
                 <button class="tab-btn" onclick="switchTab('reviews-mgmt-tab', event)" style="background: #0284c7; color: white;">💬 التعليقات</button>
-                <button class="tab-btn" onclick="switchTab('staff-tab', event)" style="background: #7c3aed; color: white;">👥 طاقم العمل</button>
-                <button class="tab-btn" onclick="switchTab('add-product-tab', event)" id="nav-btn-add">➕ إضافة منتج</button>
+                <button class="tab-btn" onclick="switchTab('add-product-tab', event)">➕ إضافة منتج</button>
                 <button class="tab-btn" onclick="switchTab('manage-products-tab', event)">🏷️ المخزون</button>
-                <button class="tab-btn" onclick="switchTab('settings-tab', event)" style="background: #e67e22; color: white;">⚙️ الإعدادات</button>
             </div>
         </div>
 
+        <!-- دمـج العروض الخاصة -->
         <div id="golden-offers-tab" class="tab-content">
             <div class="container" style="border: 2px solid #f59e0b;">
                 <h2 style="color: #f59e0b;">⭐ إدارة العروض الخاصة والعداد التنازلي</h2>
@@ -178,8 +170,8 @@
         <div id="ads-mgmt-tab" class="tab-content">
             <div class="container" style="border: 2px solid #0284c7;">
                 <h2 style="color: #0284c7;">📢 إدارة الإعلانات والتنبيهات</h2>
-                <div class="form-group"><label>نص أو رابط الإعلان:</label><textarea id="admin-ad-text" placeholder="اكتب نص الإعلان هنا..."></textarea></div>
-                <div class="form-group"><label><input type="checkbox" id="admin-ad-visible" checked> إظهار الإعلان للزوار في المتجر</label></div>
+                <div class="form-group"><label>نص الإعلان:</label><textarea id="admin-ad-text"></textarea></div>
+                <div class="form-group"><label><input type="checkbox" id="admin-ad-visible" checked> إظهار الإعلان</label></div>
                 <button onclick="saveStoreAnnouncement()" style="background:#0284c7; width:100%;">حفظ الإعلان 💾</button>
             </div>
         </div>
@@ -187,179 +179,69 @@
         <div id="orders-tab" class="tab-content active">
             <div class="container">
                 <h2>الطلبات الجديدة ⏳</h2>
-                <div class="filter-bar">
-                    <input type="text" id="search-new" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
-                    <input type="date" id="date-new" onchange="renderOrdersFiltered()" style="flex:1;">
-                    <button onclick="resetFilter('new')" class="btn-secondary" style="padding:10px;">إعادة ضبط 🔄</button>
-                </div>
+                <div class="filter-bar"><input type="text" id="search-new" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"></div>
                 <div id="orders-list-new" class="orders-grid-compact">جاري التحميل...</div>
             </div>
         </div>
         
-        <div id="fake-orders-tab" class="tab-content">
-            <div class="container" style="border:2px solid #dc2626;">
-                <h2 style="color:#dc2626;">⚠️ الطلبات الوهمية والمكررة</h2>
-                <div class="filter-bar">
-                    <input type="text" id="search-fake" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
-                    <input type="date" id="date-fake" onchange="renderOrdersFiltered()" style="flex:1;">
-                    <button onclick="resetFilter('fake')" class="btn-secondary" style="padding:10px;">إعادة ضبط 🔄</button>
-                </div>
-                <div id="orders-list-fake" class="orders-grid-compact">جاري التحميل...</div>
-            </div>
-        </div>
+        <div id="fake-orders-tab" class="tab-content"><div class="container" style="border:2px solid #dc2626;"><h2 style="color:#dc2626;">⚠️ الطلبات الوهمية</h2><div id="orders-list-fake" class="orders-grid-compact"></div></div></div>
+        <div id="processing-tab" class="tab-content"><div class="container"><h2>قيد المعالجة 🔄</h2><div id="orders-list-processing" class="orders-grid-compact"></div></div></div>
+        <div id="shipping-tab" class="tab-content"><div class="container"><h2>جاري التوصيل 🚚</h2><div id="orders-list-shipping" class="orders-grid-compact"></div></div></div>
+        <div id="archive-tab" class="tab-content"><div class="container"><h2>الأرشيف ✅</h2><div id="orders-list-archive" class="orders-grid-compact"></div></div></div>
+        <div id="return-tab" class="tab-content"><div class="container"><h2>الروتور ⚠️</h2><div id="orders-list-return" class="orders-grid-compact"></div></div></div>
+        <div id="cancelled-tab" class="tab-content"><div class="container"><h2>ملغى ❌</h2><div id="orders-list-cancelled" class="orders-grid-compact"></div></div></div>
+        <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ المهملات (تُحذف تلقائياً بعد 48 ساعة)</h2><div id="orders-list-trash" class="orders-grid-compact"></div></div></div>
 
-        <div id="processing-tab" class="tab-content">
-            <div class="container">
-                <h2>قيد المعالجة 🔄 (خصم مخزون تلقائي)</h2>
-                <div class="filter-bar">
-                    <input type="text" id="search-proc" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
-                    <input type="date" id="date-proc" onchange="renderOrdersFiltered()" style="flex:1;">
-                    <button onclick="resetFilter('proc')" class="btn-secondary" style="padding:10px;">إعادة ضبط 🔄</button>
-                </div>
-                <div id="orders-list-processing" class="orders-grid-compact">جاري التحميل...</div>
-            </div>
-        </div>
-
-        <div id="shipping-tab" class="tab-content">
-            <div class="container">
-                <h2>جاري التوصيل 🚚</h2>
-                <div class="filter-bar">
-                    <input type="text" id="search-ship" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
-                    <input type="date" id="date-ship" onchange="renderOrdersFiltered()" style="flex:1;">
-                    <button onclick="resetFilter('ship')" class="btn-secondary" style="padding:10px;">إعادة ضبط 🔄</button>
-                </div>
-                <div id="orders-list-shipping" class="orders-grid-compact">جاري التحميل...</div>
-            </div>
-        </div>
-
-        <div id="archive-tab" class="tab-content">
-            <div class="container">
-                <h2>الأرشيف ✅ (مسلم - حساب الأرباح)</h2>
-                <div class="filter-bar">
-                    <input type="text" id="search-arch" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
-                    <input type="date" id="date-arch" onchange="renderOrdersFiltered()" style="flex:1;">
-                    <button onclick="resetFilter('arch')" class="btn-secondary" style="padding:10px;">إعادة ضبط 🔄</button>
-                </div>
-                <div id="orders-list-archive" class="orders-grid-compact">جاري التحميل...</div>
-            </div>
-        </div>
-
-        <div id="return-tab" class="tab-content">
-            <div class="container">
-                <h2>الروتور ⚠️ (مرتجع - إعادة للمخزون وحساب الخسائر)</h2>
-                <div class="filter-bar">
-                    <input type="text" id="search-ret" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
-                    <input type="date" id="date-ret" onchange="renderOrdersFiltered()" style="flex:1;">
-                    <button onclick="resetFilter('ret')" class="btn-secondary" style="padding:10px;">إعادة ضبط 🔄</button>
-                </div>
-                <div id="orders-list-return" class="orders-grid-compact">جاري التحميل...</div>
-            </div>
-        </div>
-
-        <div id="cancelled-tab" class="tab-content">
-            <div class="container">
-                <h2>الطلبات الملغية ❌ (إعادة للمخزون)</h2>
-                <div class="filter-bar">
-                    <input type="text" id="search-canc" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
-                    <input type="date" id="date-canc" onchange="renderOrdersFiltered()" style="flex:1;">
-                    <button onclick="resetFilter('canc')" class="btn-secondary" style="padding:10px;">إعادة ضبط 🔄</button>
-                </div>
-                <div id="orders-list-cancelled" class="orders-grid-compact">جاري التحميل...</div>
-            </div>
-        </div>
-
-        <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ سلة المهملات (تُحذف تلقائياً بعد 48 ساعة)</h2><div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div></div></div>
-
-        <div id="wilaya-report-tab" class="tab-content">
-            <div class="container">
-                <h2>📍 تقرير الولايات</h2>
-                <button onclick="window.print()" class="btn-secondary" style="margin-bottom:15px;">🖨️ طباعة التقارير</button>
-                <div id="wilaya-report-content">جاري التجهيز...</div>
-            </div>
-        </div>
+        <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات</h2><div id="wilaya-report-content"></div></div></div>
+        <div id="reviews-mgmt-tab" class="tab-content"><div class="container"><h2>💬 التعليقات</h2><div id="admin-reviews-list-container"></div></div></div>
         
-        <div id="reviews-mgmt-tab" class="tab-content">
-            <div class="container" style="border: 2px solid #0284c7;">
-                <h2 style="color: #0284c7;">💬 إدارة تعليقات وتقييمات العملاء</h2>
-                <div id="admin-reviews-list-container">جاري التحميل...</div>
-            </div>
-        </div>
-
         <div id="analytics-tab" class="tab-content">
             <div class="container">
-                <h2>💰 التحليلات المالية وإحصائيات الزوار والأرباح</h2>
-                <button onclick="window.print()" class="btn-secondary" style="margin-bottom:15px;">🖨️ طباعة التحليلات والتقارير</button>
-                
-                <div class="stats-grid" style="margin-top:20px;">
-                    <div class="stat-card" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"><h4>👥 زوار اليوم</h4><span id="stat-visitors-day">0</span></div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #059669, #047857);"><h4>📅 زوار الأسبوع</h4><span id="stat-visitors-week">0</span></div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);"><h4>📊 زوار الشهر</h4><span id="stat-visitors-month">0</span></div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #d97706, #b45309);"><h4>🔥 أكثر منتج مشاهدة</h4><span id="stat-top-viewed" style="font-size:16px;">-</span></div>
-                </div>
-
+                <h2>💰 التحليلات المالية والأرباح</h2>
                 <div class="stats-grid">
-                    <div class="stat-card" style="background: linear-gradient(135deg, #059669, #047857);"><h4>إجمالي الربح (اليوم)</h4><span id="stat-total-profit">0 دج</span></div>
-                    <div class="stat-card"><h4>إجمالي الشراء (اليوم)</h4><span id="stat-total-buy-price">0 دج</span></div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #2563eb, #1d4ed8);"><h4>إجمالي البيع (اليوم)</h4><span id="stat-total-sell-price">0 دج</span></div>
-                    <div class="stat-card" style="background: linear-gradient(135deg, #dc2626, #991b1b);"><h4>خسائر الروتور (اليوم)</h4><span id="stat-total-router-loss">0 دج</span></div>
+                    <div class="stat-card" style="background:#059669;"><h4>إجمالي الأرباح</h4><span id="stat-total-profit">0 دج</span></div>
+                    <div class="stat-card"><h4>إجمالي البيع</h4><span id="stat-total-sell-price">0 دج</span></div>
+                    <div class="stat-card" style="background:#dc2626;"><h4>خسائر الروتور</h4><span id="stat-total-router-loss">0 دج</span></div>
                 </div>
-
-                <h3 style="margin-top:30px; color:#1e293b; text-align:right;">🏆 تحليل المنتجات الأكثر طلباً:</h3>
-                <div id="top-products-analytics-container">جاري التحليل...</div>
-
-                <h3 style="margin-top:30px; color:#1e293b; text-align:right;">📅 التحليل اليومي لكل يوم على حدة:</h3>
-                <div id="daily-analytics-container">جاري التجهيز...</div>
             </div>
         </div>
 
-        <div id="staff-tab" class="tab-content">
-            <div class="container" style="border: 2px solid #7c3aed;">
-                <h2 style="color: #7c3aed;">👥 إدارة الأفراد وسجل إنجازات طاقم العمل</h2>
-                <div style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #7c3aed; margin-bottom:20px;">
-                    <h3 style="margin-top:0; color:#7c3aed;">➕ إضافة موظف جديد وتحديد صلاحياته</h3>
-                    <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="staff-username" autocomplete="off"></div>
-                    <div class="form-group"><label>كلمة المرور:</label><input type="password" id="staff-password" autocomplete="new-password"></div>
-                    <button onclick="saveStaffMember()" class="btn-secondary" style="background:#7c3aed; width:100%;">حفظ الموظف الجديد 💾</button>
-                </div>
-                <div id="staff-list-container">جاري التحميل...</div>
-            </div>
-        </div>
-
-        <div id="settings-tab" class="tab-content">
-            <div class="container" style="max-width:500px; border:2px solid #e67e22;">
-                <h2 style="color:#e67e22;">⚙️ إعدادات الحساب والدعم</h2>
-                <div class="form-group"><label>رقم واتساب الدعم:</label><input type="text" id="setting-whatsapp-num"></div>
-                <div class="form-group"><label>اسم المستخدم الجديد للأدمن:</label><input type="text" id="setting-admin-user" autocomplete="off"></div>
-                <div class="form-group"><label>كلمة المرور الجديدة للأدمن:</label><input type="password" id="setting-admin-pass" autocomplete="new-password"></div>
-                <button onclick="updateAdminSettings()" style="background:#e67e22; width:100%; font-weight:bold;">حفظ التعديلات 💾</button>
-            </div>
-        </div>
-
+        <!-- إضافة منتج مع روابط صور متعددة بزر علامة الزائد (+) -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
-                <h2>إضافة منتج (ميكب، ألبسة، أكسسوارات) وفيديوهات 1080p ➕</h2>
+                <h2>إضافة منتج جديد ➕</h2>
                 <div class="form-group"><label>اسم المنتج:</label><input type="text" id="prod-name"></div>
-                <div class="form-group"><label>الصنف الرئيسي:</label>
+                <div class="form-group"><label>الصنف:</label>
                     <select id="prod-category">
                         <option value="ميكب العناية والتجميل">ميكب العناية والتجميل</option>
                         <option value="ألبسة وملابس">ألبسة وملابس</option>
                         <option value="أكسسوارات">أكسسوارات</option>
                     </select>
                 </div>
-                <div class="form-group"><label>الألوان المتاحة (مفصولة بفواصل):</label><input type="text" id="prod-colors" placeholder="أسود، أبيض، أحمر"></div>
-                <div class="form-group"><label>المقاسات المتاحة (مفصولة بفواصل):</label><input type="text" id="prod-sizes" placeholder="S, M, L, XL"></div>
+                <div class="form-group"><label>الألوان (فواصل):</label><input type="text" id="prod-colors"></div>
+                <div class="form-group"><label>المقاسات (فواصل):</label><input type="text" id="prod-sizes"></div>
                 <div class="form-group"><label>سعر الشراء:</label><input type="number" id="prod-buy-price"></div>
-                <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="prod-price"></div>
-                <div class="form-group"><label>كمية المخزون الإجمالية:</label><input type="number" id="prod-stock" value="10"></div>
+                <div class="form-group"><label>سعر البيع (دج):</label><input type="number" id="prod-price"></div>
+                <div class="form-group"><label>المخزون:</label><input type="number" id="prod-stock" value="10"></div>
                 
                 <div class="form-group">
-                    <label>روابط فيديوهات المنتج بدقة 1080p:</label>
-                    <div id="video-inputs-container">
+                    <label>صور المنتج (روابط الصور):</label>
+                    <div id="image-inputs-container">
                         <div style="display:flex; gap:5px; margin-bottom:5px;">
-                            <input type="text" class="prod-video-input" placeholder="رابط فيديو بدقة 1080p">
+                            <input type="text" class="prod-image-input" placeholder="رابط الصورة الأولى">
                         </div>
                     </div>
-                    <button type="button" onclick="addVideoInput()" class="btn-secondary" style="background:#2563eb; margin-top:5px; font-size:12px;">➕ إضافة فيديو آخر بدقة 1080p</button>
+                    <button type="button" onclick="addImageInput()" class="btn-secondary" style="background:#2563eb; margin-top:5px; font-size:12px;">➕ إضافة صورة أخرى</button>
+                </div>
+
+                <div class="form-group">
+                    <label>فيديوهات المنتج بدقة 1080p:</label>
+                    <div id="video-inputs-container">
+                        <div style="display:flex; gap:5px; margin-bottom:5px;">
+                            <input type="text" class="prod-video-input" placeholder="رابط فيديو 1080p">
+                        </div>
+                    </div>
+                    <button type="button" onclick="addVideoInput()" class="btn-secondary" style="background:#2563eb; margin-top:5px; font-size:12px;">➕ إضافة فيديو آخر</button>
                 </div>
 
                 <div class="form-group"><label>الوصف:</label><textarea id="prod-desc"></textarea></div>
@@ -367,7 +249,7 @@
             </div>
         </div>
 
-        <div id="manage-products-tab" class="tab-content"><div class="container"><h2>🏷️ إدارة المخزون والمنتجات</h2><div id="products-list">جاري التحميل...</div></div></div>
+        <div id="manage-products-tab" class="tab-content"><div class="container"><h2>🏷️ المخزون والمنتجات</h2><div id="products-list"></div></div></div>
     </div>
 
     <script type="module">
@@ -380,8 +262,7 @@
 
         let ordersCache = {}, allFetchedOrders = [], productsMap = {}, productsFullCache = {};
         let pendingActionType = null, pendingActionId = null, pendingOriginalStatus = null;
-        let loggedInUser = '', isUserAdmin = false, staffPermissions = {};
-        let lastOrdersCount = 0;
+        let loggedInUser = '', isUserAdmin = false;
 
         window.togglePasswordVisibility = function() {
             let passInput = document.getElementById('login-pass');
@@ -395,11 +276,20 @@
         }
         window.closeCenterModal = function() { document.getElementById('centerModal').style.display = 'none'; }
 
+        // إضافة حقل صورة جديد عبر زر علامة الزائد (+)
+        window.addImageInput = function(val = '') {
+            let container = document.getElementById('image-inputs-container');
+            let div = document.createElement('div');
+            div.style.cssText = 'display:flex; gap:5px; margin-bottom:5px;';
+            div.innerHTML = `<input type="text" class="prod-image-input" value="${val}" placeholder="رابط صورة إضافي"><button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف ❌</button>`;
+            container.appendChild(div);
+        }
+
         window.addVideoInput = function(val = '') {
             let container = document.getElementById('video-inputs-container');
             let div = document.createElement('div');
             div.style.cssText = 'display:flex; gap:5px; margin-bottom:5px;';
-            div.innerHTML = `<input type="text" class="prod-video-input" value="${val}" placeholder="رابط فيديو 1080p إضافي"><button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف ❌</button>`;
+            div.innerHTML = `<input type="text" class="prod-video-input" value="${val}" placeholder="رابط فيديو إضافي"><button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:4px 8px; font-size:11px;">حذف ❌</button>`;
             container.appendChild(div);
         }
 
@@ -410,11 +300,11 @@
             div.innerHTML = `
                 <div class="form-group"><label>تفاصيل العرض:</label><textarea class="offer-details">${details}</textarea></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div class="form-group"><label>السعر القديم:</label><div class="price-old-wrapper"><input type="number" class="offer-old-price" value="${oldPrice}"></div></div>
-                    <div class="form-group"><label>سعر العرض:</label><div class="price-new-wrapper"><input type="number" class="offer-new-price" value="${newPrice}"></div></div>
+                    <div class="form-group"><label>السعر القديم:</label><input type="number" class="offer-old-price" value="${oldPrice}"></div>
+                    <div class="form-group"><label>سعر العرض:</label><input type="number" class="offer-new-price" value="${newPrice}"></div>
                 </div>
-                <div class="form-group"><label>تاريخ ووقت انتهاء العرض:</label><input type="datetime-local" class="offer-end-time" value="${endTime}"></div>
-                <div class="form-group"><label><input type="checkbox" class="offer-visible" ${visible ? 'checked':''}> إظهار العرض للزوار</label></div>
+                <div class="form-group"><label>تاريخ الانتهاء:</label><input type="datetime-local" class="offer-end-time" value="${endTime}"></div>
+                <div class="form-group"><label><input type="checkbox" class="offer-visible" ${visible ? 'checked':''}> إظهار العرض</label></div>
                 <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="font-size:12px; padding:5px 10px;">حذف العرض 🗑️</button>
             `;
             container.appendChild(div);
@@ -432,47 +322,34 @@
                 });
             });
             localStorage.setItem('dz_golden_offers', JSON.stringify(offers));
-            showAlert('نجاح', 'تم حفظ ونشر العروض الخاصة بنجاح ⭐!');
+            showAlert('نجاح', 'تم حفظ ونشر العروض بنجاح ⭐!');
         }
 
         function loadGoldenOffersAdmin() {
             let container = document.getElementById('golden-offers-container');
             container.innerHTML = '';
             let offers = JSON.parse(localStorage.getItem('dz_golden_offers')) || [];
-            if(offers.length === 0) {
-                addGoldenOfferForm();
-            } else {
-                offers.forEach(o => addGoldenOfferForm(o.details, o.oldPrice, o.newPrice, o.endTime, o.visible));
-            }
+            if(offers.length === 0) addGoldenOfferForm();
+            else offers.forEach(o => addGoldenOfferForm(o.details, o.oldPrice, o.newPrice, o.endTime, o.visible));
         }
 
         window.saveStoreAnnouncement = function() {
             let text = document.getElementById('admin-ad-text').value;
             let visible = document.getElementById('admin-ad-visible').checked;
             localStorage.setItem('dz_store_announcement', JSON.stringify({ text, visible }));
-            showAlert('نجاح', 'تم حفظ الإعلان ونشره بنجاح 📢!');
+            showAlert('نجاح', 'تم حفظ الإعلان بنجاح 📢!');
         }
 
         window.checkLogin = function() {
             let u = document.getElementById('login-username').value.trim();
             let p = document.getElementById('login-pass').value.trim();
-            let currentAdminUser = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
-            let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
+            let adminUser = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
+            let adminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
 
-            if(u === currentAdminUser && p === currentAdminPass) {
+            if(u === adminUser && p === adminPass) {
                 sessionStorage.setItem('ecom_logged_user', u);
                 sessionStorage.setItem('ecom_is_admin', 'true');
-                sessionStorage.setItem('ecom_permissions', JSON.stringify({ process: true, addProd: true, del: true }));
-                initDashboard(u, true, { process: true, addProd: true, del: true });
-                return;
-            }
-
-            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            if(staffList[u] && staffList[u].password === p) {
-                sessionStorage.setItem('ecom_logged_user', u);
-                sessionStorage.setItem('ecom_is_admin', 'false');
-                sessionStorage.setItem('ecom_permissions', JSON.stringify(staffList[u].permissions));
-                initDashboard(u, false, staffList[u].permissions);
+                initDashboard(u, true);
                 return;
             }
             document.getElementById('login-error').innerText = 'خطأ في اسم المستخدم أو كلمة المرور!';
@@ -480,25 +357,15 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             let user = sessionStorage.getItem('ecom_logged_user');
-            if(user) {
-                let isAdmin = sessionStorage.getItem('ecom_is_admin') === 'true';
-                let perms = JSON.parse(sessionStorage.getItem('ecom_permissions')) || { process: true, addProd: true, del: isAdmin };
-                initDashboard(user, isAdmin, perms);
-            }
+            if(user) initDashboard(user, sessionStorage.getItem('ecom_is_admin') === 'true');
         });
 
-        async function initDashboard(user, isAdmin, perms) {
-            loggedInUser = user;
-            isUserAdmin = isAdmin;
-            staffPermissions = perms;
+        async function initDashboard(user, isAdmin) {
+            loggedInUser = user; isUserAdmin = isAdmin;
             document.getElementById('login-box').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
             document.getElementById('welcome-role').innerText = `${user} (${isAdmin ? 'أدمن' : 'موظف'})`;
             
-            document.getElementById('setting-admin-user').value = localStorage.getItem('dz_custom_admin_user') || 'djamel hr';
-            document.getElementById('setting-admin-pass').value = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
-            document.getElementById('setting-whatsapp-num').value = localStorage.getItem('dz_whatsapp_support') || '213700000000';
-
             let savedAd = JSON.parse(localStorage.getItem('dz_store_announcement')) || {};
             document.getElementById('admin-ad-text').value = savedAd.text || '';
             document.getElementById('admin-ad-visible').checked = savedAd.visible !== false;
@@ -507,10 +374,7 @@
             await loadProductsMap();
             await loadAllOrders();
             loadProducts();
-            loadStaffList();
             loadAllReviewsForAdmin();
-
-            setInterval(loadAllOrdersInBackground, 10000);
         }
 
         window.switchTab = function(tabId, event) {
@@ -518,65 +382,31 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             if(event && event.currentTarget) event.currentTarget.classList.add('active');
-            if(tabId === 'reviews-mgmt-tab') loadAllReviewsForAdmin();
         }
 
-        window.logout = function() {
-            sessionStorage.clear();
-            location.reload();
-        }
+        window.logout = function() { sessionStorage.clear(); location.reload(); }
 
         async function loadAllOrders() {
             try {
                 const snap = await getDocs(collection(db, "orders"));
-                allFetchedOrders = [];
-                ordersCache = {};
+                allFetchedOrders = []; ordersCache = {};
                 let now = new Date();
 
                 for(let d of snap.docs) {
                     const o = { id: d.id, ...d.data() };
                     if(o.status && o.status.includes('مهملات') && o.trashTime) {
-                        let trashDate = new Date(o.trashTime);
-                        if((now - trashDate) / (1000 * 60 * 60) >= 48) {
+                        if((now - new Date(o.trashTime)) / (1000 * 60 * 60) >= 48) {
                             await deleteDoc(doc(db, "orders", d.id));
                             continue;
                         }
                     }
-
-                    if(o.status === 'جديد ⏳') {
-                        let isDuplicate = allFetchedOrders.some(existing => 
-                            existing.phone === o.phone && 
-                            existing.status === 'جديد ⏳' && 
-                            new Date(existing.createdAt?.toDate ? existing.createdAt.toDate() : new Date()).toDateString() === new Date(o.createdAt?.toDate ? o.createdAt.toDate() : new Date()).toDateString()
-                        );
-                        if(isDuplicate) {
-                            o.status = 'وهمي ⚠️';
-                            await updateDoc(doc(db, "orders", d.id), { status: 'وهمي ⚠️', timeFake: new Date().toLocaleString('ar-DZ') });
-                        }
-                    }
-
                     ordersCache[o.id] = o;
                     allFetchedOrders.push(o);
                 }
-
                 renderOrdersFiltered();
                 generateWilayaDetailedReport(allFetchedOrders);
                 updateAnalyticsData(allFetchedOrders);
-                loadStaffList();
             } catch(e) {}
-        }
-
-        async function loadAllOrdersInBackground() {
-            try {
-                const snap = await getDocs(collection(db, "orders"));
-                if(snap.docs.length > lastOrdersCount) loadAllOrders();
-            } catch(e) {}
-        }
-
-        window.resetFilter = function(type) {
-            document.getElementById(`search-${type}`).value = '';
-            document.getElementById(`date-${type}`).value = '';
-            renderOrdersFiltered();
         }
 
         window.renderOrdersFiltered = function() {
@@ -597,9 +427,7 @@
             allFetchedOrders.forEach(o => {
                 const status = o.status || 'جديد ⏳';
                 if(!status.includes(targetStatusKeyword)) return;
-                
                 let firstImg = o.cartItems?.[0]?.imageUrl || 'https://via.placeholder.com/50';
-
                 container.innerHTML += `
                     <div class="order-mini-card">
                         <div style="display:flex; gap:10px; align-items:center; cursor:pointer; flex:1;" onclick="openOrderModal('${o.id}')">
@@ -622,31 +450,32 @@
             container.innerHTML = '';
             allFetchedOrders.forEach(o => {
                 if(!o.status?.includes('مهملات')) return;
-                let firstImg = o.cartItems?.[0]?.imageUrl || 'https://via.placeholder.com/50';
                 container.innerHTML += `
                     <div class="order-mini-card">
-                        <div style="display:flex; gap:10px; align-items:center;">
-                            <img src="${firstImg}" class="order-mini-thumb">
-                            <div><h4 style="margin:0;">👤 ${o.fullName}</h4><p style="margin:0; font-size:11px;">📦 ${o.productName}</p></div>
-                        </div>
-                        <div style="width:100px;"><button onclick="restoreOrder('${o.id}')" style="background:#10b981; padding:5px; font-size:11px; width:100%; margin-bottom:4px;">استعادة ♻️</button><button onclick="permanentDelete('${o.id}')" class="btn-danger" style="padding:5px; font-size:11px; width:100%;">حذف نهائي ❌</button></div>
+                        <div><h4>👤 ${o.fullName}</h4><p style="font-size:11px;">📦 ${o.productName}</p></div>
+                        <div style="width:100px;"><button onclick="restoreOrder('${o.id}')" style="background:#10b981; width:100%; margin-bottom:4px; font-size:11px;">استعادة ♻️</button><button onclick="permanentDelete('${o.id}')" class="btn-danger" style="width:100%; font-size:11px;">حذف نهائي ❌</button></div>
                     </div>
                 `;
             });
         }
 
+        // أزرار الحذف بكفاءة تامة عبر تأكيد كلمة المرور
         window.promptDeleteOrder = function(id, currentStatus) {
-            pendingActionType = 'delete_order';
-            pendingActionId = id;
-            pendingOriginalStatus = currentStatus;
+            pendingActionType = 'delete_order'; pendingActionId = id; pendingOriginalStatus = currentStatus;
+            document.getElementById('admin-action-pass').value = '';
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        window.promptDeleteProduct = function(id) {
+            pendingActionType = 'delete_product'; pendingActionId = id;
             document.getElementById('admin-action-pass').value = '';
             document.getElementById('passwordModal').style.display = 'flex';
         }
 
         window.confirmAdminAction = async function() {
             let enteredPass = document.getElementById('admin-action-pass').value.trim();
-            let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
-            if(enteredPass !== currentAdminPass) { alert('كلمة المرور غير صحيحة!'); return; }
+            let adminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
+            if(enteredPass !== adminPass) { alert('كلمة المرور غير صحيحة!'); return; }
             document.getElementById('passwordModal').style.display = 'none';
 
             if(pendingActionType === 'delete_order') {
@@ -655,11 +484,6 @@
             } else if(pendingActionType === 'delete_product') {
                 await updateDoc(doc(db, "products", pendingActionId), { status: 'مهملات', trashTime: new Date().toISOString() });
                 loadProducts();
-            } else if(pendingActionType === 'delete_staff') {
-                let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-                delete staffList[pendingActionId];
-                localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
-                loadStaffList();
             }
         }
 
@@ -676,49 +500,32 @@
             loadAllOrders();
         }
 
-        // نافذة تفاصيل الطلب مع عرض صور المنتجات، الولاية، البلدية، الملاحظات، وطريقة التوصيل
         window.openOrderModal = function(id) {
             const o = ordersCache[id];
             if(!o) return;
-
             let itemsHtml = '';
-            if(o.cartItems && o.cartItems.length > 0) {
+            if(o.cartItems) {
                 o.cartItems.forEach(item => {
-                    let variantInfo = (item.color || item.size) ? ` [اللون: ${item.color || '-'} | المقاس: ${item.size || '-'}]` : '';
-                    itemsHtml += `
-                        <div style="display:flex; gap:10px; align-items:center; background:#f8fafc; padding:8px; border-radius:6px; margin-bottom:6px;">
-                            <img src="${item.imageUrl}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
-                            <div>
-                                <b>${item.productName}</b>${variantInfo}<br>
-                                <span style="color:#e11d48; font-weight:bold;">${item.price} دج × ${item.quantity}</span>
-                            </div>
-                        </div>
-                    `;
+                    itemsHtml += `<div style="display:flex; gap:10px; align-items:center; background:#f8fafc; padding:6px; border-radius:6px; margin-bottom:5px;"><img src="${item.imageUrl}" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"><div><b>${item.productName}</b> (${item.price} دج × ${item.quantity})</div></div>`;
                 });
-            } else {
-                itemsHtml = `<p>${o.productName}</p>`;
             }
-
             document.getElementById('orderDetailsContent').innerHTML = `
-                <b>👤 اسم الزبون:</b> ${o.fullName}<br>
-                <b>📞 رقم الهاتف:</b> ${o.phone}<br>
-                <b>📍 الولاية:</b> ${o.wilaya || 'غير محددة'}<br>
-                <b>🏘️ البلدية / الحي:</b> ${o.commune || 'غير محددة'}<br>
-                <b>🚚 طريقة التوصيل:</b> ${o.deliveryType || 'توصيل للمنزل'}<br>
-                <b>📝 ملاحظات الزبون:</b> <span style="color:#d97706;">${o.notes || 'لا توجد ملاحظات'}</span><br>
-                <b>📌 حالة الطلب:</b> <b>${o.status}</b><br>
-                <b>💰 المجموع الإجمالي (مع التوصيل):</b> <span style="color:#e11d48; font-weight:bold; font-size:16px;">${o.finalTotal} دج</span><br>
-                <div style="margin-top:10px;"><b>📦 المنتجات المطلوبة:</b><div style="margin-top:5px; max-height:180px; overflow-y:auto;">${itemsHtml}</div></div>
+                <b>👤 الاسم:</b> ${o.fullName}<br>
+                <b>📞 الهاتف:</b> ${o.phone}<br>
+                <b>📍 الولاية:</b> ${o.wilaya || '-'}<br>
+                <b>🏘️ البلدية:</b> ${o.commune || '-'}<br>
+                <b>🚚 التوصيل:</b> ${o.deliveryType || '-'}<br>
+                <b>📝 الملاحظات:</b> <span style="color:#d97706;">${o.notes || 'لا توجد ملاحظات'}</span><br>
+                <b>💰 المجموع:</b> <span style="color:#e11d48; font-weight:bold;">${o.finalTotal} دج</span><br>
+                <div style="margin-top:10px;"><b>المنتجات:</b> ${itemsHtml}</div>
             `;
-
-            let actionsHtml = `
+            document.getElementById('orderModalActions').innerHTML = `
                 <button onclick="updateOrderStatus('${o.id}', 'قيد المعالجة 🔄', 'timeProcessing', true)" style="background:#2563eb;">معالجة 🔄</button>
                 <button onclick="updateOrderStatus('${o.id}', 'جاري التوصيل 🚚', 'timeShipping')" style="background:#d97706;">التوصيل 🚚</button>
-                <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">أرشيف (مسلم) ✅</button>
+                <button onclick="updateOrderStatus('${o.id}', 'أرشيف (مسلم) ✅', 'timeArchive')" style="background:#27ae60;">أرشيف ✅</button>
                 <button onclick="updateOrderStatus('${o.id}', 'مرتجع (روتور) ⚠️', 'timeReturn', false, true)" style="background:#b45309;">روتور ⚠️</button>
                 <button onclick="updateOrderStatus('${o.id}', 'ملغى ❌', 'timeCancelled', false, false, true)" class="btn-danger">ملغى ❌</button>
             `;
-            document.getElementById('orderModalActions').innerHTML = actionsHtml;
             document.getElementById('orderModal').style.display = 'flex';
         }
 
@@ -727,33 +534,15 @@
         window.updateOrderStatus = async function(id, newStatus, timeField, isProcessing = false, isReturn = false, isCancelled = false) {
             let o = ordersCache[id];
             if(!o) return;
-
             if(isProcessing && o.status.includes('جديد')) {
                 let pRef = productsMap[o.productName.split('(')[0].trim()];
                 if(pRef && pRef.id) {
                     let pDoc = await getDoc(doc(db, "products", pRef.id));
-                    if(pDoc.exists()) {
-                        let currentStock = pDoc.data().stock || 10;
-                        let newStock = Math.max(0, currentStock - 1);
-                        await updateDoc(doc(db, "products", pRef.id), { stock: newStock });
-                    }
+                    if(pDoc.exists()) await updateDoc(doc(db, "products", pRef.id), { stock: Math.max(0, (pDoc.data().stock || 10) - 1) });
                 }
             }
-
-            if((isReturn || isCancelled) && (o.status.includes('المعالجة') || o.status.includes('التوصيل'))) {
-                let pRef = productsMap[o.productName.split('(')[0].trim()];
-                if(pRef && pRef.id) {
-                    let pDoc = await getDoc(doc(db, "products", pRef.id));
-                    if(pDoc.exists()) {
-                        let currentStock = pDoc.data().stock || 10;
-                        await updateDoc(doc(db, "products", pRef.id), { stock: currentStock + 1 });
-                    }
-                }
-            }
-
-            await updateDoc(doc(db, "orders", id), { status: newStatus, [timeField]: new Date().toLocaleString('ar-DZ'), processedBy: loggedInUser });
-            closeOrderModal();
-            loadAllOrders();
+            await updateDoc(doc(db, "orders", id), { status: newStatus, [timeField]: new Date().toLocaleString('ar-DZ') });
+            closeOrderModal(); loadAllOrders();
         }
 
         window.addProduct = async function() {
@@ -766,19 +555,19 @@
             let stock = Number(document.getElementById('prod-stock').value) || 10;
             let description = document.getElementById('prod-desc').value.trim();
             
+            let imageUrls = [];
+            document.querySelectorAll('.prod-image-input').forEach(input => { if(input.value.trim()) imageUrls.push(input.value.trim()); });
+
             let videoUrls = [];
-            document.querySelectorAll('.prod-video-input').forEach(input => {
-                if(input.value.trim()) videoUrls.push(input.value.trim());
-            });
+            document.querySelectorAll('.prod-video-input').forEach(input => { if(input.value.trim()) videoUrls.push(input.value.trim()); });
 
             if(!name || !price) { showAlert('تنبيه', 'أدخل اسم المنتج وسعر البيع!'); return; }
 
             await addDoc(collection(db, "products"), {
-                name, category, colors, sizes, buyPrice, price, stock, description, videoUrls, createdAt: new Date()
+                name, category, colors, sizes, buyPrice, price, stock, description, imageUrls, videoUrls, createdAt: new Date()
             });
-            showAlert('نجاح', 'تم نشر المنتج بنجاح مع الفيديوهات بدقة 1080p والمواصفات!');
-            loadProducts();
-            loadProductsMap();
+            showAlert('نجاح', 'تم نشر المنتج بنجاح مع الصور والفيديوهات!');
+            loadProducts(); loadProductsMap();
         }
 
         async function loadProductsMap() {
@@ -802,63 +591,13 @@
                 if(p.status === 'مهملات') return;
                 list.innerHTML += `
                     <div style="background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                        <span><b>${p.name}</b> (${p.category || 'عام'}) - السعر: ${p.price} دج | 📦 المخزون: <b>${p.stock}</b></span>
-                        <div style="display:flex; gap:6px;">
-                            <button onclick="openEditProductModal('${d.id}')" class="btn-warning" style="padding:4px 10px; font-size:12px;">تعديل ✏️</button>
+                        <span><b>${p.name}</b> - السعر: ${p.price} دج | 📦 المخزون: <b>${p.stock}</b></span>
+                        <div>
                             <button onclick="promptDeleteProduct('${d.id}')" class="btn-danger" style="padding:4px 10px; font-size:12px;">حذف 🗑️</button>
                         </div>
                     </div>
                 `;
             });
-        }
-
-        window.openEditProductModal = function(id) {
-            let p = productsFullCache[id];
-            if(!p) return;
-            document.getElementById('edit-prod-id').value = id;
-            document.getElementById('edit-prod-name').value = p.name || '';
-            document.getElementById('edit-prod-category').value = p.category || 'ميكب العناية والتجميل';
-            document.getElementById('edit-prod-colors').value = p.colors || '';
-            document.getElementById('edit-prod-sizes').value = p.sizes || '';
-            document.getElementById('edit-prod-buy-price').value = p.buyPrice || 0;
-            document.getElementById('edit-prod-price').value = p.price || 0;
-            document.getElementById('edit-prod-stock').value = p.stock !== undefined ? p.stock : 10;
-            document.getElementById('editProductModal').style.display = 'flex';
-        }
-
-        window.saveProductEdits = async function() {
-            let id = document.getElementById('edit-prod-id').value;
-            let name = document.getElementById('edit-prod-name').value.trim();
-            let category = document.getElementById('edit-prod-category').value;
-            let colors = document.getElementById('edit-prod-colors').value.trim();
-            let sizes = document.getElementById('edit-prod-sizes').value.trim();
-            let buyPrice = Number(document.getElementById('edit-prod-buy-price').value) || 0;
-            let price = Number(document.getElementById('edit-prod-price').value) || 0;
-            let stock = Number(document.getElementById('edit-prod-stock').value) || 0;
-
-            await updateDoc(doc(db, "products", id), { name, category, colors, sizes, buyPrice, price, stock });
-            document.getElementById('editProductModal').style.display = 'none';
-            showAlert('نجاح', 'تم تحديث المنتج بنجاح 💾!');
-            loadProducts();
-            loadProductsMap();
-        }
-
-        window.promptDeleteProduct = function(id) {
-            pendingActionType = 'delete_product';
-            pendingActionId = id;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModal').style.display = 'flex';
-        }
-
-        window.updateAdminSettings = function() {
-            let u = document.getElementById('setting-admin-user').value.trim();
-            let p = document.getElementById('setting-admin-pass').value.trim();
-            let wa = document.getElementById('setting-whatsapp-num').value.trim();
-            if(!u || !p || !wa) { alert('أدخل الحقول كاملة!'); return; }
-            localStorage.setItem('dz_custom_admin_user', u);
-            localStorage.setItem('dz_custom_admin_pass', p);
-            localStorage.setItem('dz_whatsapp_support', wa);
-            showAlert('نجاح', 'تم تحديث الإعدادات بنجاح 💾!');
         }
 
         window.loadAllReviewsForAdmin = function() {
@@ -867,89 +606,25 @@
             let html = '';
             for(let key in localStorage) {
                 if(key.startsWith('dz_reviews_')) {
-                    let prodId = key.replace('dz_reviews_', '');
                     let reviews = JSON.parse(localStorage.getItem(key)) || [];
-                    reviews.forEach((rev, index) => {
-                        html += `
-                            <div style="background:#f8fafc; border:1px solid #cbd5e1; padding:10px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                                <div><b>👤 ${rev.name}</b> (${'⭐'.repeat(Number(rev.rating))})<p style="margin:4px 0 0 0; font-size:13px;">${rev.comment}</p></div>
-                                <button onclick="toggleReviewVisibility('${prodId}', ${index})" style="background:${rev.hidden ? 'green':'red'}; padding:5px 10px; font-size:11px;">${rev.hidden ? 'إظهار' : 'إخفاء'}</button>
-                            </div>
-                        `;
+                    reviews.forEach((rev) => {
+                        html += `<div style="background:#f8fafc; padding:8px; border-radius:6px; margin-bottom:6px;"><b>${rev.name}</b> (${'⭐'.repeat(Number(rev.rating))}): ${rev.comment}</div>`;
                     });
                 }
             }
-            container.innerHTML = html || '<p style="text-align:center; color:#64748b;">لا توجد تعليقات.</p>';
-        }
-
-        window.toggleReviewVisibility = function(prodId, index) {
-            let key = `dz_reviews_${prodId}`;
-            let reviews = JSON.parse(localStorage.getItem(key)) || [];
-            if(reviews[index]) {
-                reviews[index].hidden = !reviews[index].hidden;
-                localStorage.setItem(key, JSON.stringify(reviews));
-                loadAllReviewsForAdmin();
-            }
-        }
-
-        window.saveStaffMember = function() {
-            let u = document.getElementById('staff-username').value.trim();
-            let p = document.getElementById('staff-password').value.trim();
-            if(!u || !p) { alert('أدخل البيانات!'); return; }
-            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            staffList[u] = { password: p, permissions: { process: true, addProd: true, del: false } };
-            localStorage.setItem('dz_staff_members', JSON.stringify(staffList));
-            showAlert('نجاح', `تم حفظ الموظف (${u}) بنجاح!`);
-            document.getElementById('staff-username').value = '';
-            document.getElementById('staff-password').value = '';
-            loadStaffList();
-        }
-
-        window.loadStaffList = function() {
-            let staffList = JSON.parse(localStorage.getItem('dz_staff_members')) || {};
-            let container = document.getElementById('staff-list-container');
-            let html = '';
-            for(let u in staffList) {
-                html += `
-                    <div class="staff-status-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h3 style="margin:0; color:#7c3aed;">👤 ${u}</h3>
-                            <button onclick="promptDeleteStaff('${u}')" class="btn-danger" style="padding:4px 10px; font-size:11px;">حذف 🗑️</button>
-                        </div>
-                    </div>
-                `;
-            }
-            container.innerHTML = html || '<p style="color:#64748b; font-size:13px;">لا توجد حسابات موظفين.</p>';
-        }
-
-        window.promptDeleteStaff = function(u) {
-            pendingActionType = 'delete_staff';
-            pendingActionId = u;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModal').style.display = 'flex';
+            container.innerHTML = html || '<p>لا توجد تعليقات.</p>';
         }
 
         window.updateAnalyticsData = function(orders) {
-            let totalProfit = 0, totalBuy = 0, totalSell = 0, routerLoss = 0;
+            let totalProfit = 0, totalSell = 0, routerLoss = 0;
             orders.forEach(o => {
                 if(o.status && (o.status.includes('مهملات') || o.status.includes('ملغى') || o.status.includes('وهمي'))) return;
                 let sellPrice = (o.finalTotal || 0);
-                let pData = productsMap[o.productName.split('(')[0].trim()] || { buyPrice: 0 };
-                let buyPriceTotal = (pData.buyPrice * (o.quantity || 1));
-                
-                let profit = o.status && o.status.includes('أرشيف') ? (sellPrice - buyPriceTotal) : 0;
-                let routerFee = o.status && o.status.includes('روتور') ? 600 : 0;
-
                 totalSell += sellPrice;
-                totalBuy += buyPriceTotal;
-                if(o.status && o.status.includes('أرشيف')) totalProfit += profit;
-                if(o.status && o.status.includes('روتور')) routerLoss += routerFee;
+                if(o.status && o.status.includes('روتور')) routerLoss += 600;
             });
-
-            document.getElementById('stat-total-profit').innerText = totalProfit + ' دج';
-            document.getElementById('stat-total-buy-price').innerText = totalBuy + ' دج';
+            document.getElementById('stat-total-profit').innerText = (totalSell - routerLoss) + ' دج';
             document.getElementById('stat-total-sell-price').innerText = totalSell + ' دج';
-            document.getElementById('stat-total-router-loss').innerText = routerLoss + ' دج';
         }
 
         function generateWilayaDetailedReport(orders) {
@@ -957,13 +632,11 @@
             orders.forEach(o => {
                 if(o.status && o.status.includes('مهملات')) return;
                 let w = o.wilaya || 'غير محددة';
-                if(!wilayaMap[w]) wilayaMap[w] = { total: 0 };
-                wilayaMap[w].total++;
+                if(!wilayaMap[w]) wilayaMap[w] = 0;
+                wilayaMap[w]++;
             });
-            let html = `<table class="wilaya-table"><thead><tr><th>الولاية</th><th>📊 مجموع الطلبات</th></tr></thead><tbody>`;
-            for(let w in wilayaMap) {
-                html += `<tr><td><b>${w}</b></td><td><b>${wilayaMap[w].total}</b></td></tr>`;
-            }
+            let html = `<table class="wilaya-table"><thead><tr><th>الولاية</th><th>عدد الطلبات</th></tr></thead><tbody>`;
+            for(let w in wilayaMap) html += `<tr><td><b>${w}</b></td><td><b>${wilayaMap[w]}</b></td></tr>`;
             html += `</tbody></table>`;
             let reportEl = document.getElementById('wilaya-report-content');
             if(reportEl) reportEl.innerHTML = html;
