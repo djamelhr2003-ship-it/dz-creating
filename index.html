@@ -33,7 +33,6 @@
 
         #store-announcement-bar { background: #0284c7; color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 15px; display: none; font-size: 14px; }
         .golden-offer-banner { background: #fef9c3; border: 2px solid #f59e0b; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
-        .countdown-timer { font-weight: bold; color: #b45309; font-size: 14px; margin-top: 6px; }
 
         .categories-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; }
         .categories-nav::-webkit-scrollbar { display: none; }
@@ -77,9 +76,11 @@
 <body>
 
     <div class="header">
-        <div style="display:flex; align-items:center; gap:10px;">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
             <button class="menu-toggle-btn" onclick="toggleDrawer()">☰</button>
-            <h1 onclick="switchPage('home-page')">🛍️ LAVENDER_store.dz</h1>
+            <h1 onclick="switchPage('home-page')" style="cursor:pointer;">🛍️ LAVENDER_store.dz</h1>
+            <!-- حاوية ظهور صور وسائل التواصل الاجتماعي في الجهة العلوية بجانب الاسم -->
+            <div id="header-social-icons" style="display:flex; gap:8px; align-items:center;"></div>
         </div>
         <div class="nav-links">
             <button class="cart-btn" onclick="openCartPage()">🛒 سلة الشراء (<span id="cart-count">0</span>)</button>
@@ -175,6 +176,7 @@
             setupWhatsappSupport();
             loadStoreAnnouncement();
             loadGoldenOffersStore();
+            loadHeaderSocialIcons();
             fetchStoreProducts();
             updateCartCountUI();
 
@@ -224,7 +226,26 @@
             else { bar.style.display = 'none'; }
         }
 
-        // دالة التحقق من العروض الذهبية وتحديث السعر تلقائياً
+        // عرض أيقونات وسائل التواصل الاجتماعي في الهيدر بجانب اسم المتجر
+        function loadHeaderSocialIcons() {
+            let container = document.getElementById('header-social-icons');
+            if(!container) return;
+            let links = JSON.parse(localStorage.getItem('dz_social_links')) || [];
+            if(links.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            let html = '';
+            links.forEach(l => {
+                html += `
+                    <a href="${l.url}" target="_blank" title="تواصل معنا" style="display:inline-block; transition:0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                        <img src="${l.iconUrl}" style="width:28px; height:28px; border-radius:50%; object-fit:cover; border:1px solid #fff; background:#fff;">
+                    </a>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
         function getActiveOfferForProduct(productName) {
             let offers = JSON.parse(localStorage.getItem('dz_golden_offers')) || [];
             let now = new Date();
@@ -294,9 +315,7 @@
                 let img = p.imageUrls?.[0] || 'https://via.placeholder.com/200';
                 let stockVal = p.stock !== undefined ? p.stock : 10;
                 
-                // التحقق من وجود عرض خاص للمنتج وتطبيق السعر الجديد
                 let offer = getActiveOfferForProduct(p.name);
-                let finalDisplayPrice = offer.hasOffer ? offer.newPrice : p.price;
                 let priceHtml = offer.hasOffer ? `
                     <span style="text-decoration: line-through; color: #9ca3af; font-size: 13px;">${offer.oldPrice} دج</span>
                     <span style="color: #e11d48; font-weight: bold; font-size: 16px; margin-right: 5px;">${offer.newPrice} دج</span>
