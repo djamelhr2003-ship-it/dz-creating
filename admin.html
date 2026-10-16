@@ -9,8 +9,8 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; animation: fadeIn 0.4s ease-in-out; }
-        .container { max-width: 1150px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; transition: 0.3s; }
+        body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 15px; color: #333; animation: fadeIn 0.4s ease-in-out; }
+        .container { max-width: 1150px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
         h2, h3 { color: #2c3e50; text-align: center; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
@@ -36,10 +36,11 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-        .orders-grid-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-        .order-mini-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; }
-        .order-mini-card:hover { border-color: #2563eb; background: #f1f5f9; transform: translateY(-2px); }
-        .order-mini-thumb { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; background: #eee; flex-shrink: 0; }
+        /* تصميم المستطيل الصغير والطويل المطور */
+        .orders-list-strip { display: flex; flex-direction: column; gap: 8px; }
+        .order-strip-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: 0.2s; flex-wrap: wrap; }
+        .order-strip-card:hover { border-color: #2563eb; background: #f1f5f9; }
+        .order-strip-thumb { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: #eee; flex-shrink: 0; }
         
         .wilaya-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; }
         .wilaya-table th, .wilaya-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
@@ -53,9 +54,10 @@
         .stat-card h4 { margin: 0 0 8px 0; font-size: 14px; color: #94a3b8; }
         .stat-card span { font-size: 24px; font-weight: bold; color: #38bdf8; }
 
-        .filter-bar { background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filter-bar { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .golden-offer-box { background: #fef9c3; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .social-box { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; gap: 10px; align-items: center; }
+        .staff-box { background: #f8fafc; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -72,9 +74,9 @@
     <div class="modal-overlay" id="passwordModal" style="z-index: 6000;">
         <div class="modal-card" style="max-width: 380px; text-align: center;">
             <h3 style="color: #c0392b; margin-top:0;">🔒 تأكيد الحذف بكلمة المرور</h3>
-            <p style="font-size: 13px; color: #555;">أدخل كلمة مرور الأدمن لنقل العنصر إلى المهملات:</p>
+            <p style="font-size: 13px; color: #555;">أدخل كلمة مرور الأدمن للمتابعة:</p>
             <div class="form-group"><input type="password" id="admin-action-pass" autocomplete="new-password"></div>
-            <button onclick="confirmAdminAction()" class="btn-danger" style="width: 100%; margin-bottom: 8px;">تأكيد للحذف 🗑️</button>
+            <button onclick="confirmAdminAction()" class="btn-danger" style="width: 100%; margin-bottom: 8px;">تأكيد التنفيذ 🗑️</button>
             <button onclick="document.getElementById('passwordModal').style.display='none'" class="btn-secondary" style="width: 100%; background: #64748b;">إلغاء</button>
         </div>
     </div>
@@ -127,6 +129,8 @@
                 <button class="tab-btn" onclick="switchTab('trash-tab', event)" style="background:#64748b; color:white;">🗑️ المهملات</button>
                 <button class="tab-btn" onclick="switchTab('golden-offers-tab', event)" style="background:#f59e0b; color:white;">⭐ العروض</button>
                 <button class="tab-btn" onclick="switchTab('social-media-tab', event)" style="background:#25d366; color:white;">🌐 التواصل</button>
+                <button class="tab-btn" onclick="switchTab('staff-tab', event)" style="background:#8b5cf6; color:white;">👥 الطاقم</button>
+                <button class="tab-btn" onclick="switchTab('settings-tab', event)" style="background:#475569; color:white;">⚙️ الإعدادات</button>
                 <button class="tab-btn" onclick="switchTab('ads-mgmt-tab', event)" style="background:#0284c7; color:white;">📢 الإعلانات</button>
                 <button class="tab-btn" onclick="switchTab('wilaya-report-tab', event)" style="background: #2563eb; color: white;">📍 الولايات</button>
                 <button class="tab-btn" onclick="switchTab('analytics-tab', event)">💰 التحليلات</button>
@@ -136,7 +140,7 @@
             </div>
         </div>
 
-        <!-- الطلبات الجديدة مع شريط البحث، التاريخ، وتحديد الكل -->
+        <!-- الطلبات الجديدة -->
         <div id="orders-tab" class="tab-content active">
             <div class="container">
                 <h2>الطلبات الجديدة ⏳</h2>
@@ -144,31 +148,53 @@
                     <input type="text" id="search-new" placeholder="🔍 بحث بالاسم، الهاتف أو المنتج..." oninput="renderOrdersFiltered()" style="flex:2;">
                     <input type="date" id="date-new" onchange="renderOrdersFiltered()" style="flex:1;">
                 </div>
-                <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
+                <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap:wrap;">
                     <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
                         <input type="checkbox" id="select-all-new" onclick="toggleSelectAll('new', this)"> تحديد الكل
                     </label>
-                    <button onclick="batchAction('new', 'قيد المعالجة 🔄', 'timeProcessing')" class="btn-secondary" style="font-size:12px; padding:6px 12px;">معالجة المجلد المحدد 🔄</button>
+                    <button onclick="batchAction('new', 'قيد المعالجة 🔄', 'timeProcessing')" class="btn-secondary" style="font-size:12px; padding:6px 12px;">معالجة المحدد 🔄</button>
                 </div>
-                <div id="orders-list-new" class="orders-grid-compact">جاري التحميل...</div>
+                <div id="orders-list-new" class="orders-list-strip">جاري التحميل...</div>
             </div>
         </div>
         
-        <div id="fake-orders-tab" class="tab-content"><div class="container" style="border:2px solid #dc2626;"><h2 style="color:#dc2626;">⚠️ الطلبات الوهمية</h2><div class="filter-bar"><input type="text" id="search-fake" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-fake" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-fake" class="orders-grid-compact"></div></div></div>
+        <div id="fake-orders-tab" class="tab-content"><div class="container" style="border:2px solid #dc2626;"><h2 style="color:#dc2626;">⚠️ الطلبات الوهمية</h2><div class="filter-bar"><input type="text" id="search-fake" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-fake" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-fake" class="orders-list-strip"></div></div></div>
         
-        <div id="processing-tab" class="tab-content"><div class="container"><h2>قيد المعالجة 🔄</h2><div class="filter-bar"><input type="text" id="search-proc" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-proc" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-processing" class="orders-grid-compact"></div></div></div>
+        <div id="processing-tab" class="tab-content"><div class="container"><h2>قيد المعالجة 🔄</h2><div class="filter-bar"><input type="text" id="search-proc" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-proc" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-processing" class="orders-list-strip"></div></div></div>
         
-        <div id="shipping-tab" class="tab-content"><div class="container"><h2>جاري التوصيل 🚚</h2><div class="filter-bar"><input type="text" id="search-ship" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-ship" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-shipping" class="orders-grid-compact"></div></div></div>
+        <div id="shipping-tab" class="tab-content"><div class="container"><h2>جاري التوصيل 🚚</h2><div class="filter-bar"><input type="text" id="search-ship" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-ship" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-shipping" class="orders-list-strip"></div></div></div>
         
-        <div id="archive-tab" class="tab-content"><div class="container"><h2>الأرشيف ✅</h2><div class="filter-bar"><input type="text" id="search-arch" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-arch" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-archive" class="orders-grid-compact"></div></div></div>
+        <div id="archive-tab" class="tab-content"><div class="container"><h2>الأرشيف ✅</h2><div class="filter-bar"><input type="text" id="search-arch" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-arch" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-archive" class="orders-list-strip"></div></div></div>
         
-        <div id="return-tab" class="tab-content"><div class="container"><h2>الروتور ⚠️</h2><div class="filter-bar"><input type="text" id="search-ret" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-ret" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-return" class="orders-grid-compact"></div></div></div>
+        <div id="return-tab" class="tab-content"><div class="container"><h2>الروتور ⚠️</h2><div class="filter-bar"><input type="text" id="search-ret" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-ret" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-return" class="orders-list-strip"></div></div></div>
         
-        <div id="cancelled-tab" class="tab-content"><div class="container"><h2>ملغى ❌</h2><div class="filter-bar"><input type="text" id="search-canc" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-canc" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-cancelled" class="orders-grid-compact"></div></div></div>
+        <div id="cancelled-tab" class="tab-content"><div class="container"><h2>ملغى ❌</h2><div class="filter-bar"><input type="text" id="search-canc" placeholder="🔍 بحث..." oninput="renderOrdersFiltered()" style="flex:2;"><input type="date" id="date-canc" onchange="renderOrdersFiltered()" style="flex:1;"></div><div id="orders-list-cancelled" class="orders-list-strip"></div></div></div>
         
-        <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ المهملات (تُحذف تلقائياً بعد 48 ساعة)</h2><div id="orders-list-trash" class="orders-grid-compact"></div></div></div>
+        <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ المهملات (تُحذف نهائياً فقط من هنا)</h2><div id="orders-list-trash" class="orders-list-strip"></div></div></div>
 
-        <!-- الأقسام الأخرى -->
+        <!-- قسم الطاقم -->
+        <div id="staff-tab" class="tab-content">
+            <div class="container" style="border: 2px solid #8b5cf6;">
+                <h2 style="color: #8b5cf6;">👥 إدارة طاقم العمل</h2>
+                <div id="staff-list-container"></div>
+                <button type="button" onclick="addStaffForm()" class="btn-secondary" style="background:#8b5cf6; margin-bottom:15px; width:100%;">➕ إضافة عضو طاقم جديد</button>
+                <button onclick="saveStaffList()" style="background:#8b5cf6; width:100%;">حفظ بيانات الطاقم 💾</button>
+            </div>
+        </div>
+
+        <!-- قسم الإعدادات -->
+        <div id="settings-tab" class="tab-content">
+            <div class="container" style="border: 2px solid #475569;">
+                <h2 style="color: #475569;">⚙️ إعدادات المتجر العامة</h2>
+                <div class="form-group">
+                    <label>رقم أو رابط واتساب الدعم:</label>
+                    <input type="text" id="settings-whatsapp" placeholder="مثال: 213700000000">
+                </div>
+                <button onclick="saveStoreSettings()" style="background:#475569; width:100%;">حفظ الإعدادات 💾</button>
+            </div>
+        </div>
+
+        <!-- وسائل التواصل الاجتماعي -->
         <div id="social-media-tab" class="tab-content">
             <div class="container" style="border: 2px solid #25d366;">
                 <h2 style="color: #25d366;">🌐 إدارة روابط وسائل التواصل الاجتماعي</h2>
@@ -327,6 +353,43 @@
             else links.forEach(l => addSocialLinkForm(l.url, l.iconUrl));
         }
 
+        window.addStaffForm = function(name = '', role = '') {
+            let container = document.getElementById('staff-list-container');
+            let div = document.createElement('div');
+            div.className = 'staff-box';
+            div.innerHTML = `
+                <div class="form-group" style="margin-bottom:8px;"><label>اسم العضو:</label><input type="text" class="staff-name" value="${name}" placeholder="اسم موظف الطاقم"></div>
+                <div class="form-group" style="margin-bottom:8px;"><label>الدور / المهمة:</label><input type="text" class="staff-role" value="${role}" placeholder="مثال: مسؤول التوصيل، الدعم الفني"></div>
+                <button type="button" onclick="this.parentElement.remove()" class="btn-danger" style="padding:5px 10px; font-size:11px;">حذف العضو 🗑️</button>
+            `;
+            container.appendChild(div);
+        }
+
+        window.saveStaffList = function() {
+            let staff = [];
+            document.querySelectorAll('.staff-box').forEach(box => {
+                let name = box.querySelector('.staff-name').value.trim();
+                let role = box.querySelector('.staff-role').value.trim();
+                if(name) staff.push({ name, role });
+            });
+            localStorage.setItem('dz_store_staff', JSON.stringify(staff));
+            showAlert('نجاح العملية ✅', 'تم حفظ بيانات طاقم العمل بنجاح 👥!');
+        }
+
+        function loadStaffAdmin() {
+            let container = document.getElementById('staff-list-container');
+            container.innerHTML = '';
+            let staff = JSON.parse(localStorage.getItem('dz_store_staff')) || [];
+            if(staff.length === 0) addStaffForm();
+            else staff.forEach(s => addStaffForm(s.name, s.role));
+        }
+
+        window.saveStoreSettings = function() {
+            let wa = document.getElementById('settings-whatsapp').value.trim();
+            localStorage.setItem('dz_whatsapp_support', wa);
+            showAlert('نجاح العملية ✅', 'تم حفظ إعدادات المتجر العامة بنجاح ⚙️!');
+        }
+
         window.addGoldenOfferForm = function(productId = '', details = '', oldPrice = '', newPrice = '', endTime = '', visible = true) {
             let container = document.getElementById('golden-offers-container');
             let productOptions = '<option value="">-- اختر المنتج المشمول بالعرض --</option>';
@@ -366,14 +429,6 @@
             showAlert('نجاح العملية ✅', 'تم حفظ ونشر العروض وتحديث الأسعار بنجاح ⭐!');
         }
 
-        function loadGoldenOffersAdmin() {
-            let container = document.getElementById('golden-offers-container');
-            container.innerHTML = '';
-            let offers = JSON.parse(localStorage.getItem('dz_golden_offers')) || [];
-            if(offers.length === 0) addGoldenOfferForm();
-            else offers.forEach(o => addGoldenOfferForm(o.productName, o.details, o.oldPrice, o.newPrice, o.endTime, o.visible));
-        }
-
         window.saveStoreAnnouncement = function() {
             let text = document.getElementById('admin-ad-text').value;
             let visible = document.getElementById('admin-ad-visible').checked;
@@ -390,7 +445,7 @@
             if(u === adminUser && p === adminPass) {
                 sessionStorage.setItem('ecom_logged_user', u);
                 sessionStorage.setItem('ecom_is_admin', 'true');
-                initDashboard(u, true);
+                initDashboard();
                 return;
             }
             document.getElementById('login-error').innerText = 'خطأ في اسم المستخدم أو كلمة المرور!';
@@ -398,10 +453,10 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             let user = sessionStorage.getItem('ecom_logged_user');
-            if(user) initDashboard(user, sessionStorage.getItem('ecom_is_admin') === 'true');
+            if(user) initDashboard();
         });
 
-        async function initDashboard(user, isAdmin) {
+        async function initDashboard() {
             document.getElementById('login-box').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
             
@@ -409,9 +464,12 @@
             document.getElementById('admin-ad-text').value = savedAd.text || '';
             document.getElementById('admin-ad-visible').checked = savedAd.visible !== false;
 
+            document.getElementById('settings-whatsapp').value = localStorage.getItem('dz_whatsapp_support') || '213700000000';
+
             await loadProductsMap();
             loadGoldenOffersAdmin();
             loadSocialLinksAdmin();
+            loadStaffAdmin();
             await loadAllOrders();
             loadProducts();
             loadAllReviewsForAdmin();
@@ -430,19 +488,39 @@
             try {
                 const snap = await getDocs(collection(db, "orders"));
                 allFetchedOrders = []; ordersCache = {};
-                let now = new Date();
+                
+                // فحص الطلبات وتطبيق الفحص التلقائي للطلبات الوهمية (نفس الزبون في نفس اليوم)
+                let tempOrders = [];
+                snap.forEach(d => {
+                    tempOrders.push({ id: d.id, ...d.data() });
+                });
 
-                for(let d of snap.docs) {
-                    const o = { id: d.id, ...d.data() };
-                    if(o.status && o.status.includes('مهملات') && o.trashTime) {
-                        if((now - new Date(o.trashTime)) / (1000 * 60 * 60) >= 48) {
-                            await deleteDoc(doc(db, "orders", d.id));
-                            continue;
-                        }
+                // ترتيب تصاعدي حسب التاريخ للتحقق من التكرار في نفس اليوم
+                tempOrders.sort((a, b) => {
+                    let timeA = new Date(a.createdAt?.seconds ? a.createdAt.seconds * 1000 : (a.createdAt || 0));
+                    let timeB = new Date(b.createdAt?.seconds ? b.createdAt.seconds * 1000 : (b.createdAt || 0));
+                    return timeA - timeB;
+                });
+
+                let seenCustomersToday = new Set();
+
+                for(let o of tempOrders) {
+                    let dObj = new Date(o.createdAt?.seconds ? o.createdAt.seconds * 1000 : (o.createdAt || Date.now()));
+                    let dateStr = dObj.toISOString().split('T')[0];
+                    let customerKey = `${(o.phone || '').trim()}_${(o.fullName || '').trim()}_${dateStr}`;
+
+                    // التحقق إذا كان الطلب جديداً وصدر طلب سابق لنفس الشخص في نفس اليوم
+                    if(o.status && o.status.includes('جديد') && seenCustomersToday.has(customerKey)) {
+                        o.status = 'وهمي ⚠️';
+                        await updateDoc(doc(db, "orders", o.id), { status: 'وهمي ⚠️' });
+                    } else {
+                        seenCustomersToday.add(customerKey);
                     }
+
                     ordersCache[o.id] = o;
                     allFetchedOrders.push(o);
                 }
+
                 renderOrdersFiltered();
                 generateWilayaDetailedReport(allFetchedOrders);
                 updateAnalyticsData(allFetchedOrders);
@@ -450,17 +528,17 @@
         }
 
         window.renderOrdersFiltered = function() {
-            renderList('new', 'orders-list-new', 'جديد ⏳', 'search-new', 'date-new');
-            renderList('fake', 'orders-list-fake', 'وهمي ⚠️', 'search-fake', 'date-fake');
-            renderList('proc', 'orders-list-processing', 'قيد المعالجة 🔄', 'search-proc', 'date-proc');
-            renderList('ship', 'orders-list-shipping', 'جاري التوصيل 🚚', 'search-ship', 'date-ship');
-            renderList('arch', 'orders-list-archive', 'أرشيف (مسلم) ✅', 'search-arch', 'date-arch');
-            renderList('ret', 'orders-list-return', 'مرتجع (روتور) ⚠️', 'search-ret', 'date-ret');
-            renderList('canc', 'orders-list-cancelled', 'ملغى ❌', 'search-canc', 'date-canc');
+            renderList('new', 'orders-list-new', 'جديد ⏳', 'search-new', 'date-new', true);
+            renderList('fake', 'orders-list-fake', 'وهمي ⚠️', 'search-fake', 'date-fake', false);
+            renderList('proc', 'orders-list-processing', 'قيد المعالجة 🔄', 'search-proc', 'date-proc', false);
+            renderList('ship', 'orders-list-shipping', 'جاري التوصيل 🚚', 'search-ship', 'date-ship', false);
+            renderList('arch', 'orders-list-archive', 'أرشيف (مسلم) ✅', 'search-arch', 'date-arch', false);
+            renderList('ret', 'orders-list-return', 'مرتجع (روتور) ⚠️', 'search-ret', 'date-ret', false);
+            renderList('canc', 'orders-list-cancelled', 'ملغى ❌', 'search-canc', 'date-canc', false);
             renderTrashList();
         }
 
-        function renderList(type, elementId, targetStatusKeyword, searchInputId, dateInputId) {
+        function renderList(type, elementId, targetStatusKeyword, searchInputId, dateInputId, showFakeBtn) {
             let container = document.getElementById(elementId);
             if(!container) return;
             container.innerHTML = '';
@@ -472,34 +550,49 @@
                 const status = o.status || 'جديد ⏳';
                 if(!status.includes(targetStatusKeyword)) return;
 
-                // تصفية البحث (الاسم، الهاتف، أو المنتج)
                 let matchQuery = !query || o.fullName?.toLowerCase().includes(query) || o.phone?.includes(query) || o.productName?.toLowerCase().includes(query);
-                
-                // تصفية التاريخ
                 let matchDate = true;
-                if(selectedDate && o.createdAt) {
-                    let orderDate = new Date(o.createdAt.seconds ? o.createdAt.seconds * 1000 : o.createdAt).toISOString().split('T')[0];
-                    matchDate = (orderDate === selectedDate);
+                let dateStr = '';
+                if(o.createdAt) {
+                    let dObj = new Date(o.createdAt.seconds ? o.createdAt.seconds * 1000 : o.createdAt);
+                    dateStr = dObj.toLocaleDateString('ar-DZ') + ' ' + dObj.toLocaleTimeString('ar-DZ', {hour: '2-digit', minute:'2-digit'});
+                    let orderDateOnly = dObj.toISOString().split('T')[0];
+                    if(selectedDate && orderDateOnly !== selectedDate) matchDate = false;
                 }
 
                 if(!matchQuery || !matchDate) return;
 
                 let firstImg = o.cartItems?.[0]?.imageUrl || 'https://via.placeholder.com/50';
+                let fakeBtnHtml = showFakeBtn ? `<button onclick="markAsFake('${o.id}')" style="background:#dc2626; padding:5px 8px; font-size:11px;">وهمي ⚠️</button>` : '';
+
                 container.innerHTML += `
-                    <div class="order-mini-card">
-                        <div style="display:flex; gap:10px; align-items:center; flex:1;">
+                    <div class="order-strip-card">
+                        <div style="display:flex; gap:10px; align-items:center; flex:1; min-width: 250px;">
                             <input type="checkbox" class="order-checkbox-${type}" value="${o.id}">
-                            <img src="${firstImg}" class="order-mini-thumb" style="cursor:pointer;" onclick="openOrderModal('${o.id}')">
+                            <img src="${firstImg}" class="order-strip-thumb" style="cursor:pointer;" onclick="openOrderModal('${o.id}')">
                             <div style="cursor:pointer; flex:1;" onclick="openOrderModal('${o.id}')">
-                                <h4 style="margin:0 0 2px 0; font-size:13px;">👤 ${o.fullName}</h4>
-                                <p style="margin:0; font-size:11px; color:#555;">📦 ${o.productName}</p>
-                                <p style="margin:0; color:#ef4444; font-weight:bold; font-size:12px;">${o.finalTotal || 0} دج</p>
+                                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                                    <h4 style="margin:0; font-size:13px; color:#1e293b;">👤 ${o.fullName} (${o.phone})</h4>
+                                    <span style="font-size:11px; color:#64748b;">📍 ${o.wilaya || '-'}</span>
+                                    <span style="font-size:11px; color:#0284c7;">📅 ${dateStr}</span>
+                                </div>
+                                <p style="margin:3px 0 0 0; font-size:12px; color:#475569;">📦 ${o.productName}</p>
                             </div>
                         </div>
-                        <div><button onclick="promptDeleteOrder('${o.id}', '${status}')" class="btn-danger" style="padding:5px; font-size:11px;">حذف 🗑️</button></div>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <span style="color:#e11d48; font-weight:bold; font-size:13px;">${o.finalTotal || 0} دج</span>
+                            ${fakeBtnHtml}
+                            <button onclick="promptDeleteOrder('${o.id}', '${status}')" class="btn-danger" style="padding:5px 10px; font-size:11px;">حذف 🗑️</button>
+                        </div>
                     </div>
                 `;
             });
+        }
+
+        window.markAsFake = async function(id) {
+            await updateDoc(doc(db, "orders", id), { status: 'وهمي ⚠️' });
+            showAlert('نجاح العملية ✅', 'تم نقل الطلب إلى قسم الطلبات الوهمية بنجاح!');
+            loadAllOrders();
         }
 
         window.toggleSelectAll = function(type, masterCheckbox) {
@@ -525,9 +618,12 @@
             allFetchedOrders.forEach(o => {
                 if(!o.status?.includes('مهملات')) return;
                 container.innerHTML += `
-                    <div class="order-mini-card">
-                        <div><h4>👤 ${o.fullName}</h4><p style="font-size:11px;">📦 ${o.productName}</p></div>
-                        <div style="width:100px;"><button onclick="restoreOrder('${o.id}')" style="background:#10b981; width:100%; margin-bottom:4px; font-size:11px;">استعادة ♻️</button><button onclick="permanentDelete('${o.id}')" class="btn-danger" style="width:100%; font-size:11px;">حذف نهائي ❌</button></div>
+                    <div class="order-strip-card">
+                        <div><h4 style="margin:0; font-size:13px;">👤 ${o.fullName} (${o.phone})</h4><p style="margin:0; font-size:11px;">📦 ${o.productName}</p></div>
+                        <div style="display:flex; gap:5px;">
+                            <button onclick="restoreOrder('${o.id}')" style="background:#10b981; padding:5px 10px; font-size:11px;">استعادة ♻️</button>
+                            <button onclick="promptPermanentDelete('${o.id}')" class="btn-danger" style="padding:5px 10px; font-size:11px;">حذف نهائي ❌</button>
+                        </div>
                     </div>
                 `;
             });
@@ -535,6 +631,12 @@
 
         window.promptDeleteOrder = function(id, currentStatus) {
             pendingActionType = 'delete_order'; pendingActionId = id; pendingOriginalStatus = currentStatus;
+            document.getElementById('admin-action-pass').value = '';
+            document.getElementById('passwordModal').style.display = 'flex';
+        }
+
+        window.promptPermanentDelete = function(id) {
+            pendingActionType = 'permanent_delete'; pendingActionId = id;
             document.getElementById('admin-action-pass').value = '';
             document.getElementById('passwordModal').style.display = 'flex';
         }
@@ -555,6 +657,10 @@
                 await updateDoc(doc(db, "orders", pendingActionId), { status: `مهملات | ${pendingOriginalStatus}`, trashTime: new Date().toISOString() });
                 showAlert('نجاح العملية ✅', 'تم نقل الطلب إلى المهملات بنجاح!');
                 loadAllOrders();
+            } else if(pendingActionType === 'permanent_delete') {
+                await deleteDoc(doc(db, "orders", pendingActionId));
+                showAlert('نجاح العملية ✅', 'تم حذف الطلب نهائياً من قاعدة البيانات!');
+                loadAllOrders();
             } else if(pendingActionType === 'delete_product') {
                 await updateDoc(doc(db, "products", pendingActionId), { status: 'مهملات', trashTime: new Date().toISOString() });
                 showAlert('نجاح العملية ✅', 'تم نقل المنتج إلى المهملات بنجاح!');
@@ -568,12 +674,6 @@
             let originalStatus = o.status.split('|')[1]?.trim() || 'جديد ⏳';
             await updateDoc(doc(db, "orders", id), { status: originalStatus, trashTime: null });
             showAlert('نجاح العملية ✅', 'تم استعادة الطلب بنجاح!');
-            loadAllOrders();
-        }
-
-        window.permanentDelete = async function(id) {
-            await deleteDoc(doc(db, "orders", id));
-            showAlert('نجاح العملية ✅', 'تم حذف الطلب نهائياً!');
             loadAllOrders();
         }
 
@@ -645,7 +745,7 @@
             await addDoc(collection(db, "products"), {
                 name, category, colors, sizes, buyPrice, price, stock, description, imageUrls, videoUrls, createdAt: new Date()
             });
-            showAlert('نجاح العملية ✅', 'تم نشر المنتج بنجاح مع الصور والفيديوهات للمتجر!');
+            showAlert('نجاح العملية ✅', 'تم نشر المنتج بنجاح للمتجر!');
             loadProducts(); loadProductsMap();
         }
 
