@@ -330,7 +330,7 @@
             </div>
         </div>
 
-        <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات</h2><div id="wilaya-report-content"></div></div></div>
+        <div id="wilaya-report-tab" class="tab-content"><div class="container"><h2>📍 تقرير الولايات (حسب المكتب والمنزل)</h2><div id="wilaya-report-content"></div></div></div>
         
         <div id="analytics-tab" class="tab-content">
             <div class="container" style="border: 2px solid #059669;">
@@ -949,7 +949,6 @@
             const o = ordersCache[id];
             if(!o) return;
             
-            // تنسيق تاريخ إنشاء الطلب
             let createdDateStr = 'غير محدد';
             if(o.createdAt) {
                 let dObj = new Date(o.createdAt.seconds ? o.createdAt.seconds * 1000 : o.createdAt);
@@ -971,7 +970,7 @@
                 <b>📞 رقم الهاتف:</b> ${o.phone || 'غير محدد'}<br>
                 <b>📍 الولاية:</b> ${o.wilaya || '-'}<br>
                 <b>🏘️ البلدية:</b> ${o.commune || '-'}<br>
-                <b>🚚 نوع التوصيل:</b> ${o.deliveryType || '-'}<br>
+                <b>🚚 نوع التوصيل:</b> <span style="background:#e0e7ff; color:#3730a3; padding:2px 6px; border-radius:4px; font-weight:bold;">${o.deliveryType || '-'}</span><br>
                 <b>💰 إجمالي المبلغ:</b> <span style="color:#e11d48; font-weight:bold;">${o.finalTotal || 0} دج</span><br>
                 <b>📝 ملاحظات الزبون:</b> <span style="color:#d97706;">${o.notes || 'لا توجد ملاحظات'}</span><br>
                 <hr style="margin:8px 0; border:0; border-top:1px solid #cbd5e1;">
@@ -1123,7 +1122,7 @@
         }
 
         window.updateAnalyticsData = function(orders) {
-            let totalSell =, routerLoss = 0, todayOrdersCount = 0, todaySellAmount = 0, todayProcessedCount = 0;
+            let totalSell = 0, routerLoss = 0, todayOrdersCount = 0, todaySellAmount = 0, todayProcessedCount = 0;
             let todayStr = new Date().toISOString().split('T')[0];
 
             orders.forEach(o => {
@@ -1165,15 +1164,50 @@
 
         function generateWilayaDetailedReport(orders) {
             let wilayaMap = {};
+            let totalOffice = 0, totalHome = 0;
+
             orders.forEach(o => {
                 if(o.status && o.status.includes('مهملات')) return;
                 let w = o.wilaya || 'غير محددة';
-                if(!wilayaMap[w]) wilayaMap[w] = 0;
-                wilayaMap[w]++;
+                let dtype = o.deliveryType || 'المنزل'; // افتراضي إذا لم يُحدد
+
+                if(!wilayaMap[w]) {
+                    wilayaMap[w] = { office: 0, home: 0, total: 0 };
+                }
+
+                if(dtype.includes('مكتب') || dtype.toLowerCase().includes('office')) {
+                    wilayaMap[w].office++;
+                    totalOffice++;
+                } else {
+                    wilayaMap[w].home++;
+                    totalHome++;
+                }
+                wilayaMap[w].total++;
             });
-            let html = `<table class="wilaya-table"><thead><tr><th>الولاية</th><th>عدد الطلبات</th></tr></thead><tbody>`;
-            for(let w in wilayaMap) html += `<tr><td><b>${w}</b></td><td><b>${wilayaMap[w]}</b></td></tr>`;
+
+            let html = `<table class="wilaya-table">
+                <thead>
+                    <tr>
+                        <th>الولاية</th>
+                        <th>توصيل للمكتب 🏢</th>
+                        <th>توصيل للمنزل 🏠</th>
+                        <th>إجمالي الطلبات 📦</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            
+            for(let w in wilayaMap) {
+                let data = wilayaMap[w];
+                html += `<tr>
+                    <td><b>${w}</b></td>
+                    <td><span style="color:#2563eb; font-weight:bold;">${data.office}</span></td>
+                    <td><span style="color:#059669; font-weight:bold;">${data.home}</span></td>
+                    <td><b>${data.total}</b></td>
+                </tr>`;
+            }
+
             html += `</tbody></table>`;
+            
             let reportEl = document.getElementById('wilaya-report-content');
             if(reportEl) reportEl.innerHTML = html;
         }
