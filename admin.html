@@ -51,7 +51,6 @@
         .staff-status-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .filter-bar { background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         
-        /* تنسيق مربع العروض الخاصة الذهبي */
         .golden-offer-box { background: #fef9c3; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .price-old-wrapper { position: relative; display: inline-block; width: 100%; }
         .price-old-wrapper::after { content: '✕'; color: red; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-weight: bold; font-size: 16px; pointer-events: none; }
@@ -93,8 +92,8 @@
                     <option value="أكسسوارات">أكسسوارات</option>
                 </select>
             </div>
-            <div class="form-group"><label>الألوان المتاحة (مفصولة بفواصل):</label><input type="text" id="edit-prod-colors" placeholder="أسود، أبيض، أحمر"></div>
-            <div class="form-group"><label>المقاسات المتاحة (مفصولة بفواصل):</label><input type="text" id="edit-prod-sizes" placeholder="S, M, L, XL"></div>
+            <div class="form-group"><label>الألوان المتاحة (مفصولة بفواصل):</label><input type="text" id="edit-prod-colors"></div>
+            <div class="form-group"><label>المقاسات المتاحة (مفصولة بفواصل):</label><input type="text" id="edit-prod-sizes"></div>
             <div class="form-group"><label>سعر الشراء:</label><input type="number" id="edit-prod-buy-price"></div>
             <div class="form-group"><label>سعر البيع الأساسي (دج):</label><input type="number" id="edit-prod-price"></div>
             <div class="form-group"><label>كمية المخزون:</label><input type="number" id="edit-prod-stock"></div>
@@ -103,7 +102,7 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل الطلب -->
+    <!-- نافذة تفاصيل الطلب وحالاته -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal-card">
             <h3 style="margin-top: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">📋 تفاصيل الطلب، جدول التوقيت والملاحظات</h3>
@@ -161,7 +160,6 @@
             </div>
         </div>
 
-        <!-- تبويب العروض الخاصة الذهبية -->
         <div id="golden-offers-tab" class="tab-content">
             <div class="container" style="border: 2px solid #f59e0b;">
                 <h2 style="color: #f59e0b;">⭐ إدارة العروض الخاصة والعداد التنازلي</h2>
@@ -171,11 +169,10 @@
             </div>
         </div>
 
-        <!-- تبويب الإعلانات -->
         <div id="ads-mgmt-tab" class="tab-content">
             <div class="container" style="border: 2px solid #0284c7;">
                 <h2 style="color: #0284c7;">📢 إدارة الإعلانات والتنبيهات</h2>
-                <div class="form-group"><label>نص أو رابط الإعلان:</label><textarea id="admin-ad-text" placeholder="اكتب نص الإعلان هنا أو ضع رابطه..."></textarea></div>
+                <div class="form-group"><label>نص أو رابط الإعلان:</label><textarea id="admin-ad-text" placeholder="اكتب نص الإعلان هنا..."></textarea></div>
                 <div class="form-group"><label><input type="checkbox" id="admin-ad-visible" checked> إظهار الإعلان للزوار في المتجر</label></div>
                 <button onclick="saveStoreAnnouncement()" style="background:#0284c7; width:100%;">حفظ الإعلان 💾</button>
             </div>
@@ -207,7 +204,7 @@
 
         <div id="processing-tab" class="tab-content">
             <div class="container">
-                <h2>قيد المعالجة 🔄</h2>
+                <h2>قيد المعالجة 🔄 (خصم مخزون تلقائي)</h2>
                 <div class="filter-bar">
                     <input type="text" id="search-proc" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
                     <input type="date" id="date-proc" onchange="renderOrdersFiltered()" style="flex:1;">
@@ -231,7 +228,7 @@
 
         <div id="archive-tab" class="tab-content">
             <div class="container">
-                <h2>الأرشيف ✅</h2>
+                <h2>الأرشيف ✅ (مسلم - حساب الأرباح)</h2>
                 <div class="filter-bar">
                     <input type="text" id="search-arch" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
                     <input type="date" id="date-arch" onchange="renderOrdersFiltered()" style="flex:1;">
@@ -243,7 +240,7 @@
 
         <div id="return-tab" class="tab-content">
             <div class="container">
-                <h2>الروتور ⚠️</h2>
+                <h2>الروتور ⚠️ (مرتجع - إعادة للمخزون وحساب الخسائر)</h2>
                 <div class="filter-bar">
                     <input type="text" id="search-ret" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
                     <input type="date" id="date-ret" onchange="renderOrdersFiltered()" style="flex:1;">
@@ -255,7 +252,7 @@
 
         <div id="cancelled-tab" class="tab-content">
             <div class="container">
-                <h2>الطلبات الملغية ❌</h2>
+                <h2>الطلبات الملغية ❌ (إعادة للمخزون)</h2>
                 <div class="filter-bar">
                     <input type="text" id="search-canc" placeholder="🔍 بحث بالاسم أو رقم الهاتف..." oninput="renderOrdersFiltered()" style="flex:2;">
                     <input type="date" id="date-canc" onchange="renderOrdersFiltered()" style="flex:1;">
@@ -265,7 +262,7 @@
             </div>
         </div>
 
-        <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ سلة المهملات (تحذف تلقائياً بعد 48 ساعة)</h2><div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div></div></div>
+        <div id="trash-tab" class="tab-content"><div class="container"><h2>🗑️ سلة المهملات (تُحذف تلقائياً بعد 48 ساعة)</h2><div id="orders-list-trash" class="orders-grid-compact">سلة المهملات فارغة.</div></div></div>
 
         <div id="wilaya-report-tab" class="tab-content">
             <div class="container">
@@ -284,7 +281,7 @@
 
         <div id="analytics-tab" class="tab-content">
             <div class="container">
-                <h2>💰 التحليلات المالية وإحصائيات الزوار</h2>
+                <h2>💰 التحليلات المالية وإحصائيات الزوار والأرباح</h2>
                 <button onclick="window.print()" class="btn-secondary" style="margin-bottom:15px;">🖨️ طباعة التحليلات والتقارير</button>
                 
                 <div class="stats-grid" style="margin-top:20px;">
@@ -303,6 +300,9 @@
 
                 <h3 style="margin-top:30px; color:#1e293b; text-align:right;">🏆 تحليل المنتجات الأكثر طلباً:</h3>
                 <div id="top-products-analytics-container">جاري التحليل...</div>
+
+                <h3 style="margin-top:30px; color:#1e293b; text-align:right;">📅 التحليل اليومي لكل يوم على حدة:</h3>
+                <div id="daily-analytics-container">جاري التجهيز...</div>
             </div>
         </div>
 
@@ -329,7 +329,6 @@
             </div>
         </div>
 
-        <!-- إضافة منتج مع الفيديوهات بدقة 1080p والأصناف المحدثة -->
         <div id="add-product-tab" class="tab-content">
             <div class="container">
                 <h2>إضافة منتج (ميكب، ألبسة، أكسسوارات) وفيديوهات 1080p ➕</h2>
@@ -513,6 +512,7 @@
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             if(event && event.currentTarget) event.currentTarget.classList.add('active');
+            if(tabId === 'reviews-mgmt-tab') loadAllReviewsForAdmin();
         }
 
         window.logout = function() {
@@ -536,10 +536,28 @@
                             continue;
                         }
                     }
+
+                    // الكشف التلقائي عن الطلبات الوهمية والمكررة لنفس الشخص في نفس اليوم
+                    if(o.status === 'جديد ⏳') {
+                        let isDuplicate = allFetchedOrders.some(existing => 
+                            existing.phone === o.phone && 
+                            existing.status === 'جديد ⏳' && 
+                            new Date(existing.createdAt?.toDate ? existing.createdAt.toDate() : new Date()).toDateString() === new Date(o.createdAt?.toDate ? o.createdAt.toDate() : new Date()).toDateString()
+                        );
+                        if(isDuplicate) {
+                            o.status = 'وهمي ⚠️';
+                            await updateDoc(doc(db, "orders", d.id), { status: 'وهمي ⚠️', timeFake: new Date().toLocaleString('ar-DZ') });
+                        }
+                    }
+
                     ordersCache[o.id] = o;
                     allFetchedOrders.push(o);
                 }
+
                 renderOrdersFiltered();
+                generateWilayaDetailedReport(allFetchedOrders);
+                updateAnalyticsData(allFetchedOrders);
+                loadStaffList();
             } catch(e) {}
         }
 
@@ -596,163 +614,4 @@
                 container.innerHTML += `
                     <div class="order-mini-card">
                         <div><h4 style="margin:0;">👤 ${o.fullName}</h4><p style="margin:0; font-size:11px;">📦 ${o.productName}</p></div>
-                        <div style="width:100px;"><button onclick="restoreOrder('${o.id}')" style="background:#10b981; padding:5px; font-size:11px; width:100%; margin-bottom:4px;">استعادة ♻️</button><button onclick="permanentDelete('${o.id}')" class="btn-danger" style="padding:5px; font-size:11px; width:100%;">حذف نهائي ❌</button></div>
-                    </div>
-                `;
-            });
-        }
-
-        window.promptDeleteOrder = function(id, currentStatus) {
-            pendingActionType = 'delete_order';
-            pendingActionId = id;
-            pendingOriginalStatus = currentStatus;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModal').style.display = 'flex';
-        }
-
-        window.confirmAdminAction = async function() {
-            let enteredPass = document.getElementById('admin-action-pass').value.trim();
-            let currentAdminPass = localStorage.getItem('dz_custom_admin_pass') || 'Djamel2003';
-            if(enteredPass !== currentAdminPass) { alert('كلمة المرور غير صحيحة!'); return; }
-            document.getElementById('passwordModal').style.display = 'none';
-
-            if(pendingActionType === 'delete_order') {
-                await updateDoc(doc(db, "orders", pendingActionId), { status: `مهملات | ${pendingOriginalStatus}`, trashTime: new Date().toISOString() });
-                loadAllOrders();
-            } else if(pendingActionType === 'delete_product') {
-                await updateDoc(doc(db, "products", pendingActionId), { status: 'مهملات', trashTime: new Date().toISOString() });
-                loadProducts();
-            }
-        }
-
-        window.restoreOrder = async function(id) {
-            let o = ordersCache[id];
-            if(!o) return;
-            let originalStatus = o.status.split('|')[1]?.trim() || 'جديد ⏳';
-            await updateDoc(doc(db, "orders", id), { status: originalStatus, trashTime: null });
-            loadAllOrders();
-        }
-
-        window.permanentDelete = async function(id) {
-            await deleteDoc(doc(db, "orders", id));
-            loadAllOrders();
-        }
-
-        window.openOrderModal = function(id) {
-            const o = ordersCache[id];
-            if(!o) return;
-            document.getElementById('orderDetailsContent').innerHTML = `<b>👤 الزبون:</b> ${o.fullName}<br><b>📞 الهاتف:</b> ${o.phone}<br><b>📦 الطلب:</b> ${o.productName}<br><b>💰 المجموع:</b> ${o.finalTotal} دج`;
-            document.getElementById('orderModal').style.display = 'flex';
-        }
-        window.closeOrderModal = function() { document.getElementById('orderModal').style.display = 'none'; }
-
-        window.addProduct = async function() {
-            let name = document.getElementById('prod-name').value.trim();
-            let category = document.getElementById('prod-category').value;
-            let colors = document.getElementById('prod-colors').value.trim();
-            let sizes = document.getElementById('prod-sizes').value.trim();
-            let buyPrice = Number(document.getElementById('prod-buy-price').value) || 0;
-            let price = Number(document.getElementById('prod-price').value) || 0;
-            let stock = Number(document.getElementById('prod-stock').value) || 10;
-            let description = document.getElementById('prod-desc').value.trim();
-            
-            let videoUrls = [];
-            document.querySelectorAll('.prod-video-input').forEach(input => {
-                if(input.value.trim()) videoUrls.push(input.value.trim());
-            });
-
-            if(!name || !price) { showAlert('تنبيه', 'أدخل اسم المنتج وسعر البيع!'); return; }
-
-            await addDoc(collection(db, "products"), {
-                name, category, colors, sizes, buyPrice, price, stock, description, videoUrls, createdAt: new Date()
-            });
-            showAlert('نجاح', 'تم نشر المنتج بنجاح مع الفيديوهات والمواصفات!');
-            loadProducts();
-            loadProductsMap();
-        }
-
-        async function loadProductsMap() {
-            try {
-                const snap = await getDocs(collection(db, "products"));
-                productsMap = {}; productsFullCache = {};
-                snap.forEach(d => {
-                    const p = d.data();
-                    productsFullCache[d.id] = p;
-                    productsMap[p.name] = { id: d.id, buyPrice: p.buyPrice || 0, stock: p.stock !== undefined ? p.stock : 10 };
-                });
-            } catch(e) {}
-        }
-
-        async function loadProducts() {
-            const list = document.getElementById('products-list');
-            const snap = await getDocs(collection(db, "products"));
-            list.innerHTML = '';
-            snap.forEach(d => {
-                const p = d.data();
-                if(p.status === 'مهملات') return;
-                list.innerHTML += `
-                    <div style="background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                        <span><b>${p.name}</b> (${p.category || 'عام'}) - السعر: ${p.price} دج | 📦 المخزون: <b>${p.stock}</b></span>
-                        <div style="display:flex; gap:6px;">
-                            <button onclick="openEditProductModal('${d.id}')" class="btn-warning" style="padding:4px 10px; font-size:12px;">تعديل ✏️</button>
-                            <button onclick="promptDeleteProduct('${d.id}')" class="btn-danger" style="padding:4px 10px; font-size:12px;">حذف 🗑️</button>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        window.openEditProductModal = function(id) {
-            let p = productsFullCache[id];
-            if(!p) return;
-            document.getElementById('edit-prod-id').value = id;
-            document.getElementById('edit-prod-name').value = p.name || '';
-            document.getElementById('edit-prod-category').value = p.category || 'ميكب العناية والتجميل';
-            document.getElementById('edit-prod-colors').value = p.colors || '';
-            document.getElementById('edit-prod-sizes').value = p.sizes || '';
-            document.getElementById('edit-prod-buy-price').value = p.buyPrice || 0;
-            document.getElementById('edit-prod-price').value = p.price || 0;
-            document.getElementById('edit-prod-stock').value = p.stock !== undefined ? p.stock : 10;
-            document.getElementById('editProductModal').style.display = 'flex';
-        }
-
-        window.saveProductEdits = async function() {
-            let id = document.getElementById('edit-prod-id').value;
-            let name = document.getElementById('edit-prod-name').value.trim();
-            let category = document.getElementById('edit-prod-category').value;
-            let colors = document.getElementById('edit-prod-colors').value.trim();
-            let sizes = document.getElementById('edit-prod-sizes').value.trim();
-            let buyPrice = Number(document.getElementById('edit-prod-buy-price').value) || 0;
-            let price = Number(document.getElementById('edit-prod-price').value) || 0;
-            let stock = Number(document.getElementById('edit-prod-stock').value) || 0;
-
-            await updateDoc(doc(db, "products", id), { name, category, colors, sizes, buyPrice, price, stock });
-            document.getElementById('editProductModal').style.display = 'none';
-            showAlert('نجاح', 'تم تحديث المنتج بنجاح 💾!');
-            loadProducts();
-            loadProductsMap();
-        }
-
-        window.promptDeleteProduct = function(id) {
-            pendingActionType = 'delete_product';
-            pendingActionId = id;
-            document.getElementById('admin-action-pass').value = '';
-            document.getElementById('passwordModal').style.display = 'flex';
-        }
-
-        window.updateAdminSettings = function() {
-            let u = document.getElementById('setting-admin-user').value.trim();
-            let p = document.getElementById('setting-admin-pass').value.trim();
-            let wa = document.getElementById('setting-whatsapp-num').value.trim();
-            if(!u || !p || !wa) { alert('أدخل الحقول كاملة!'); return; }
-            localStorage.setItem('dz_custom_admin_user', u);
-            localStorage.setItem('dz_custom_admin_pass', p);
-            localStorage.setItem('dz_whatsapp_support', wa);
-            showAlert('نجاح', 'تم تحديث الإعدادات بنجاح 💾!');
-        }
-
-        window.loadAllReviewsForAdmin = function() {}
-        window.loadStaffList = function() {}
-    </script>
-</body>
-</html>
+                        <div
